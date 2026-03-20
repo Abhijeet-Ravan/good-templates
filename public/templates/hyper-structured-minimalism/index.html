@@ -78,7 +78,7 @@
         font-weight: 700;
         font-variant-numeric: tabular-nums;
         letter-spacing: -0.02em;
-        font-size: clamp(2.5rem, 5vw, 7rem);
+        font-size: clamp(2rem, 4vw, 4.25rem);
       }
 
       .type-metric-label {
@@ -187,7 +187,7 @@
       /* METRIC GRID */
       .metric-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
         gap: 24px;
         margin-top: 32px;
       }
@@ -201,6 +201,71 @@
 
       .metric-tile:hover {
         border-top-color: rgb(var(--accent));
+      }
+
+      /* TOPOLOGY MAP SYSTEM */
+      .topology-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 0;
+        border: 1px solid rgb(var(--border));
+        margin-top: 32px;
+      }
+
+      .topology-node {
+        padding: 40px 32px;
+        border-right: 1px solid rgb(var(--border));
+        border-bottom: 1px solid rgb(var(--border));
+        position: relative;
+        min-height: 200px;
+        background-color: rgb(var(--surface));
+        transition: all 200ms cubic-bezier(0.77, 0, 0.18, 1);
+      }
+
+      .topology-node:hover {
+        background-color: rgba(var(--accent-light), 0.3);
+        border-top: 2px solid rgb(var(--accent));
+        padding-top: 39px;
+      }
+
+      @media (min-width: 1024px) {
+        .topology-node:nth-child(4n) {
+          border-right: none;
+        }
+      }
+
+      .node-index {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.7rem;
+        color: rgb(var(--accent));
+        margin-bottom: 24px;
+        display: block;
+      }
+
+      .node-title {
+        font-weight: 700;
+        font-size: 1.125rem;
+        line-height: 1.2;
+        margin-bottom: 12px;
+        letter-spacing: -0.01em;
+      }
+
+      .node-desc {
+        font-size: 0.875rem;
+        color: rgba(var(--ink), 0.6);
+        max-width: 240px;
+      }
+
+      .node-spec {
+        position: absolute;
+        bottom: 24px;
+        right: 24px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.625rem;
+        text-transform: uppercase;
+        color: rgba(var(--ink), 0.4);
+        letter-spacing: 0.12em;
+        text-align: right;
       }
 
       /* ANCHOR SECTION */
@@ -490,46 +555,54 @@
 
     <div class="section-rule anim-rule"></div>
 
-    <!-- SECTION 4: MECHANISM BREAKDOWN -->
+    <!-- SECTION 4: MECHANISM BREAKDOWN (Topology Map) -->
     <section class="section">
-      <div class="type-section anim-ready">Data Pipeline</div>
-      <div class="table-container">
-        <table class="anim-ready">
-          <thead>
-            <tr>
-              <th class="type-table-head">step</th>
-              <th class="type-table-head">action</th>
-              <th class="type-table-head">output</th>
-              <th class="type-table-head">spec</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="stagger-child">
-              <td class="type-table-data">1</td>
-              <td class="type-table-data">Incremental ingestion</td>
-              <td class="type-table-data">Raw event stream</td>
-              <td class="type-table-data">4.2 TB/day</td>
-            </tr>
-            <tr class="stagger-child">
-              <td class="type-table-data">2</td>
-              <td class="type-table-data">Schema validation</td>
-              <td class="type-table-data">Typed records</td>
-              <td class="type-table-data">99.999% accuracy</td>
-            </tr>
-            <tr class="stagger-child">
-              <td class="type-table-data">3</td>
-              <td class="type-table-data">Cross-source reconciliation</td>
-              <td class="type-table-data">Unified ledger</td>
-              <td class="type-table-data">12ms latency</td>
-            </tr>
-            <tr class="stagger-child">
-              <td class="type-table-data">4</td>
-              <td class="type-table-data">Metric materialization</td>
-              <td class="type-table-data">Queryable metrics</td>
-              <td class="type-table-data">62s freshness</td>
-            </tr>
-          </tbody>
-        </table>
+      <div class="type-section anim-ready">Data Pipeline Topology</div>
+      <div class="topology-grid container">
+        <div class="topology-node anim-col-in">
+          <span class="node-index">SYS_ENTRY_01</span>
+          <h3 class="node-title">Incremental Ingestion</h3>
+          <p class="node-desc">
+            Stateless event streaming with zero-buffer, multi-region ingestion.
+          </p>
+          <div class="node-spec">
+            LOAD: 4.2 TB/DAY<br />
+            P99: 12MS
+          </div>
+        </div>
+        <div class="topology-node anim-col-in" style="transition-delay: 100ms">
+          <span class="node-index">SYS_VAL_02</span>
+          <h3 class="node-title">Schema Validation</h3>
+          <p class="node-desc">
+            Microsecond record typing against immutable data contracts.
+          </p>
+          <div class="node-spec">
+            ACCURACY: 99.999%<br />
+            MODE: STRICT
+          </div>
+        </div>
+        <div class="topology-node anim-col-in" style="transition-delay: 200ms">
+          <span class="node-index">SYS_RECON_03</span>
+          <h3 class="node-title">Ledger Reconciliation</h3>
+          <p class="node-desc">
+            Cross-source referencing with automated conflict resolution.
+          </p>
+          <div class="node-spec">
+            LATENCY: 14MS<br />
+            COVERAGE: GLOBAL
+          </div>
+        </div>
+        <div class="topology-node anim-col-in" style="transition-delay: 300ms">
+          <span class="node-index">SYS_OUTPUT_04</span>
+          <h3 class="node-title">Metric Materialization</h3>
+          <p class="node-desc">
+            State delivery via high-concurrency optimized query engine.
+          </p>
+          <div class="node-spec">
+            FRESHNESS: 62S<br />
+            QUERY_P95: 8MS
+          </div>
+        </div>
       </div>
     </section>
 
@@ -1133,16 +1206,8 @@
         { id: "anchor-metric", value: 1247, format: "number" },
       ];
 
-      // Layer 3: Parallax for report header bar (desktop only)
-      let parallaxActive = true;
-      if (window.innerWidth > 768) {
-        window.addEventListener("scroll", () => {
-          if (!parallaxActive) return;
-          const scrollY = window.scrollY;
-          document.querySelector(".report-header-bar").style.transform =
-            `translateY(${scrollY * 0.05}px)`;
-        });
-      }
+      // Layer 3: Report header bar (Fixed Position Logic)
+      // Drift script removed to prevent viewport obstruction.
 
       // Layer 1 & 2: Scroll-triggered animations
       const observer = new IntersectionObserver(
@@ -1169,19 +1234,24 @@
         { threshold: 0.1 },
       );
 
-      // Setup observers
-      document.querySelectorAll(".anim-ready").forEach((el) => {
-        // Assign animation type based on section position
-        const sectionIndex = Array.from(
-          document.querySelectorAll("section"),
-        ).indexOf(el.closest("section"));
-        if (sectionIndex !== -1) {
-          if (sectionIndex % 3 === 0) {
-            el.classList.add("anim-ready");
-          } else if (sectionIndex % 3 === 1) {
-            el.classList.add("anim-row");
-          } else {
-            el.classList.add("anim-col-in");
+      // Setup observers for all animatable elements
+      document.querySelectorAll(".anim-ready, .anim-row, .anim-col-in").forEach((el) => {
+        // Only apply automatic fallback animation classes if the element doesn't have a specific direction yet
+        const hasExplicitAnim = el.classList.contains("anim-row") || el.classList.contains("anim-col-in");
+        
+        if (!hasExplicitAnim) {
+          const sectionIndex = Array.from(
+            document.querySelectorAll("section"),
+          ).indexOf(el.closest("section"));
+          
+          if (sectionIndex !== -1) {
+            if (sectionIndex % 3 === 0) {
+              el.classList.add("anim-ready");
+            } else if (sectionIndex % 3 === 1) {
+              el.classList.add("anim-row");
+            } else {
+              el.classList.add("anim-col-in");
+            }
           }
         }
         observer.observe(el);
