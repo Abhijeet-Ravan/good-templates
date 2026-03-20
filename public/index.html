@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Minimal Template Browser</title>
+  <meta name="description" content="A clean, serverless browser for exploring HTML and Markdown templates.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Template Browser</h1>
+    <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.25rem;">Explore, open, and copy your high-performance templates.</p>
+  </header>
+
+  <main>
+    <div id="templateGrid" class="template-grid">
+      <!-- Templates will be rendered here dynamically -->
+      <p style="color: var(--text-secondary); padding: 2rem;">Loading templates...</p>
+    </div>
+  </main>
+
+  <div id="toast">Copied to clipboard!</div>
+
+  <!-- Note: This build is 100% Stateless & Vanilla -->
+  <script src="script.js"></script>
+</body>
+</html>

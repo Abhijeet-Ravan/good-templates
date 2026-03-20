@@ -1,0 +1,1080 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PRESSFORM | Industrial Type for Serious Work</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Unbounded:wght@200..900&family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap");
+
+      :root {
+        --c-yellow: #ffe500;
+        --c-green: #0ae448;
+        --c-pink: #ff2d78;
+        --c-lavender: #9d95ff;
+        --c-orange: #ff8709;
+        --c-lime: #abff84;
+        --c-cyan: #00bae2;
+        --c-ink: #0a0a0a;
+        --border: 4px solid var(--c-ink);
+        --border-thick: 6px solid var(--c-ink);
+        --font-display: "Unbounded", sans-serif;
+        --font-stamp: "Bebas Neue", sans-serif;
+        --font-mono: "Space Mono", monospace;
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        background: var(--c-ink);
+        color: var(--c-ink);
+        cursor: crosshair;
+        overflow-x: hidden;
+      }
+
+      /* CURSOR DOT */
+      .cursor-dot {
+        position: fixed;
+        width: 18px;
+        height: 18px;
+        border: 2px solid var(--c-ink);
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 9999;
+        transform: translate(-50%, -50%);
+        transition:
+          width 0.18s,
+          height 0.18s,
+          background 0.18s;
+        mix-blend-mode: multiply;
+      }
+      .cursor-dot--large {
+        width: 48px;
+        height: 48px;
+        background: rgba(255, 229, 0, 0.55);
+      }
+
+      /* SCROLL PROGRESS */
+      .scroll-progress {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 5px;
+        background: var(--c-pink);
+        z-index: 9998;
+        transform-origin: left;
+        transform: scaleX(0);
+        width: 100%;
+      }
+
+      /* NOISE TEXTURE */
+      section {
+        position: relative;
+      }
+      section::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        background-size: 160px 160px;
+        opacity: 0.26;
+        mix-blend-mode: color-dodge;
+        z-index: 2;
+      }
+
+      /* ─── HERO ─── */
+      .hero {
+        position: relative;
+        overflow: hidden;
+        background: var(--c-lavender);
+        border-bottom: var(--border-thick);
+        padding: clamp(80px, 14vw, 200px) clamp(24px, 6vw, 80px);
+        text-align: center;
+      }
+      .hero__kicker {
+        font-family: var(--font-mono);
+        font-size: clamp(10px, 1.2vw, 14px);
+        text-transform: uppercase;
+        letter-spacing: 0.2em;
+        margin-bottom: clamp(16px, 3vw, 32px);
+        position: relative;
+        z-index: 3;
+      }
+      .hero__title {
+        font-family: var(--font-display);
+        font-weight: 900;
+        font-size: clamp(56px, 11vw, 150px);
+        text-transform: uppercase;
+        line-height: 0.9;
+        letter-spacing: -0.04em;
+        position: relative;
+        z-index: 3;
+        margin-bottom: clamp(24px, 4vw, 56px);
+      }
+      .hero__title--stroke {
+        display: inline-block;
+        -webkit-text-stroke: 4px var(--c-ink);
+        color: transparent;
+      }
+      .hero__subtitle {
+        font-family: var(--font-mono);
+        font-size: clamp(13px, 1.4vw, 16px);
+        line-height: 1.7;
+        max-width: 620px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 3;
+      }
+      .hero__ghost {
+        position: absolute;
+        font-family: var(--font-stamp);
+        font-size: clamp(140px, 26vw, 360px);
+        color: transparent;
+        -webkit-text-stroke: 2px rgba(10, 10, 10, 0.1);
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        white-space: nowrap;
+        z-index: 1;
+      }
+
+      /* ─── PRINCIPLES ─── */
+      .principles {
+        position: relative;
+        overflow: hidden;
+        background: var(--c-lime);
+      }
+      .principles__header {
+        background: var(--c-pink);
+        border-bottom: var(--border-thick);
+        padding: clamp(40px, 7vw, 80px) clamp(24px, 6vw, 80px);
+        position: relative;
+        overflow: hidden;
+      }
+      .principles__header-title {
+        font-family: var(--font-display);
+        font-weight: 900;
+        font-size: clamp(48px, 9vw, 128px);
+        text-transform: uppercase;
+        line-height: 0.9;
+        letter-spacing: -0.03em;
+        position: relative;
+        z-index: 3;
+      }
+      .principles__header-title span:nth-child(2) {
+        -webkit-text-stroke: 4px var(--c-ink);
+        color: transparent;
+        display: block;
+      }
+      .principles__header-ghost {
+        position: absolute;
+        font-family: var(--font-stamp);
+        font-size: clamp(120px, 22vw, 300px);
+        color: transparent;
+        -webkit-text-stroke: 2px rgba(10, 10, 10, 0.1);
+        right: -2%;
+        top: 50%;
+        transform: translateY(-50%);
+        white-space: nowrap;
+        z-index: 1;
+      }
+      .principles__grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        align-items: stretch;
+      }
+      .card {
+        position: relative;
+        overflow: hidden;
+        border-right: var(--border-thick);
+        border-bottom: var(--border-thick);
+        padding: clamp(28px, 4vw, 56px) clamp(24px, 3.5vw, 48px);
+        min-height: clamp(340px, 40vh, 500px);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        cursor: crosshair;
+      }
+      .card:nth-child(3n) {
+        border-right: none;
+      }
+      .card--yellow {
+        background: var(--c-yellow);
+      }
+      .card--green {
+        background: var(--c-green);
+      }
+      .card--pink {
+        background: var(--c-pink);
+      }
+      .card--lavender {
+        background: var(--c-lavender);
+      }
+      .card--orange {
+        background: var(--c-orange);
+      }
+      .card--lime {
+        background: var(--c-lime);
+      }
+      .card--cyan {
+        background: var(--c-cyan);
+      }
+      .card__top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        position: relative;
+        z-index: 3;
+      }
+      .card__number {
+        font-family: var(--font-stamp);
+        font-size: clamp(13px, 1.4vw, 16px);
+        letter-spacing: 0.15em;
+        border: var(--border);
+        padding: 4px 10px;
+        background: var(--c-ink);
+        color: var(--c-yellow);
+      }
+      .card__icon {
+        font-size: clamp(20px, 2.5vw, 30px);
+        opacity: 0.5;
+      }
+      .card__body {
+        position: relative;
+        z-index: 3;
+      }
+      .card__title {
+        font-family: var(--font-display);
+        font-weight: 900;
+        font-size: clamp(24px, 3.2vw, 46px);
+        text-transform: uppercase;
+        line-height: 0.95;
+        letter-spacing: -0.02em;
+        margin-bottom: clamp(12px, 2vw, 22px);
+        min-height: 2.9em;
+      }
+      .card__title--stroke {
+        -webkit-text-stroke: 2px var(--c-ink);
+        color: transparent;
+      }
+      .card__desc {
+        font-size: clamp(12px, 1.2vw, 14px);
+        line-height: 1.75;
+        border-top: var(--border);
+        padding-top: 14px;
+        margin-top: 6px;
+      }
+      .card__tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 12px;
+      }
+      .card__tag {
+        display: inline-block;
+        font-size: clamp(9px, 0.9vw, 11px);
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        border: 2px solid var(--c-ink);
+        padding: 3px 8px;
+      }
+      .card__ghost {
+        position: absolute;
+        font-family: var(--font-stamp);
+        font-size: clamp(100px, 14vw, 180px);
+        color: transparent;
+        -webkit-text-stroke: 1.5px rgba(10, 10, 10, 0.07);
+        bottom: -8px;
+        right: -4px;
+        line-height: 1;
+        z-index: 1;
+      }
+
+      /* ─── BELIEFS ─── */
+      .beliefs {
+        position: relative;
+        overflow: hidden;
+        background: var(--c-lime);
+        border-bottom: var(--border-thick);
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+      .beliefs__left {
+        border-right: var(--border-thick);
+        padding: clamp(32px, 5vw, 72px) clamp(24px, 5vw, 72px);
+        position: relative;
+        z-index: 3;
+      }
+      .beliefs__right {
+        padding: clamp(40px, 7vw, 100px) clamp(24px, 5vw, 72px);
+        position: relative;
+        z-index: 3;
+        display: flex;
+        flex-direction: column;
+        gap: clamp(16px, 2.5vw, 28px);
+      }
+      .beliefs__title {
+        font-family: var(--font-display);
+        font-weight: 900;
+        font-size: clamp(36px, 5.5vw, 80px);
+        text-transform: uppercase;
+        line-height: 1;
+        letter-spacing: -0.03em;
+        margin-bottom: clamp(24px, 4vw, 48px);
+      }
+      .beliefs__list {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+      .beliefs__list li {
+        font-size: clamp(12px, 1.3vw, 15px);
+        line-height: 1.65;
+        border-bottom: 2px solid rgba(10, 10, 10, 0.18);
+        padding-bottom: 14px;
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+      }
+      .beliefs__list li::before {
+        content: attr(data-sym);
+        flex-shrink: 0;
+        margin-top: 2px;
+      }
+      .beliefs__box {
+        border: var(--border-thick);
+        padding: clamp(18px, 2.5vw, 32px);
+        background: var(--c-yellow);
+        color: var(--c-ink);
+        font-family: var(--font-mono);
+        font-size: clamp(12px, 1.3vw, 14px);
+        line-height: 1.75;
+      }
+      .beliefs__box--pink {
+        background: var(--c-pink);
+      }
+      .beliefs__box strong {
+        font-family: var(--font-stamp);
+        font-size: clamp(14px, 1.4vw, 17px);
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        display: block;
+        margin-bottom: 10px;
+      }
+
+      /* ─── CTA ─── */
+      .cta {
+        position: relative;
+        overflow: hidden;
+        background: var(--c-orange);
+        border-bottom: var(--border-thick);
+        padding: clamp(60px, 12vw, 160px) clamp(24px, 6vw, 80px);
+        text-align: center;
+      }
+      .cta__kicker {
+        font-family: var(--font-mono);
+        font-size: clamp(10px, 1.2vw, 14px);
+        text-transform: uppercase;
+        letter-spacing: 0.2em;
+        margin-bottom: clamp(16px, 3vw, 32px);
+        position: relative;
+        z-index: 3;
+      }
+      .cta__title {
+        font-family: var(--font-display);
+        font-weight: 900;
+        font-size: clamp(56px, 11vw, 150px);
+        text-transform: uppercase;
+        line-height: 0.9;
+        letter-spacing: -0.04em;
+        position: relative;
+        z-index: 3;
+        margin-bottom: clamp(24px, 4vw, 56px);
+      }
+      .cta__title span {
+        display: block;
+        -webkit-text-stroke: 4px var(--c-ink);
+        color: transparent;
+      }
+      .cta__btn {
+        display: inline-block;
+        font-family: var(--font-display);
+        font-weight: 900;
+        font-size: clamp(14px, 2vw, 22px);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        border: var(--border-thick);
+        padding: clamp(14px, 2vw, 22px) clamp(32px, 5vw, 72px);
+        background: var(--c-ink);
+        color: var(--c-orange);
+        text-decoration: none;
+        cursor: crosshair;
+        position: relative;
+        z-index: 3;
+        transition:
+          background 0.15s,
+          color 0.15s;
+      }
+      .cta__btn:hover {
+        background: var(--c-yellow);
+        color: var(--c-ink);
+      }
+      .cta__ghost {
+        position: absolute;
+        font-family: var(--font-stamp);
+        font-size: clamp(140px, 26vw, 360px);
+        color: transparent;
+        -webkit-text-stroke: 2px rgba(10, 10, 10, 0.1);
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        white-space: nowrap;
+        z-index: 1;
+      }
+
+      /* ─── FOOTER ─── */
+      footer.footer {
+        background: var(--c-pink);
+        color: var(--c-ink);
+        padding: clamp(32px, 5vw, 64px) clamp(24px, 6vw, 80px);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 20px;
+        border-top: var(--border-thick);
+      }
+      .footer__logo {
+        font-family: var(--font-display);
+        font-weight: 900;
+        font-size: clamp(18px, 3vw, 36px);
+        text-transform: uppercase;
+        letter-spacing: -0.02em;
+        line-height: 1.1;
+      }
+      .footer__logo span {
+        -webkit-text-stroke: 2px var(--c-ink);
+        color: transparent;
+      }
+      .footer__symbols {
+        font-size: clamp(18px, 2.8vw, 32px);
+        letter-spacing: 0.3em;
+      }
+
+      /* ─── MOBILE ─── */
+      @media (max-width: 900px) {
+        .beliefs {
+          grid-template-columns: 1fr;
+        }
+        .beliefs__left {
+          border-right: none;
+          border-bottom: var(--border-thick);
+        }
+      }
+      @media (max-width: 768px) {
+        .principles__grid {
+          grid-template-columns: 1fr 1fr;
+        }
+        .card:nth-child(3n) {
+          border-right: var(--border-thick);
+        }
+        .card:nth-child(2n) {
+          border-right: none;
+        }
+      }
+      @media (max-width: 480px) {
+        .principles__grid {
+          grid-template-columns: 1fr;
+        }
+        .card:nth-child(n) {
+          border-right: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="cursor-dot" id="cursorDot"></div>
+    <div class="scroll-progress" id="scrollProgress"></div>
+
+    <!-- ─── HERO ─── -->
+    <section class="hero">
+      <div class="hero__ghost" aria-hidden="true">TYPEFACE</div>
+      <p class="hero__kicker" id="heroKicker">
+        ★ Industrial Type Foundry — Est. 2019
+      </p>
+      <h1 class="hero__title" id="heroTitle">
+        Type built<br />
+        <span class="hero__title--stroke">for structure</span><br />
+        not beauty.
+      </h1>
+      <p class="hero__subtitle">
+        PRESSFORM makes display typefaces for people who think in grids. No
+        decorative surplus. Every glyph is load-bearing.
+      </p>
+    </section>
+
+    <!-- ─── PRINCIPLES GRID ─── -->
+    <section class="principles">
+      <div class="principles__header">
+        <div class="principles__header-ghost" aria-hidden="true">FOUNDRY</div>
+        <h2 class="principles__header-title" id="headerTitle">
+          <span>The</span>
+          <span>Principles</span>
+        </h2>
+      </div>
+      <div class="principles__grid">
+        <!-- Card 1 — yellow -->
+        <article class="card card--yellow">
+          <div class="card__ghost" aria-hidden="true">01</div>
+          <div class="card__top">
+            <span class="card__number">P—01</span>
+            <span class="card__icon">★</span>
+          </div>
+          <div class="card__body">
+            <h3 class="card__title">Type<br />as<br />Structure</h3>
+            <p class="card__desc">
+              A typeface is not decoration. It's architecture. Every stem width,
+              every aperture, every axis decision carries structural load.
+              Design accordingly.
+            </p>
+            <div class="card__tags">
+              <span class="card__tag">Form</span>
+              <span class="card__tag">Function</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Card 2 — cyan, STROKE -->
+        <article class="card card--cyan">
+          <div class="card__ghost" aria-hidden="true">02</div>
+          <div class="card__top">
+            <span class="card__number">P—02</span>
+            <span class="card__icon">∞</span>
+          </div>
+          <div class="card__body">
+            <h3 class="card__title card__title--stroke">
+              No<br />Optical<br />Lies
+            </h3>
+            <p class="card__desc">
+              We don't round corners to "feel" better. We don't add ink traps
+              for nostalgia. Corrections must earn their place with measurable
+              output improvement.
+            </p>
+            <div class="card__tags">
+              <span class="card__tag">Honesty</span>
+              <span class="card__tag">Precision</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Card 3 — pink -->
+        <article class="card card--pink">
+          <div class="card__ghost" aria-hidden="true">03</div>
+          <div class="card__top">
+            <span class="card__number">P—03</span>
+            <span class="card__icon">◉</span>
+          </div>
+          <div class="card__body">
+            <h3 class="card__title">Variable<br />by<br />Default</h3>
+            <p class="card__desc">
+              Static weights are relics. Every PRESSFORM family ships with
+              variable axes. Weight, width, optical size — all continuous. Lock
+              in what you need, iterate on the rest.
+            </p>
+            <div class="card__tags">
+              <span class="card__tag">Variable</span>
+              <span class="card__tag">Axes</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Card 4 — lavender -->
+        <article class="card card--lavender">
+          <div class="card__ghost" aria-hidden="true">04</div>
+          <div class="card__top">
+            <span class="card__number">P—04</span>
+            <span class="card__icon">✦</span>
+          </div>
+          <div class="card__body">
+            <h3 class="card__title">Specimen<br />is<br />Manual</h3>
+            <p class="card__desc">
+              Every family ships with a 12-page process specimen. Not marketing
+              — methodology. You'll know exactly why each decision was made
+              before you license anything.
+            </p>
+            <div class="card__tags">
+              <span class="card__tag">Process</span>
+              <span class="card__tag">Transparency</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Card 5 — lime, STROKE -->
+        <article class="card card--lime">
+          <div class="card__ghost" aria-hidden="true">05</div>
+          <div class="card__top">
+            <span class="card__number">P—05</span>
+            <span class="card__icon">★</span>
+          </div>
+          <div class="card__body">
+            <h3 class="card__title card__title--stroke">
+              Display<br />First<br />Always
+            </h3>
+            <p class="card__desc">
+              We make display type. We don't make body text families. If you
+              need 9pt text rendering for a legal document, look elsewhere. We
+              make things that hit from across the room.
+            </p>
+            <div class="card__tags">
+              <span class="card__tag">Scale</span>
+              <span class="card__tag">Impact</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Card 6 — orange -->
+        <article class="card card--orange">
+          <div class="card__ghost" aria-hidden="true">06</div>
+          <div class="card__top">
+            <span class="card__number">P—06</span>
+            <span class="card__icon">∞</span>
+          </div>
+          <div class="card__body">
+            <h3 class="card__title">Price<br />by<br />Use</h3>
+            <p class="card__desc">
+              Desktop, web, app, broadcast, signage — each license is priced for
+              its context. No blanket universal licenses that subsidize the
+              wrong buyers. Pay for what you actually use.
+            </p>
+            <div class="card__tags">
+              <span class="card__tag">Licensing</span>
+              <span class="card__tag">Clarity</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Card 7 — green -->
+        <article class="card card--green">
+          <div class="card__ghost" aria-hidden="true">07</div>
+          <div class="card__top">
+            <span class="card__number">P—07</span>
+            <span class="card__icon">◉</span>
+          </div>
+          <div class="card__body">
+            <h3 class="card__title">No<br />Retail<br />Polish</h3>
+            <p class="card__desc">
+              Our typefaces look industrial because they are. Deliberately raw
+              at the macro level, obsessively precise at the micro. The
+              roughness is a decision, not a deficiency.
+            </p>
+            <div class="card__tags">
+              <span class="card__tag">Craft</span>
+              <span class="card__tag">Intention</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Card 8 — yellow -->
+        <article class="card card--yellow">
+          <div class="card__ghost" aria-hidden="true">08</div>
+          <div class="card__top">
+            <span class="card__number">P—08</span>
+            <span class="card__icon">✦</span>
+          </div>
+          <div class="card__body">
+            <h3 class="card__title">Glyph<br />Count<br />Matters</h3>
+            <p class="card__desc">
+              We ship complete character sets. Latin Extended, OpenType
+              features, stylistic alternates, tabular figures. You won't hit a
+              wall three months into a project.
+            </p>
+            <div class="card__tags">
+              <span class="card__tag">Complete</span>
+              <span class="card__tag">Coverage</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Card 9 — pink -->
+        <article class="card card--pink">
+          <div class="card__ghost" aria-hidden="true">09</div>
+          <div class="card__top">
+            <span class="card__number">P—09</span>
+            <span class="card__icon">★</span>
+          </div>
+          <div class="card__body">
+            <h3 class="card__title">Context<br />Kills<br />Trends</h3>
+            <p class="card__desc">
+              We don't make typefaces that look good on Behance in 2024. We make
+              typefaces that hold up on 40-foot environmental installations and
+              10-year packaging systems.
+            </p>
+            <div class="card__tags">
+              <span class="card__tag">Longevity</span>
+              <span class="card__tag">Context</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Card 10 — cyan, STROKE -->
+        <article class="card card--cyan">
+          <div class="card__ghost" aria-hidden="true">10</div>
+          <div class="card__top">
+            <span class="card__number">P—10</span>
+            <span class="card__icon">∞</span>
+          </div>
+          <div class="card__body">
+            <h3 class="card__title card__title--stroke">
+              No<br />Free<br />Trials
+            </h3>
+            <p class="card__desc">
+              If you need to trial a typeface to know if it fits your project,
+              you need to spend more time reading the specimen. We give you
+              everything you need to decide — before you buy.
+            </p>
+            <div class="card__tags">
+              <span class="card__tag">Conviction</span>
+              <span class="card__tag">Clarity</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Card 11 — lavender -->
+        <article class="card card--lavender">
+          <div class="card__ghost" aria-hidden="true">11</div>
+          <div class="card__top">
+            <span class="card__number">P—11</span>
+            <span class="card__icon">◉</span>
+          </div>
+          <div class="card__body">
+            <h3 class="card__title">Spacing<br />is<br />Thinking</h3>
+            <p class="card__desc">
+              Kerning tables are where intellectual work becomes invisible. We
+              spend more time on spacing than drawing. Because spacing is what
+              separates type from lettering.
+            </p>
+            <div class="card__tags">
+              <span class="card__tag">Kerning</span>
+              <span class="card__tag">Rhythm</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Card 12 — orange -->
+        <article class="card card--orange">
+          <div class="card__ghost" aria-hidden="true">12</div>
+          <div class="card__top">
+            <span class="card__number">P—12</span>
+            <span class="card__icon">✦</span>
+          </div>
+          <div class="card__body">
+            <h3 class="card__title">Ship<br />When<br />Done</h3>
+            <p class="card__desc">
+              We don't announce families until they're complete. No pre-orders,
+              no waitlists, no countdown timers. When PRESSFORM drops a family,
+              it's finished. All axes. All glyphs. All specimens.
+            </p>
+            <div class="card__tags">
+              <span class="card__tag">Shipping</span>
+              <span class="card__tag">Complete</span>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ─── BELIEFS ─── -->
+    <section class="beliefs">
+      <div class="beliefs__left">
+        <h2 class="beliefs__title" id="beliefsTitle">
+          What we<br />actually<br />believe<br />about type.
+        </h2>
+        <ul class="beliefs__list">
+          <li data-sym="★">
+            Type is infrastructure. It outlives every brand refresh and every
+            art director who commissioned it.
+          </li>
+          <li data-sym="∞">
+            Trends in type are a tax on the designer who doesn't know history.
+            We refuse to pay it.
+          </li>
+          <li data-sym="◉">
+            Industrial aesthetics aren't a reaction to modernism. They're a
+            return to type's mechanical origin.
+          </li>
+          <li data-sym="✦">
+            The best typeface for a project is often the most structurally
+            honest one, not the most decorative.
+          </li>
+          <li data-sym="★">
+            Variable fonts aren't a feature. They're the correct format for type
+            in 2024 and beyond.
+          </li>
+        </ul>
+      </div>
+      <div class="beliefs__right">
+        <div class="beliefs__box" id="beliefsBox1">
+          <strong>◉ Who We're For</strong>
+          Art directors running brand systems at scale. Environmental graphic
+          designers working with fabricators. Packaging designers who need type
+          that reads at 2mm and 2 metres. Editorial designers who understand
+          that hierarchy isn't achieved with colour — it's achieved with weight,
+          width, and whitespace.
+        </div>
+        <div class="beliefs__box beliefs__box--pink" id="beliefsBox2">
+          <strong>✦ We Are Not For You If</strong>
+          → You need a soft-logo wordmark typeface<br />
+          → You want something that "feels friendly and approachable"<br />
+          → You're comparing us to free Google Fonts alternatives<br />
+          → You want a trial before you read the specimen<br />
+          → You're designing a wedding invitation
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── CTA ─── -->
+    <section class="cta">
+      <div class="cta__ghost" aria-hidden="true">LICENSE</div>
+      <p class="cta__kicker" id="ctaKicker">
+        ★ Currently Available — 4 Active Families
+      </p>
+      <h2 class="cta__title" id="ctaTitle">
+        Stop borrowing<br /><span>other people's</span><br />voice.
+      </h2>
+      <a href="#" target="_blank" class="cta__btn" id="ctaBtn"
+        >Browse the Catalog ✦</a
+      >
+    </section>
+
+    <!-- ─── FOOTER ─── -->
+    <footer class="footer">
+      <div class="footer__logo">
+        PRESSFORM<br /><span>Industrial Type Foundry</span>
+      </div>
+      <div class="footer__symbols" id="footerSymbols">★ ∞ ◉ ✦</div>
+    </footer>
+
+    <!-- GSAP -->
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/SplitText.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/CustomEase.min.js"></script>
+
+    <script>
+      gsap.registerPlugin(ScrollTrigger, SplitText, CustomEase);
+      CustomEase.create(
+        "brutalist",
+        "M0,0 C0.05,0 0.1,1 0.35,1 0.6,1 0.8,1 1,1",
+      );
+
+      // ─── CURSOR ───
+      const dot = document.getElementById("cursorDot");
+      document.addEventListener("mousemove", (e) => {
+        gsap.to(dot, {
+          x: e.clientX,
+          y: e.clientY,
+          duration: 0.1,
+          ease: "power2.out",
+        });
+      });
+      document.querySelectorAll("a, .cta__btn").forEach((el) => {
+        el.addEventListener("mouseenter", () =>
+          dot.classList.add("cursor-dot--large"),
+        );
+        el.addEventListener("mouseleave", () =>
+          dot.classList.remove("cursor-dot--large"),
+        );
+      });
+
+      // ─── SCROLL PROGRESS ───
+      gsap.to("#scrollProgress", {
+        scaleX: 1,
+        ease: "none",
+        scrollTrigger: {
+          trigger: document.body,
+          start: "top top",
+          end: "bottom bottom",
+          scrub: true,
+        },
+      });
+
+      // ─── HERO GHOST PARALLAX ───
+      gsap.to(".hero__ghost", {
+        rotation: 8,
+        scale: 1.08,
+        ease: "none",
+        scrollTrigger: {
+          trigger: ".hero",
+          start: "top bottom",
+          end: "bottom top",
+          scrub: 2,
+        },
+      });
+
+      // ─── HERO TITLE SPLITTEXT ───
+      document.fonts.ready.then(() => {
+        gsap.set("#heroTitle", { opacity: 0 });
+        new IntersectionObserver(
+          ([entry]) => {
+            if (!entry.isIntersecting) return;
+            gsap.set("#heroTitle", { opacity: 1 });
+            SplitText.create("#heroTitle", {
+              type: "chars",
+              autoSplit: true,
+              onSplit(self) {
+                return gsap.from(self.chars, {
+                  opacity: 0,
+                  scale: 0.3,
+                  stagger: { each: 0.035, from: "center" },
+                  duration: 0.6,
+                  ease: "back.out(2.5)",
+                });
+              },
+            });
+          },
+          { threshold: 0.2 },
+        ).observe(document.querySelector("#heroTitle"));
+      });
+
+      // ─── CARDS ───
+      const cards = gsap.utils.toArray(".card");
+      cards.forEach((card) =>
+        gsap.set(card, { opacity: 0, y: 36, scale: 0.96 }),
+      );
+
+      const cardIO = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            const card = entry.target;
+            const i = cards.indexOf(card);
+            gsap.to(card, {
+              opacity: 1,
+              y: 0,
+              scale: 1,
+              duration: 0.65,
+              ease: "power2.out",
+              delay: (i % 3) * 0.1,
+            });
+            cardIO.unobserve(card);
+          });
+        },
+        { threshold: 0.1 },
+      );
+      cards.forEach((card) => cardIO.observe(card));
+
+      // ─── CARD TILT ───
+      cards.forEach((card) => {
+        const setX = gsap.quickTo(card, "rotationY", {
+          duration: 0.45,
+          ease: "power1.out",
+        });
+        const setY = gsap.quickTo(card, "rotationX", {
+          duration: 0.45,
+          ease: "power1.out",
+        });
+        card.addEventListener("mousemove", (e) => {
+          const r = card.getBoundingClientRect();
+          setX(((e.clientX - r.left) / r.width - 0.5) * 7);
+          setY(((e.clientY - r.top) / r.height - 0.5) * -7);
+        });
+        card.addEventListener("mouseleave", () => {
+          setX(0);
+          setY(0);
+        });
+      });
+
+      // ─── REVEAL HELPER ───
+      function reveal(selector, fromVars, toVars, threshold) {
+        threshold = threshold || 0.15;
+        const els =
+          typeof selector === "string"
+            ? document.querySelectorAll(selector)
+            : [selector];
+        els.forEach((el) => {
+          gsap.set(el, { opacity: 0 });
+          new IntersectionObserver(
+            ([entry]) => {
+              if (!entry.isIntersecting) return;
+              gsap.fromTo(
+                el,
+                { opacity: 0, ...fromVars },
+                { opacity: 1, duration: 0.85, ease: "power3.out", ...toVars },
+              );
+            },
+            { threshold },
+          ).observe(el);
+        });
+      }
+
+      reveal("#beliefsTitle", { x: -60 }, { x: 0 });
+      reveal("#beliefsBox1", { y: 40 }, { y: 0, duration: 0.7 });
+      reveal("#beliefsBox2", { y: 40 }, { y: 0, duration: 0.7, delay: 0.15 });
+
+      // ─── CTA GHOST PARALLAX ───
+      gsap.to(".cta__ghost", {
+        rotation: 8,
+        scale: 1.08,
+        ease: "none",
+        scrollTrigger: {
+          trigger: ".cta",
+          start: "top bottom",
+          end: "bottom top",
+          scrub: 2,
+        },
+      });
+
+      reveal("#ctaKicker", { y: 30 }, { y: 0, duration: 0.7 });
+      reveal(
+        "#ctaBtn",
+        { scale: 0.8 },
+        { scale: 1, duration: 0.75, ease: "elastic.out(1,0.6)" },
+        0.5,
+      );
+
+      document.fonts.ready.then(() => {
+        gsap.set("#ctaTitle", { opacity: 0 });
+        new IntersectionObserver(
+          ([entry]) => {
+            if (!entry.isIntersecting) return;
+            gsap.set("#ctaTitle", { opacity: 1 });
+            SplitText.create("#ctaTitle", {
+              type: "chars",
+              autoSplit: true,
+              onSplit(self) {
+                return gsap.from(self.chars, {
+                  opacity: 0,
+                  scale: 0.3,
+                  stagger: { each: 0.035, from: "center" },
+                  duration: 0.6,
+                  ease: "back.out(2.5)",
+                });
+              },
+            });
+          },
+          { threshold: 0.2 },
+        ).observe(document.querySelector("#ctaTitle"));
+      });
+
+      reveal(
+        "#footerSymbols",
+        { y: 16 },
+        { y: 0, duration: 0.65, ease: "back.out(2)" },
+        0.5,
+      );
+    </script>
+  </body>
+</html>

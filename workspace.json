@@ -1,0 +1,60 @@
+{
+    "prompt":"You are given a task to integrate an interactive UI component into a static HTML website.
+
+The target environment:
+- Plain HTML (no React, no frameworks)
+- Tailwind CSS via CDN (unless specified otherwise)
+- Vanilla JavaScript for interactivity
+
+If Tailwind is not present, include setup using CDN.
+
+---
+
+Your responsibilities:
+
+1. Analyze the provided component and:
+   - Extract structure (layout, hierarchy)
+   - Identify interactive behavior
+   - Identify required assets (images, icons, etc.)
+
+2. Convert the component into:
+   - Semantic HTML structure
+   - Tailwind-based styling
+   - Vanilla JS for interactivity (if needed)
+
+3. Replace:
+   - React state → JS state or DOM-based logic
+   - Props → configurable variables or data-* attributes
+   - Imports → inline or CDN equivalents
+
+4. Output:
+   - A complete HTML section (not full app unless asked)
+   - Include <style> or Tailwind classes
+   - Include <script> for behavior (if needed)
+
+---
+
+Implementation Guidelines:
+
+- Maintain visual fidelity to original component
+- Keep code modular (wrap in a section or div with clear class/id)
+- Avoid unnecessary abstraction
+- Ensure responsiveness
+
+---
+
+Questions to consider:
+- What parts require interactivity vs static rendering?
+- What state transitions exist and how are they replicated?
+- What is the simplest JS needed to mimic behavior?
+- Can animations be replicated using CSS or require JS?
+
+---
+
+Steps to integrate:
+1. Insert the HTML section into the page
+2. Add Tailwind CDN (if missing)
+3. Add JS script at bottom or separate file
+4. Replace placeholder assets with real ones",
+"ouptut": "html file"
+}

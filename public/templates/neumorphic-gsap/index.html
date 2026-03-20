@@ -1,0 +1,2887 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NeuroPeak — Cognitive Performance Diagnostic</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.29/bundled/lenis.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/Flip.min.js"></script>
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      :root {
+        --primary: #0f172a;
+        --background: #f3f4f0;
+        --secondary: #64748b;
+        --accent: #273c39;
+        --accent-pink: #f472b6;
+        --accent-cyan: #22d3ee;
+        --success: #10b981;
+        --border: #e2e8f0;
+        --white: #ffffff;
+        --color-rim: rgba(255, 255, 255, 0.85);
+        --color-shadow-light: rgba(15, 23, 42, 0.07);
+        --color-shadow-deep: rgba(15, 23, 42, 0.18);
+        --grad-surface: linear-gradient(135deg, #ffffff 0%, #f3f4f0 100%);
+        --grad-accent: linear-gradient(135deg, #273c39 0%, #3d5e59 100%);
+        --grad-warm: linear-gradient(135deg, #882056 0%, #c92e45 100%);
+        --grad-cyan: linear-gradient(135deg, #22d3ee 0%, #4f5dda 100%);
+        --font-heading: "Bricolage Grotesque", sans-serif;
+        --font-body: "Plus Jakarta Sans", sans-serif;
+        --clay-shadow:
+          12px 12px 24px rgba(0, 0, 0, 0.05),
+          -8px -8px 16px rgba(255, 255, 255, 0.85),
+          inset 4px 4px 8px rgba(255, 255, 255, 0.5),
+          inset -4px -4px 8px rgba(0, 0, 0, 0.02);
+        --radius-sm: 8px;
+        --radius-md: 16px;
+        --radius-lg: 32px;
+        --radius-squircle: 40px;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        font-family: var(--font-body);
+        background: var(--background);
+        color: var(--primary);
+        overflow-x: hidden;
+        min-height: 100vh;
+      }
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 24px;
+      }
+      .accent-color {
+        color: var(--accent);
+      }
+      .initial-hidden {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      /* ── NAVBAR ─────────────────────────────── */
+      .navbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        padding: 16px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: rgba(243, 244, 240, 0.85);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid rgba(39, 60, 57, 0.08);
+      }
+      .nav-logo {
+        font-family: var(--font-heading);
+        font-weight: 800;
+        font-size: 1.2rem;
+        color: var(--primary);
+        letter-spacing: -0.03em;
+        text-decoration: none;
+      }
+      .nav-logo span {
+        color: var(--accent);
+      }
+      .nav-links {
+        display: flex;
+        gap: 32px;
+        list-style: none;
+      }
+      .nav-links a {
+        color: var(--secondary);
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: color 0.2s;
+      }
+      .nav-links a:hover {
+        color: var(--accent);
+      }
+      .nav-cta {
+        background: var(--grad-accent);
+        color: #fff;
+        border: none;
+        padding: 10px 22px;
+        border-radius: 50px;
+        font-family: var(--font-body);
+        font-weight: 600;
+        font-size: 0.875rem;
+        cursor: pointer;
+        transition:
+          transform 0.2s,
+          box-shadow 0.2s;
+        box-shadow: 0 4px 12px rgba(39, 60, 57, 0.25);
+      }
+      .nav-cta:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(39, 60, 57, 0.35);
+      }
+
+      /* ── GALLERY / HERO ──────────────────────── */
+      .gallery-wrap {
+        position: relative;
+        height: 100vh;
+        overflow: hidden;
+      }
+      .gallery {
+        width: 100%;
+        height: 100%;
+        display: grid;
+        gap: 1vh;
+        grid-template-columns: repeat(3, 32.5vw);
+        grid-template-rows: repeat(4, 23vh);
+        justify-content: center;
+        align-content: center;
+        will-change: transform;
+        backface-visibility: hidden;
+      }
+      .gallery__item {
+        overflow: hidden;
+        position: relative;
+      }
+      .gallery__item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+      .gallery--bento .gallery__item:nth-child(1) {
+        grid-area: 1/1/3/2;
+      }
+      .gallery--bento .gallery__item:nth-child(2) {
+        grid-area: 1/2/2/3;
+      }
+      .gallery--bento .gallery__item:nth-child(3) {
+        grid-area: 2/2/4/3;
+      }
+      .gallery--bento .gallery__item:nth-child(4) {
+        grid-area: 1/3/3/4;
+      }
+      .gallery--bento .gallery__item:nth-child(5) {
+        grid-area: 3/1/5/2;
+      }
+      .gallery--bento .gallery__item:nth-child(6) {
+        grid-area: 3/3/5/4;
+      }
+      .gallery--bento .gallery__item:nth-child(7) {
+        grid-area: 4/2/5/3;
+      }
+      .gallery--bento .gallery__item:nth-child(8) {
+        grid-area: 4/3/5/4;
+        display: none;
+      }
+      .gallery--final.gallery--bento {
+        grid-template-columns: repeat(3, 100vw);
+        grid-template-rows: repeat(4, 49.5vh);
+        gap: 1vh;
+      }
+      .hero-initial-overlay {
+        position: absolute;
+        inset: 0;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(243, 244, 240, 0.55);
+        backdrop-filter: blur(2px);
+      }
+      .hero-content {
+        text-align: center;
+        padding: 0 20px;
+      }
+      .hero-label {
+        display: inline-block;
+        font-family: var(--font-body);
+        font-weight: 700;
+        font-size: 0.75rem;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: var(--accent);
+        background: rgba(39, 60, 57, 0.1);
+        border: 1px solid rgba(39, 60, 57, 0.2);
+        border-radius: 50px;
+        padding: 6px 16px;
+        margin-bottom: 24px;
+      }
+      .hero-title {
+        font-family: var(--font-heading);
+        font-weight: 800;
+        font-size: clamp(2.8rem, 6vw, 5.5rem);
+        letter-spacing: -0.04em;
+        line-height: 1;
+        overflow: hidden;
+        margin-bottom: 20px;
+      }
+      .hero-title div {
+        overflow: hidden;
+      }
+      .hero-title div span {
+        display: block;
+        transform: translateY(120%);
+      }
+      .hero-subtitle {
+        font-size: 1.15rem;
+        color: var(--secondary);
+        max-width: 520px;
+        margin: 0 auto 32px;
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      .cta-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background: var(--grad-accent);
+        color: #fff;
+        border: none;
+        padding: 16px 32px;
+        border-radius: 50px;
+        font-family: var(--font-body);
+        font-weight: 700;
+        font-size: 1rem;
+        cursor: pointer;
+        box-shadow:
+          0 8px 24px rgba(39, 60, 57, 0.3),
+          0 2px 4px rgba(39, 60, 57, 0.2),
+          inset 0 1px 0 rgba(255, 255, 255, 0.15);
+        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        letter-spacing: -0.01em;
+        text-decoration: none;
+      }
+      .cta-button:hover {
+        transform: translateY(-4px) scale(1.02);
+        box-shadow:
+          0 16px 40px rgba(39, 60, 57, 0.4),
+          0 4px 8px rgba(39, 60, 57, 0.2);
+      }
+
+      /* ── FEATURES ────────────────────────────── */
+      .features-section {
+        padding: 120px 0;
+        position: relative;
+        overflow: hidden;
+      }
+      .cursor-glow {
+        position: absolute;
+        width: 400px;
+        height: 400px;
+        border-radius: 50%;
+        background: radial-gradient(
+          circle,
+          rgba(39, 60, 57, 0.08) 0%,
+          transparent 70%
+        );
+        pointer-events: none;
+        z-index: 0;
+        transform: translate(-50%, -50%);
+        opacity: 0;
+        transition: opacity 0.3s;
+      }
+      .features-bg {
+        position: absolute;
+        inset: 0;
+        opacity: 0.04;
+        pointer-events: none;
+        overflow: hidden;
+      }
+      .feature-bg-element {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .section-header {
+        text-align: center;
+        margin-bottom: 64px;
+        position: relative;
+        z-index: 1;
+      }
+      .section-label {
+        display: inline-block;
+        font-weight: 700;
+        font-size: 0.75rem;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 12px;
+      }
+      .section-title {
+        font-family: var(--font-heading);
+        font-weight: 800;
+        font-size: clamp(2rem, 4vw, 3.2rem);
+        letter-spacing: -0.04em;
+        line-height: 1.05;
+        margin-bottom: 16px;
+      }
+      .section-subtitle {
+        font-size: 1.05rem;
+        color: var(--secondary);
+        max-width: 540px;
+        margin: 0 auto;
+        line-height: 1.65;
+      }
+      .features-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+        position: relative;
+        z-index: 1;
+      }
+      .feature-card {
+        background: var(--grad-surface);
+        border: 2px solid var(--color-rim);
+        border-radius: var(--radius-squircle);
+        padding: 40px 32px;
+        box-shadow: var(--clay-shadow);
+        transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        position: relative;
+        overflow: visible;
+      }
+      .feature-card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        opacity: 0.025;
+        pointer-events: none;
+        border-radius: inherit;
+      }
+      .feature-card::after {
+        content: "";
+        position: absolute;
+        top: -100%;
+        left: -100%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(
+          45deg,
+          transparent 45%,
+          rgba(255, 255, 255, 0.3) 50%,
+          transparent 55%
+        );
+        transform: rotate(-25deg);
+        transition: all 0.7s ease;
+        pointer-events: none;
+      }
+      .feature-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px -10px rgba(39, 60, 57, 0.2);
+        border-radius: 44px;
+      }
+      .feature-card:hover::after {
+        top: -20%;
+        left: -20%;
+      }
+      .feature-icon {
+        font-size: 2.2rem;
+        margin-bottom: 20px;
+        display: block;
+      }
+      .feature-title {
+        font-family: var(--font-heading);
+        font-weight: 700;
+        font-size: 1.2rem;
+        letter-spacing: -0.02em;
+        margin-bottom: 10px;
+      }
+      .feature-desc {
+        color: var(--secondary);
+        font-size: 0.95rem;
+        line-height: 1.65;
+      }
+
+      /* ── QUIZ SECTION ────────────────────────── */
+      .quiz-section {
+        padding: 120px 0;
+        position: relative;
+        min-height: 100vh;
+        background: var(--background);
+      }
+      .quiz-atmosphere {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+        pointer-events: none;
+        opacity: 0.05;
+      }
+      .liquid-bg {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      #flair-container {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+        pointer-events: none;
+        z-index: 1;
+      }
+      .flair {
+        position: absolute;
+        width: 40px;
+        height: 40px;
+        opacity: 0;
+        display: none;
+      }
+      .quiz-container {
+        max-width: 680px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 2;
+      }
+      .quiz-header {
+        text-align: center;
+        margin-bottom: 48px;
+      }
+      .quiz-main-title {
+        font-family: var(--font-heading);
+        font-weight: 800;
+        font-size: clamp(2rem, 4vw, 3rem);
+        letter-spacing: -0.04em;
+        margin-bottom: 10px;
+      }
+      .quiz-meta-info {
+        color: var(--secondary);
+        font-size: 0.9rem;
+        font-weight: 500;
+      }
+      .quiz-progress {
+        margin-bottom: 36px;
+      }
+      .progress-bar {
+        background: rgba(39, 60, 57, 0.1);
+        border-radius: 50px;
+        height: 10px;
+        overflow: hidden;
+        box-shadow:
+          inset 2px 2px 4px rgba(0, 0, 0, 0.1),
+          inset -2px -2px 4px rgba(255, 255, 255, 0.8);
+        margin-bottom: 8px;
+      }
+      .progress-fill {
+        height: 100%;
+        border-radius: 50px;
+        background: var(--grad-accent);
+        box-shadow: 0 2px 8px rgba(39, 60, 57, 0.4);
+        transition: width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        position: relative;
+        overflow: hidden;
+      }
+      .progress-fill::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.4),
+          transparent
+        );
+        animation: shimmer 2s infinite;
+      }
+      @keyframes shimmer {
+        0% {
+          left: -100%;
+        }
+        100% {
+          left: 100%;
+        }
+      }
+      .progress-text {
+        font-size: 0.8rem;
+        color: var(--secondary);
+        font-weight: 600;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+      }
+      #questionContainer {
+        margin-bottom: 24px;
+      }
+      .question-title {
+        font-family: var(--font-heading);
+        font-weight: 700;
+        font-size: 1.5rem;
+        letter-spacing: -0.03em;
+        margin-bottom: 24px;
+        line-height: 1.2;
+      }
+      .question-card {
+        background: var(--grad-surface);
+        border: 2px solid var(--color-rim);
+        border-radius: 24px;
+        padding: 18px 22px;
+        box-shadow: var(--clay-shadow);
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 12px;
+        position: relative;
+        overflow: hidden;
+      }
+      .question-card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n2'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n2)'/%3E%3C/svg%3E");
+        opacity: 0.02;
+        pointer-events: none;
+      }
+      .question-card:hover {
+        transform: translateX(6px) scale(1.01);
+        box-shadow: 0 12px 30px -8px rgba(39, 60, 57, 0.2);
+      }
+      .question-card.selected {
+        border-color: var(--accent);
+        background: linear-gradient(
+          135deg,
+          rgba(39, 60, 57, 0.08) 0%,
+          rgba(255, 255, 255, 0.9) 100%
+        );
+        box-shadow:
+          0 0 0 3px rgba(39, 60, 57, 0.15),
+          var(--clay-shadow);
+      }
+      .option-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 12px;
+        background: var(--grad-accent);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 0.85rem;
+        flex-shrink: 0;
+      }
+      .question-card.selected .option-icon {
+        background: linear-gradient(135deg, #273c39, #1a2926);
+      }
+      .option-text {
+        font-size: 0.95rem;
+        font-weight: 500;
+        line-height: 1.4;
+      }
+      .question-nav {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        margin-bottom: 16px;
+      }
+      .nav-btn {
+        padding: 12px 28px;
+        border-radius: 50px;
+        font-family: var(--font-body);
+        font-weight: 600;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: none;
+      }
+      .nav-prev {
+        background: transparent;
+        border: 2px solid var(--border);
+        color: var(--secondary);
+      }
+      .nav-prev:hover:not(:disabled) {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+      .nav-prev:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+      }
+      .nav-next {
+        background: var(--grad-accent);
+        color: #fff;
+        box-shadow: 0 4px 14px rgba(39, 60, 57, 0.3);
+      }
+      .nav-next:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(39, 60, 57, 0.4);
+      }
+      .micro-copy {
+        text-align: center;
+        font-size: 0.8rem;
+        color: var(--secondary);
+        opacity: 0.7;
+      }
+
+      /* ── TESTIMONIALS ───────────────────────── */
+      .testimonials-section {
+        padding: 120px 0;
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(180deg, var(--background) 0%, #eef0eb 100%);
+      }
+      .testimonial-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+      }
+      .testimonial-card {
+        background: var(--grad-surface);
+        border: 2px solid var(--color-rim);
+        border-radius: var(--radius-squircle);
+        padding: 36px 30px;
+        box-shadow: var(--clay-shadow);
+        transition: all 0.4s ease;
+        position: relative;
+        overflow: hidden;
+      }
+      .testimonial-card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n3'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n3)'/%3E%3C/svg%3E");
+        opacity: 0.025;
+        pointer-events: none;
+        border-radius: inherit;
+      }
+      .testimonial-card:hover {
+        transform: translateY(-6px) scale(1.01);
+      }
+      .testimonial-stars {
+        color: #f59e0b;
+        font-size: 1.1rem;
+        margin-bottom: 16px;
+        letter-spacing: 2px;
+      }
+      .testimonial-text {
+        color: var(--primary);
+        font-size: 0.95rem;
+        line-height: 1.7;
+        margin-bottom: 24px;
+        font-style: italic;
+      }
+      .testimonial-author {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+      .author-avatar {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: var(--grad-accent);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 0.8rem;
+        flex-shrink: 0;
+      }
+      .author-info h4 {
+        font-weight: 700;
+        font-size: 0.9rem;
+        margin-bottom: 2px;
+      }
+      .author-info p {
+        color: var(--secondary);
+        font-size: 0.8rem;
+      }
+
+      /* ── PRICING ─────────────────────────────── */
+      .pricing-section {
+        padding: 120px 0;
+      }
+      .pricing-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+        align-items: start;
+      }
+      .pricing-card {
+        background: var(--grad-surface);
+        border: 2px solid var(--color-rim);
+        border-radius: var(--radius-squircle);
+        padding: 40px 32px;
+        box-shadow: var(--clay-shadow);
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.3s;
+      }
+      .pricing-card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n4'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n4)'/%3E%3C/svg%3E");
+        opacity: 0.025;
+        pointer-events: none;
+        border-radius: inherit;
+      }
+      .pricing-card:hover {
+        transform: translateY(-6px);
+      }
+      .pricing-card.popular {
+        border-color: var(--accent);
+        box-shadow:
+          0 0 0 3px rgba(39, 60, 57, 0.1),
+          var(--clay-shadow);
+      }
+      .popular-badge-wrapper {
+        position: relative;
+        margin-bottom: 20px;
+        height: 60px;
+      }
+      .popular-badge {
+        display: inline-block;
+        background: var(--grad-accent);
+        color: #fff;
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        padding: 5px 14px;
+        border-radius: 50px;
+      }
+      .lifestyle-accent {
+        position: absolute;
+        right: 0;
+        top: -20px;
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 50%;
+        opacity: 0.6;
+      }
+      .pricing-name {
+        font-family: var(--font-heading);
+        font-weight: 800;
+        font-size: 0.8rem;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: var(--secondary);
+        margin-bottom: 12px;
+      }
+      .pricing-price {
+        font-family: var(--font-heading);
+        font-weight: 800;
+        font-size: 3rem;
+        letter-spacing: -0.05em;
+        color: var(--primary);
+      }
+      .pricing-period {
+        color: var(--secondary);
+        font-size: 0.85rem;
+        display: block;
+        margin-bottom: 16px;
+      }
+      .pricing-description {
+        color: var(--secondary);
+        font-size: 0.9rem;
+        line-height: 1.6;
+        margin-bottom: 24px;
+        padding-bottom: 24px;
+        border-bottom: 1px solid var(--border);
+      }
+      .pricing-features {
+        list-style: none;
+        margin-bottom: 32px;
+      }
+      .pricing-feature {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 8px 0;
+        font-size: 0.9rem;
+        color: var(--primary);
+      }
+      .feature-check {
+        color: var(--success);
+        font-weight: 700;
+        flex-shrink: 0;
+      }
+      .pricing-cta {
+        display: block;
+        text-align: center;
+        padding: 14px 24px;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 0.9rem;
+        text-decoration: none;
+        transition: all 0.3s;
+        cursor: pointer;
+      }
+      .pricing-card:not(.popular) .pricing-cta {
+        border: 2px solid var(--accent);
+        color: var(--accent);
+      }
+      .pricing-card:not(.popular) .pricing-cta:hover {
+        background: var(--accent);
+        color: #fff;
+      }
+      .pricing-card.popular .pricing-cta {
+        background: var(--grad-accent);
+        color: #fff;
+        box-shadow: 0 6px 18px rgba(39, 60, 57, 0.3);
+      }
+      .pricing-card.popular .pricing-cta:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 24px rgba(39, 60, 57, 0.4);
+      }
+
+      /* ── FAQ ─────────────────────────────────── */
+      .faq-section {
+        padding: 120px 0;
+        overflow: visible;
+      }
+      .faq-items {
+        max-width: 800px;
+        margin: 0 auto;
+      }
+      .faq-item {
+        position: relative;
+        border-bottom: 1px solid var(--border);
+      }
+      .faq-item .follower-element {
+        position: fixed;
+        width: 220px;
+        height: 220px;
+        object-fit: cover;
+        border-radius: 24px;
+        pointer-events: none;
+        z-index: 100;
+        opacity: 0;
+        top: 0;
+        left: 0;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+      }
+      .faq-question {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 24px 0;
+        background: none;
+        border: none;
+        font-family: var(--font-body);
+        font-weight: 600;
+        font-size: 1.05rem;
+        color: var(--primary);
+        cursor: pointer;
+        text-align: left;
+        gap: 16px;
+        transition: color 0.2s;
+      }
+      .faq-question:hover {
+        color: var(--accent);
+      }
+      .faq-toggle {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: var(--grad-surface);
+        box-shadow: var(--clay-shadow);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        flex-shrink: 0;
+        transition:
+          transform 0.3s,
+          background 0.3s;
+        color: var(--accent);
+        font-weight: 700;
+      }
+      .faq-item.active .faq-toggle {
+        transform: rotate(45deg);
+        background: var(--grad-accent);
+        color: #fff;
+      }
+      .faq-answer {
+        max-height: 0;
+        overflow: hidden;
+      }
+      .faq-answer p {
+        color: var(--secondary);
+        line-height: 1.7;
+        font-size: 0.95rem;
+        padding: 0 0 24px 0;
+      }
+
+      /* ── CTA BANNER ──────────────────────────── */
+      .cta-banner {
+        padding: 100px 0;
+        background: linear-gradient(
+          135deg,
+          #1a2926 0%,
+          #273c39 50%,
+          #2d4a45 100%
+        );
+        position: relative;
+        overflow: hidden;
+        text-align: center;
+      }
+      .cta-banner::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n5'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n5)'/%3E%3C/svg%3E");
+        opacity: 0.06;
+        pointer-events: none;
+      }
+      .banner-title {
+        font-family: var(--font-heading);
+        font-weight: 800;
+        font-size: clamp(2rem, 4vw, 3.2rem);
+        color: #fff;
+        letter-spacing: -0.04em;
+        margin-bottom: 16px;
+        position: relative;
+        z-index: 1;
+      }
+      .banner-subtitle {
+        color: rgba(255, 255, 255, 0.65);
+        font-size: 1.05rem;
+        margin-bottom: 40px;
+        max-width: 500px;
+        margin-left: auto;
+        margin-right: auto;
+        position: relative;
+        z-index: 1;
+      }
+      .banner-cta-container {
+        display: flex;
+        gap: 16px;
+        justify-content: center;
+        position: relative;
+        z-index: 1;
+        flex-wrap: wrap;
+      }
+      .banner-btn {
+        padding: 15px 32px;
+        border-radius: 50px;
+        font-family: var(--font-body);
+        font-weight: 700;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        border: none;
+        letter-spacing: -0.01em;
+      }
+      .banner-btn-primary {
+        background: #fff;
+        color: var(--accent);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+      }
+      .banner-btn-primary:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+      }
+      .banner-btn-secondary {
+        background: transparent;
+        border: 2px solid rgba(255, 255, 255, 0.35);
+        color: #fff;
+      }
+      .banner-btn-secondary:hover {
+        border-color: #fff;
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      /* ── FOOTER ──────────────────────────────── */
+      .footer {
+        background: #0f1a19;
+        color: rgba(255, 255, 255, 0.7);
+        padding: 80px 0 40px;
+        position: relative;
+        overflow: hidden;
+      }
+      .footer-texture {
+        position: absolute;
+        inset: 0;
+        opacity: 0.03;
+        pointer-events: none;
+      }
+      .texture-overlay {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .footer-content {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1fr;
+        gap: 48px;
+        margin-bottom: 56px;
+        position: relative;
+        z-index: 1;
+      }
+      .footer-brand h3 {
+        font-family: var(--font-heading);
+        font-weight: 800;
+        font-size: 1.3rem;
+        color: #fff;
+        margin-bottom: 12px;
+        letter-spacing: -0.03em;
+      }
+      .footer-brand p {
+        font-size: 0.9rem;
+        line-height: 1.6;
+        margin-bottom: 20px;
+      }
+      .social-icons {
+        display: flex;
+        gap: 12px;
+      }
+      .social-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.08);
+        color: rgba(255, 255, 255, 0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        font-size: 0.8rem;
+        font-weight: 700;
+        transition: all 0.2s;
+      }
+      .social-icon:hover {
+        background: var(--accent);
+        color: #fff;
+      }
+      .footer-col h4 {
+        color: #fff;
+        font-weight: 700;
+        font-size: 0.85rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        margin-bottom: 16px;
+      }
+      .footer-links {
+        list-style: none;
+      }
+      .footer-links li {
+        margin-bottom: 8px;
+      }
+      .footer-links a {
+        color: rgba(255, 255, 255, 0.55);
+        text-decoration: none;
+        font-size: 0.875rem;
+        transition: color 0.2s;
+      }
+      .footer-links a:hover {
+        color: #fff;
+      }
+      .footer-bottom {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 24px;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        font-size: 0.8rem;
+        position: relative;
+        z-index: 1;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      .legal-buttons {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+      .legal-btn {
+        background: none;
+        border: none;
+        color: rgba(255, 255, 255, 0.45);
+        font-family: var(--font-body);
+        font-size: 0.8rem;
+        cursor: pointer;
+        padding: 0;
+        transition: color 0.2s;
+      }
+      .legal-btn:hover {
+        color: rgba(255, 255, 255, 0.85);
+      }
+
+      /* ── EMAIL GATE MODAL ───────────────────── */
+      .modal-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 9000;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        background: rgba(15, 23, 42, 0.97);
+      }
+      .modal-overlay.active {
+        display: flex;
+      }
+      .modal-content {
+        background: var(--background);
+        border-radius: var(--radius-squircle);
+        padding: 48px 44px;
+        max-width: 480px;
+        width: 90%;
+        position: relative;
+        box-shadow:
+          0 40px 80px rgba(0, 0, 0, 0.4),
+          0 0 0 1px rgba(255, 255, 255, 0.05);
+        max-height: 90vh;
+        overflow-y: auto;
+      }
+      .modal-close {
+        position: absolute;
+        top: 16px;
+        right: 18px;
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        color: var(--secondary);
+        cursor: pointer;
+        line-height: 1;
+        padding: 4px 8px;
+        border-radius: 8px;
+        transition: color 0.2s;
+      }
+      .modal-close:hover {
+        color: var(--primary);
+      }
+      .modal-badge {
+        display: inline-block;
+        background: rgba(39, 60, 57, 0.1);
+        color: var(--accent);
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        padding: 5px 14px;
+        border-radius: 50px;
+        margin-bottom: 16px;
+        border: 1px solid rgba(39, 60, 57, 0.2);
+      }
+      .modal-title {
+        font-family: var(--font-heading);
+        font-weight: 800;
+        font-size: 1.8rem;
+        letter-spacing: -0.04em;
+        margin-bottom: 8px;
+      }
+      .modal-subtitle {
+        color: var(--secondary);
+        font-size: 0.95rem;
+        margin-bottom: 28px;
+        line-height: 1.5;
+      }
+      .email-form {
+        margin-bottom: 28px;
+      }
+      .form-label {
+        display: block;
+        font-weight: 600;
+        font-size: 0.85rem;
+        margin-bottom: 8px;
+        color: var(--primary);
+      }
+      .form-input {
+        width: 100%;
+        padding: 14px 18px;
+        border: 2px solid var(--border);
+        border-radius: 16px;
+        font-family: var(--font-body);
+        font-size: 0.95rem;
+        color: var(--primary);
+        background: var(--white);
+        margin-bottom: 8px;
+        transition: border-color 0.2s;
+        outline: none;
+        display: block;
+      }
+      .form-input:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(39, 60, 57, 0.1);
+      }
+      .form-hint {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.78rem;
+        color: var(--secondary);
+        margin-bottom: 16px;
+      }
+      .result-previews {
+        border-top: 1px solid var(--border);
+        padding-top: 24px;
+      }
+      .receive-label {
+        font-weight: 600;
+        font-size: 0.85rem;
+        margin-bottom: 12px;
+        color: var(--secondary);
+      }
+      .preview-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 0;
+        font-size: 0.9rem;
+        font-weight: 500;
+      }
+      .preview-check {
+        color: var(--success);
+        font-weight: 700;
+      }
+
+      /* ── RESULT MODAL ───────────────────────── */
+      #resultModal {
+        position: fixed;
+        inset: 0;
+        z-index: 9500;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        background: rgba(15, 23, 42, 0.98);
+      }
+      #resultModal.active {
+        display: flex;
+      }
+      .result-modal {
+        background: var(--background);
+        border-radius: var(--radius-squircle);
+        padding: 48px 44px;
+        max-width: 560px;
+        width: 90%;
+        position: relative;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 40px 80px rgba(0, 0, 0, 0.5);
+      }
+      .result-close {
+        position: absolute;
+        top: 16px;
+        right: 18px;
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        color: var(--secondary);
+        cursor: pointer;
+        padding: 4px 8px;
+      }
+      .result-avatar-container {
+        position: relative;
+        margin-bottom: 24px;
+        height: 120px;
+      }
+      .result-avatar-img {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid var(--color-rim);
+        box-shadow: var(--clay-shadow);
+        transform: scale(0.8);
+        opacity: 0;
+      }
+      .result-badge {
+        position: absolute;
+        left: 130px;
+        top: 20px;
+        background: var(--grad-accent);
+        color: #fff;
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        padding: 6px 14px;
+        border-radius: 50px;
+        transform: translateY(10px);
+        opacity: 0;
+      }
+      .result-headline {
+        font-family: var(--font-heading);
+        font-weight: 800;
+        font-size: 1.8rem;
+        letter-spacing: -0.04em;
+        margin-bottom: 12px;
+        transform: scale(0.95);
+        opacity: 0;
+      }
+      .result-summary {
+        color: var(--secondary);
+        font-size: 0.95rem;
+        line-height: 1.7;
+        margin-bottom: 24px;
+        transform: translateX(-10px);
+        opacity: 0;
+      }
+      .result-mistakes {
+        background: rgba(239, 68, 68, 0.06);
+        border: 1px solid rgba(239, 68, 68, 0.15);
+        border-radius: 24px;
+        padding: 24px;
+        margin-bottom: 24px;
+        opacity: 0;
+      }
+      .mistake-title {
+        font-weight: 700;
+        font-size: 0.9rem;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .mistake-list {
+        list-style: none;
+      }
+      .mistake-item {
+        display: flex;
+        gap: 10px;
+        padding: 8px 0;
+        font-size: 0.9rem;
+        transform: translateX(-10px);
+        opacity: 0;
+        border-bottom: 1px solid rgba(239, 68, 68, 0.1);
+      }
+      .mistake-item:last-child {
+        border-bottom: none;
+      }
+      .mistake-icon {
+        color: var(--accent);
+        font-size: 1rem;
+      }
+      .recommended-action {
+        background: linear-gradient(
+          135deg,
+          rgba(39, 60, 57, 0.06),
+          rgba(39, 60, 57, 0.02)
+        );
+        border: 2px solid rgba(39, 60, 57, 0.15);
+        border-radius: 24px;
+        padding: 24px;
+        margin-bottom: 20px;
+        transform: translateY(10px);
+        opacity: 0;
+      }
+      .action-title {
+        font-weight: 700;
+        font-size: 1rem;
+        margin-bottom: 8px;
+        color: var(--accent);
+      }
+      .action-desc {
+        color: var(--secondary);
+        font-size: 0.9rem;
+        line-height: 1.6;
+        margin-bottom: 16px;
+      }
+      .action-btn {
+        display: inline-block;
+        background: var(--grad-accent);
+        color: #fff;
+        padding: 12px 24px;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 0.9rem;
+        text-decoration: none;
+        box-shadow: 0 4px 12px rgba(39, 60, 57, 0.3);
+      }
+      .sent-notice {
+        color: var(--success);
+        font-size: 0.85rem;
+        font-weight: 500;
+        margin-bottom: 12px;
+        opacity: 0;
+        text-align: center;
+      }
+      .reset-link {
+        text-align: center;
+        opacity: 0;
+      }
+      .reset-link a {
+        color: var(--secondary);
+        font-size: 0.85rem;
+        text-decoration: underline;
+        cursor: pointer;
+      }
+
+      /* ── PULSE ANIMATION ─────────────────────── */
+      @keyframes pulse {
+        0%,
+        100% {
+          box-shadow:
+            0 8px 24px rgba(39, 60, 57, 0.3),
+            0 0 0 0 rgba(39, 60, 57, 0.3);
+        }
+        50% {
+          box-shadow:
+            0 8px 24px rgba(39, 60, 57, 0.3),
+            0 0 0 10px rgba(39, 60, 57, 0);
+        }
+      }
+      .pulse {
+        animation: pulse 2.5s infinite;
+      }
+
+      /* ── RESPONSIVE ──────────────────────────── */
+      @media (max-width: 1024px) {
+        .features-grid,
+        .pricing-grid,
+        .testimonial-grid {
+          grid-template-columns: 1fr;
+        }
+        .footer-content {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+      @media (max-width: 768px) {
+        .section-title {
+          font-size: 2rem;
+        }
+        .hero-title {
+          font-size: 2.5rem;
+        }
+        .nav-links {
+          display: none;
+        }
+        .footer-content {
+          grid-template-columns: 1fr;
+          text-align: center;
+        }
+        .footer-bottom {
+          flex-direction: column;
+          text-align: center;
+        }
+        .gallery--bento {
+          grid-template-columns: repeat(2, 48vw);
+          grid-template-rows: repeat(4, 22vh);
+        }
+        .modal-content,
+        .result-modal {
+          padding: 32px 24px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- NAVBAR -->
+    <nav class="navbar">
+      <a href="#" class="nav-logo">Neuro<span>Peak</span></a>
+      <ul class="nav-links">
+        <li><a href="#how-it-works">How It Works</a></li>
+        <li><a href="#quiz">Take the Test</a></li>
+        <li><a href="#pricing">Pricing</a></li>
+        <li><a href="#faq">FAQ</a></li>
+      </ul>
+      <button class="nav-cta" id="navStartBtn">Free Diagnostic →</button>
+    </nav>
+
+    <!-- HERO / GALLERY -->
+    <div class="gallery-wrap" id="galleryWrap">
+      <div class="hero-initial-overlay" id="heroOverlay">
+        <div class="hero-content">
+          <span class="hero-label">Free Cognitive Diagnostic</span>
+          <h1 class="hero-title reveal-text">
+            <div><span>What's Blocking</span></div>
+            <div>
+              <span>Your <span class="accent-color">Peak Brain?</span></span>
+            </div>
+          </h1>
+          <p class="hero-subtitle reveal-sub">
+            5 questions reveal the exact cognitive bottleneck draining your
+            focus, energy, and decision-making capacity.
+          </p>
+          <div>
+            <button id="startQuizBtn" class="cta-button pulse">
+              Diagnose My Brain Free ↗
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div id="gallery-8" class="gallery gallery--bento">
+        <div class="gallery__item">
+          <img
+            src="https://assets.cdn.filesafe.space/3Mh94ewIWZaOQuAxTDt4/media/69b439bebfc81f54f4f24807.png"
+            alt="Biohacking lab"
+          />
+        </div>
+        <div class="gallery__item">
+          <img
+            src="https://assets.cdn.filesafe.space/3Mh94ewIWZaOQuAxTDt4/media/69b439beeba48751402641db.png"
+            alt="Performance"
+          />
+        </div>
+        <div class="gallery__item">
+          <img
+            src="https://assets.cdn.filesafe.space/3Mh94ewIWZaOQuAxTDt4/media/69b439be070c58e28e626115.png"
+            alt="Biohacking"
+          />
+        </div>
+        <div class="gallery__item">
+          <img
+            src="https://assets.cdn.filesafe.space/3Mh94ewIWZaOQuAxTDt4/media/69b439bed548179ed021687d.png"
+            alt="Estate"
+          />
+        </div>
+        <div class="gallery__item">
+          <img
+            src="https://assets.cdn.filesafe.space/3Mh94ewIWZaOQuAxTDt4/media/69b439befb38cabb229231e2.png"
+            alt="Wealth"
+          />
+        </div>
+        <div class="gallery__item">
+          <img
+            src="https://assets.cdn.filesafe.space/3Mh94ewIWZaOQuAxTDt4/media/69b439befc5128f11e732220.png"
+            alt="Estate view"
+          />
+        </div>
+        <div class="gallery__item">
+          <img
+            src="https://assets.cdn.filesafe.space/3Mh94ewIWZaOQuAxTDt4/media/69b439be070c582337626116.png"
+            alt="Mindset"
+          />
+        </div>
+        <div class="gallery__item">
+          <img
+            src="https://assets.cdn.filesafe.space/3Mh94ewIWZaOQuAxTDt4/media/69b43b27eba4875b6d267ef7.png"
+            alt="Lifestyle"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- HOW IT WORKS / FEATURES -->
+    <section id="how-it-works" class="features-section">
+      <div class="cursor-glow" id="featuresGlow"></div>
+      <div class="features-bg">
+        <img
+          src="https://assets.cdn.filesafe.space/3Mh94ewIWZaOQuAxTDt4/media/69b439be070c58e28e626115.png"
+          alt=""
+          class="feature-bg-element"
+        />
+      </div>
+      <div class="container">
+        <div class="section-header">
+          <span class="section-label">Why It Matters</span>
+          <h2 class="section-title">Why Take The Cognitive Diagnostic?</h2>
+          <p class="section-subtitle">
+            Most high-performers optimize the wrong thing first — and wonder why
+            their output still feels capped.
+          </p>
+        </div>
+        <div class="features-grid">
+          <div class="feature-card">
+            <span class="feature-icon">🧠</span>
+            <h3 class="feature-title">Pinpoint Your Bottleneck</h3>
+            <p class="feature-desc">
+              Identify whether your cognitive drain is rooted in decision
+              fatigue, context-switching, or deep-focus deficit — each requires
+              a completely different fix.
+            </p>
+          </div>
+          <div class="feature-card">
+            <span class="feature-icon">⚡</span>
+            <h3 class="feature-title">Actionable in 60 Seconds</h3>
+            <p class="feature-desc">
+              Get a prioritized protocol — not a 40-page PDF. Know exactly which
+              lever to pull first based on your specific cognitive profile.
+            </p>
+          </div>
+          <div class="feature-card">
+            <span class="feature-icon">📊</span>
+            <h3 class="feature-title">Benchmark Against Peers</h3>
+            <p class="feature-desc">
+              See how your cognitive performance compares to other executives
+              and knowledge workers at your career stage and workload intensity.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- QUIZ SECTION -->
+    <section id="quiz" class="quiz-section">
+      <div class="quiz-atmosphere">
+        <img
+          src="https://assets.cdn.filesafe.space/3Mh94ewIWZaOQuAxTDt4/media/69b43b27eba4875b6d267ef7.png"
+          class="liquid-bg"
+          alt=""
+        />
+      </div>
+      <div id="flair-container"></div>
+
+      <div class="container quiz-container">
+        <div class="quiz-header">
+          <h2 class="quiz-main-title">Diagnose Your Cognitive Engine</h2>
+          <p class="quiz-meta-info">
+            5 questions · 60 seconds · Instant results
+          </p>
+        </div>
+
+        <div class="quiz-progress">
+          <div class="progress-bar">
+            <div
+              class="progress-fill"
+              id="progressFill"
+              style="width: 20%"
+            ></div>
+          </div>
+          <span class="progress-text"
+            ><span id="currentQ">1</span>/5 Questions</span
+          >
+        </div>
+
+        <div id="questionContainer"></div>
+
+        <div class="question-nav">
+          <button id="prevBtn" class="nav-btn nav-prev" disabled>← Back</button>
+          <button id="nextBtn" class="nav-btn nav-next">Next →</button>
+        </div>
+        <p class="micro-copy">
+          No account required · Instant results · No spam
+        </p>
+      </div>
+    </section>
+
+    <!-- TESTIMONIALS -->
+    <section class="testimonials-section">
+      <div class="cursor-glow" id="testimonialsGlow"></div>
+      <div class="container">
+        <div class="section-header">
+          <span class="section-label">Social Proof</span>
+          <h2 class="section-title testimonial-title">
+            Trusted by 14,700+ Knowledge Workers
+          </h2>
+          <p class="section-subtitle testimonial-subtitle">
+            Real cognitive breakthroughs from the diagnostic tool.
+          </p>
+        </div>
+        <div class="testimonial-grid">
+          <div class="testimonial-card">
+            <div class="testimonial-stars">★★★★★</div>
+            <p class="testimonial-text">
+              "The diagnostic flagged context-switching as my #1 bottleneck —
+              something I'd been blaming on poor sleep. Changed my calendar
+              structure and recovered ~2.5 hours of deep work per day within a
+              week."
+            </p>
+            <div class="testimonial-author">
+              <div class="author-avatar">MK</div>
+              <div class="author-info">
+                <h4>Marcus Kiehl</h4>
+                <p>VP of Engineering, Meridian</p>
+              </div>
+            </div>
+          </div>
+          <div class="testimonial-card">
+            <div class="testimonial-stars">★★★★★</div>
+            <p class="testimonial-text">
+              "I'd tried nootropics, meditation, cold plunges — nothing moved
+              the needle. NeuroPeak told me the real issue was pre-decision
+              anxiety. The protocol they gave me is embarrassingly simple and
+              actually works."
+            </p>
+            <div class="testimonial-author">
+              <div class="author-avatar">SA</div>
+              <div class="author-info">
+                <h4>Sofia Andreou</h4>
+                <p>Founder, Parallax Studio</p>
+              </div>
+            </div>
+          </div>
+          <div class="testimonial-card">
+            <div class="testimonial-stars">★★★★★</div>
+            <p class="testimonial-text">
+              "I thought I was a 'Peak Performer' — the results humbled me fast.
+              Identifying my reactive-mode trigger was genuinely one of the most
+              useful 60 seconds I've spent this year."
+            </p>
+            <div class="testimonial-author">
+              <div class="author-avatar">JT</div>
+              <div class="author-info">
+                <h4>James Tran</h4>
+                <p>COO, Northgate Capital</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PRICING -->
+    <section id="pricing" class="pricing-section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-label">Upgrade Insights</span>
+          <h2 class="section-title">Free Diagnostic. Deeper Protocols.</h2>
+          <p class="section-subtitle">
+            The assessment is always free. Upgrade to get the full cognitive
+            stack engineered for your profile.
+          </p>
+        </div>
+        <div class="pricing-grid">
+          <div class="pricing-card">
+            <div class="pricing-name">Diagnostic</div>
+            <div><span class="pricing-price">$0</span></div>
+            <span class="pricing-period">Forever Free</span>
+            <p class="pricing-description">
+              Identify your cognitive profile and receive your top bottleneck.
+            </p>
+            <ul class="pricing-features">
+              <li class="pricing-feature">
+                <span class="feature-check">✓</span> 5-question diagnostic
+              </li>
+              <li class="pricing-feature">
+                <span class="feature-check">✓</span> Cognitive profile
+                classification
+              </li>
+              <li class="pricing-feature">
+                <span class="feature-check">✓</span> #1 bottleneck
+                identification
+              </li>
+              <li class="pricing-feature">
+                <span class="feature-check">✓</span> Email delivery of results
+              </li>
+            </ul>
+            <a href="#quiz" class="pricing-cta">Start Free Diagnostic</a>
+          </div>
+          <div class="pricing-card popular">
+            <div class="popular-badge-wrapper">
+              <div class="popular-badge">Most Popular</div>
+              <img
+                src="https://assets.cdn.filesafe.space/3Mh94ewIWZaOQuAxTDt4/media/69b43b27eba4875b6d267ef7.png"
+                alt=""
+                class="lifestyle-accent"
+              />
+            </div>
+            <div class="pricing-name">Protocol</div>
+            <div><span class="pricing-price">$39</span></div>
+            <span class="pricing-period">One-time · Lifetime access</span>
+            <p class="pricing-description">
+              Full cognitive stack protocol customized to your profile, not a
+              template.
+            </p>
+            <ul class="pricing-features">
+              <li class="pricing-feature">
+                <span class="feature-check">✓</span> Everything in Diagnostic
+              </li>
+              <li class="pricing-feature">
+                <span class="feature-check">✓</span> 30-day cognitive protocol
+                PDF
+              </li>
+              <li class="pricing-feature">
+                <span class="feature-check">✓</span> 3 supplemental stacks by
+                profile
+              </li>
+              <li class="pricing-feature">
+                <span class="feature-check">✓</span> Weekly intervention
+                calendar
+              </li>
+              <li class="pricing-feature">
+                <span class="feature-check">✓</span> Slack community access
+              </li>
+            </ul>
+            <a href="#" class="pricing-cta">Get Protocol Report</a>
+          </div>
+          <div class="pricing-card">
+            <div class="pricing-name">Intensive</div>
+            <div><span class="pricing-price">$199</span></div>
+            <span class="pricing-period">Per session · 90 min</span>
+            <p class="pricing-description">
+              Live 1:1 debrief with a certified cognitive performance coach.
+            </p>
+            <ul class="pricing-features">
+              <li class="pricing-feature">
+                <span class="feature-check">✓</span> Everything in Protocol
+              </li>
+              <li class="pricing-feature">
+                <span class="feature-check">✓</span> 90-min Zoom deep-dive
+              </li>
+              <li class="pricing-feature">
+                <span class="feature-check">✓</span> Extended 60-question
+                assessment
+              </li>
+              <li class="pricing-feature">
+                <span class="feature-check">✓</span> 3-month check-in call
+                included
+              </li>
+            </ul>
+            <a href="#" class="pricing-cta">Book a Session</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section id="faq" class="faq-section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-label">Questions</span>
+          <h2 class="section-title">Frequently Asked</h2>
+        </div>
+        <div class="faq-items">
+          <div class="faq-item hover-trigger">
+            <img
+              class="follower-element"
+              src="https://assets.cdn.filesafe.space/3Mh94ewIWZaOQuAxTDt4/media/69b439be070c58e28e626115.png"
+              alt=""
+            />
+            <button
+              class="faq-question"
+              aria-expanded="false"
+              aria-controls="faq-ans-1"
+            >
+              How accurate is a 5-question diagnostic?
+              <span class="faq-toggle">+</span>
+            </button>
+            <div class="faq-answer" id="faq-ans-1">
+              <p>
+                Our diagnostic is based on validated cognitive workload research
+                and calibrated against 14,000+ user sessions. The 5 questions
+                target the highest signal-to-noise variables. Longer assessments
+                add noise, not accuracy — our brevity is a design choice, not a
+                shortcut.
+              </p>
+            </div>
+          </div>
+          <div class="faq-item hover-trigger">
+            <img
+              class="follower-element"
+              src="https://assets.cdn.filesafe.space/3Mh94ewIWZaOQuAxTDt4/media/69b439bebfc81f54f4f24807.png"
+              alt=""
+            />
+            <button
+              class="faq-question"
+              aria-expanded="false"
+              aria-controls="faq-ans-2"
+            >
+              What happens to my email after I enter it?
+              <span class="faq-toggle">+</span>
+            </button>
+            <div class="faq-answer" id="faq-ans-2">
+              <p>
+                Your results are sent immediately. You'll receive one follow-up
+                email 7 days later with an advanced tip matched to your profile.
+                No drip sequences, no pitch sequences. You can unsubscribe from
+                that single email if you prefer pure silence.
+              </p>
+            </div>
+          </div>
+          <div class="faq-item hover-trigger">
+            <img
+              class="follower-element"
+              src="https://assets.cdn.filesafe.space/3Mh94ewIWZaOQuAxTDt4/media/69b439beeba48751402641db.png"
+              alt=""
+            />
+            <button
+              class="faq-question"
+              aria-expanded="false"
+              aria-controls="faq-ans-3"
+            >
+              Is this based on neuroscience or just personality typing?
+              <span class="faq-toggle">+</span>
+            </button>
+            <div class="faq-answer" id="faq-ans-3">
+              <p>
+                NeuroPeak is not MBTI-style typing. Our model is built on
+                cognitive load theory, attention research, and prefrontal cortex
+                fatigue literature. Questions are behaviorally anchored — they
+                assess what you actually do under pressure, not how you see
+                yourself.
+              </p>
+            </div>
+          </div>
+          <div class="faq-item hover-trigger">
+            <img
+              class="follower-element"
+              src="https://assets.cdn.filesafe.space/3Mh94ewIWZaOQuAxTDt4/media/69b439bed548179ed021687d.png"
+              alt=""
+            />
+            <button
+              class="faq-question"
+              aria-expanded="false"
+              aria-controls="faq-ans-4"
+            >
+              Can I take the diagnostic more than once?
+              <span class="faq-toggle">+</span>
+            </button>
+            <div class="faq-answer" id="faq-ans-4">
+              <p>
+                Yes, and we recommend retaking it every 90 days. Cognitive
+                profiles shift with workload, life circumstances, and deliberate
+                intervention. Tracking your profile over time is one of the most
+                useful signals available to high-performance knowledge workers.
+              </p>
+            </div>
+          </div>
+          <div class="faq-item hover-trigger">
+            <img
+              class="follower-element"
+              src="https://assets.cdn.filesafe.space/3Mh94ewIWZaOQuAxTDt4/media/69b439befb38cabb229231e2.png"
+              alt=""
+            />
+            <button
+              class="faq-question"
+              aria-expanded="false"
+              aria-controls="faq-ans-5"
+            >
+              Why is the diagnostic free?
+              <span class="faq-toggle">+</span>
+            </button>
+            <div class="faq-answer" id="faq-ans-5">
+              <p>
+                The free diagnostic creates trust — and it genuinely helps
+                people. Our business model is the Protocol report and Intensive
+                sessions for users who want to go deeper. We don't upsell during
+                the assessment, and the free results are complete, not a teaser.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA BANNER -->
+    <section class="cta-banner">
+      <div class="container">
+        <h2 class="banner-title">
+          Find Your Cognitive Ceiling—<br />Then Break It.
+        </h2>
+        <p class="banner-subtitle">
+          Join 14,700+ knowledge workers who've already diagnosed and addressed
+          their performance bottleneck.
+        </p>
+        <div class="banner-cta-container">
+          <button
+            class="banner-btn banner-btn-primary pulse"
+            onclick="
+              document
+                .getElementById('quiz')
+                .scrollIntoView({ behavior: 'smooth' })
+            "
+          >
+            Take Free Assessment
+          </button>
+          <button
+            class="banner-btn banner-btn-secondary"
+            onclick="
+              document.getElementById('resultModal').classList.add('active')
+            "
+          >
+            View Sample Results
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      <div class="footer-texture">
+        <img
+          src="https://assets.cdn.filesafe.space/3Mh94ewIWZaOQuAxTDt4/media/69b43b27eba4875b6d267ef7.png"
+          alt=""
+          class="texture-overlay"
+        />
+      </div>
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-brand">
+            <h3>🧠 NeuroPeak</h3>
+            <p>
+              Understand where your cognitive engine is leaking capacity — and
+              what to do about it.
+            </p>
+            <div class="social-icons">
+              <a href="#" class="social-icon">𝕏</a>
+              <a href="#" class="social-icon">IN</a>
+              <a href="#" class="social-icon">IG</a>
+            </div>
+          </div>
+          <div class="footer-col">
+            <h4>Product</h4>
+            <ul class="footer-links">
+              <li><a href="#">Diagnostic Tool</a></li>
+              <li><a href="#">Protocol Reports</a></li>
+              <li><a href="#">Intensive Sessions</a></li>
+            </ul>
+          </div>
+          <div class="footer-col">
+            <h4>Company</h4>
+            <ul class="footer-links">
+              <li><a href="#">About</a></li>
+              <li><a href="#">Research</a></li>
+              <li><a href="#">Contact</a></li>
+            </ul>
+          </div>
+          <div class="footer-col">
+            <h4>Resources</h4>
+            <ul class="footer-links">
+              <li><a href="#">Cognitive Blog</a></li>
+              <li><a href="#">Free Templates</a></li>
+              <li><a href="#">Partner With Us</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <div>© 2025 NeuroPeak Diagnostics. All rights reserved.</div>
+          <div class="legal-buttons">
+            <button class="legal-btn" data-legal="privacy">
+              Privacy Policy
+            </button>
+            <button class="legal-btn" data-legal="terms">
+              Terms of Service
+            </button>
+            <button class="legal-btn" data-legal="cookie">Cookie Policy</button>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- EMAIL GATE MODAL -->
+    <div id="emailGateModal" class="modal-overlay">
+      <div class="modal-content" data-lenis-prevent>
+        <button class="modal-close" id="closeEmailBtn">×</button>
+        <span class="modal-badge">Unlock Your Results</span>
+        <h2 class="modal-title">One Step to Your Report</h2>
+        <p class="modal-subtitle">
+          Enter your email to get your Cognitive Profile and personalized
+          protocol delivered instantly.
+        </p>
+        <form
+          id="emailForm"
+          class="email-form"
+          action="{{FORM_ENDPOINT}}"
+          method="POST"
+        >
+          <label class="form-label" for="emailInput">Your Email Address</label>
+          <input
+            type="email"
+            id="emailInput"
+            class="form-input"
+            placeholder="you@company.com"
+            required
+          />
+          <div class="form-hint">
+            <span>🔒</span> Secure · No spam · Unsubscribe anytime
+          </div>
+          <button
+            type="submit"
+            class="cta-button pulse"
+            style="width: 100%; justify-content: center"
+          >
+            Send My Results →
+          </button>
+        </form>
+        <div class="result-previews">
+          <p class="receive-label">You'll Receive:</p>
+          <div class="preview-item">
+            <span class="preview-check">✓</span
+            ><span>Your Exact Cognitive Profile Type</span>
+          </div>
+          <div class="preview-item">
+            <span class="preview-check">✓</span
+            ><span>Top 3 Performance Leak Points</span>
+          </div>
+          <div class="preview-item">
+            <span class="preview-check">✓</span
+            ><span>Immediate Intervention Protocol</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESULT MODAL -->
+    <div
+      id="resultModal"
+      style="
+        position: fixed;
+        inset: 0;
+        z-index: 9500;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        background: rgba(15, 23, 42, 0.98);
+      "
+    >
+      <div class="result-modal" data-lenis-prevent>
+        <button class="result-close" id="closeResultBtn">×</button>
+        <div id="resultContent"></div>
+      </div>
+    </div>
+
+    <script>
+      gsap.registerPlugin(ScrollTrigger, Flip);
+
+      // ── LENIS ──────────────────────────────────
+      let lenis;
+      try {
+        lenis = new Lenis({ lerp: 1, smoothWheel: false });
+      } catch (e) {
+        lenis = { stop: () => {}, start: () => {}, on: () => {} };
+      }
+
+      gsap.defaults({ ease: "power3.out" });
+
+      // ── QUIZ DATA ─────────────────────────────
+      const quizData = [
+        {
+          question:
+            "When you sit down to do deep work, what usually happens within the first 20 minutes?",
+          options: [
+            {
+              text: "I drift to email, Slack, or random tabs without realising it",
+              points: 1,
+              cat: "scattered",
+            },
+            {
+              text: "I get going but lose momentum mid-task and feel stuck",
+              points: 2,
+              cat: "drifter",
+            },
+            {
+              text: "I push through but feel like I'm running on fumes the entire time",
+              points: 3,
+              cat: "burnout",
+            },
+            {
+              text: "I enter flow reliably and produce my best work",
+              points: 4,
+              cat: "peak",
+            },
+          ],
+        },
+        {
+          question:
+            "How do you feel after a day packed with back-to-back meetings?",
+          options: [
+            {
+              text: "Completely empty — I can't form a coherent sentence by 5pm",
+              points: 1,
+              cat: "burnout",
+            },
+            {
+              text: "Mildly drained but I can push through with coffee or willpower",
+              points: 2,
+              cat: "scattered",
+            },
+            {
+              text: "Frustrated — I had no time for actual work, but I'm not exhausted",
+              points: 3,
+              cat: "drifter",
+            },
+            {
+              text: "I batch meetings strategically so this rarely happens",
+              points: 4,
+              cat: "peak",
+            },
+          ],
+        },
+        {
+          question:
+            "How many tabs or apps do you typically have open while doing focused work?",
+          options: [
+            {
+              text: "20+ — I need everything visible or I forget about it",
+              points: 1,
+              cat: "scattered",
+            },
+            {
+              text: "8–20 — I keep 'just in case' references open constantly",
+              points: 2,
+              cat: "drifter",
+            },
+            {
+              text: "3–8 — I try to focus but distractions creep in",
+              points: 3,
+              cat: "burnout",
+            },
+            {
+              text: "1–3 — I work in single-task sessions with everything else closed",
+              points: 4,
+              cat: "peak",
+            },
+          ],
+        },
+        {
+          question:
+            "When you face a hard decision, what's your internal experience?",
+          options: [
+            {
+              text: "Paralysis — I loop on options and can't commit without external input",
+              points: 1,
+              cat: "scattered",
+            },
+            {
+              text: "Delay — I postpone it, hoping clarity arrives on its own",
+              points: 2,
+              cat: "drifter",
+            },
+            {
+              text: "Anxiety — I decide quickly just to end the discomfort, often regretting it",
+              points: 3,
+              cat: "burnout",
+            },
+            {
+              text: "Clarity — I have a reliable framework and make decisions with confidence",
+              points: 4,
+              cat: "peak",
+            },
+          ],
+        },
+        {
+          question:
+            "At the end of a typical workday, how do you feel about what you accomplished?",
+          options: [
+            {
+              text: "Busy but empty — lots of activity, almost nothing actually shipped",
+              points: 1,
+              cat: "scattered",
+            },
+            {
+              text: "Okay — I made progress but it felt slower and harder than it should",
+              points: 2,
+              cat: "drifter",
+            },
+            {
+              text: "Proud but depleted — I did good work but I'm not sure how long I can sustain this",
+              points: 3,
+              cat: "burnout",
+            },
+            {
+              text: "Satisfied — I moved the needle on what actually matters, and I still have energy",
+              points: 4,
+              cat: "peak",
+            },
+          ],
+        },
+      ];
+
+      const resultsData = [
+        {
+          category: "COGNITIVE PROFILE",
+          emoji: "🌀",
+          title: "The Scattered Achiever",
+          summary:
+            "Your cognitive engine is powerful but untethered. You're not lazy or undisciplined — your attention architecture is simply poorly configured for the demands you're facing. The output you're capable of is significantly higher than what you're currently producing.",
+          mistakes: [
+            "Attention Leak: You operate in reactive mode — your cognitive resources are consumed by whatever demands attention loudest, not what matters most.",
+            "Context Overload: Keeping too many open loops in working memory creates a permanent low-grade cognitive drain that masquerades as tiredness.",
+            "Trigger Blindness: You haven't mapped the specific environmental cues that pull you out of focus — so you can't neutralize them.",
+          ],
+          actionTitle:
+            "Your First Move: Implement a 90-Minute Containment Block",
+          actionDesc:
+            "Block your top 90-minute window each morning for a single output. No comms, no tabs except the work. This one structural change removes the trigger architecture feeding your scatter pattern.",
+          ctaText: "Get Full Scattered Achiever Protocol →",
+        },
+        {
+          category: "COGNITIVE PROFILE",
+          emoji: "🌫️",
+          title: "The Focused Drifter",
+          summary:
+            "You can focus — you simply lose motivational momentum mid-task. Your bottleneck isn't attention, it's completion energy. You start strong but the cognitive cost of sustained follow-through exceeds your current reserves.",
+          mistakes: [
+            "Completion Debt: Unfinished tasks create open loops that sit in working memory and quietly drain cognitive resources even when you're not actively thinking about them.",
+            "Progress Invisibility: Without visible momentum markers, your brain treats long tasks as infinite — which triggers premature disengagement.",
+            "Recovery Gap: You're not cycling between effort and recovery intentionally, so fatigue accumulates invisibly across the week.",
+          ],
+          actionTitle: "Your First Move: Install Weekly Completion Rituals",
+          actionDesc:
+            "End each Friday with a 20-minute 'closure audit' — explicitly marking tasks done or consciously parking them. This clears open loops from working memory and dramatically improves your Monday entry state.",
+          ctaText: "Get Full Focused Drifter Protocol →",
+        },
+        {
+          category: "COGNITIVE PROFILE",
+          emoji: "🔥",
+          title: "The Burned-Out Expert",
+          summary:
+            "You're performing at a high level through sheer will — but the substrate is deteriorating. Your cognitive output is strong today but your trajectory is unsustainable. The risk isn't failure, it's a forced stop — a health event, a burnout crash, or a creative shutdown that comes without warning.",
+          mistakes: [
+            "Cortisol Accumulation: Sustained high-output without adequate recovery phases causes hormonal dysregulation that impairs prefrontal cortex function — the exact faculty you rely on most.",
+            "Recovery Avoidance: High-performers often treat rest as wasted time. In practice, strategic recovery is what makes elite performance sustainable.",
+            "Identity Fusion: Your performance has become so fused with your self-concept that slowing down feels like failure — which prevents the recovery your system urgently needs.",
+          ],
+          actionTitle:
+            "Your First Move: Audit Your Week for Hidden Cognitive Costs",
+          actionDesc:
+            "List every activity that depletes you versus restores you. Most burned-out experts discover they've systematically eliminated recovery from their schedule. Reintegrating 2–3 intentional restoration windows per week produces measurable performance improvement within 10 days.",
+          ctaText: "Get Full Burned-Out Expert Protocol →",
+        },
+        {
+          category: "COGNITIVE PROFILE",
+          emoji: "⚡",
+          title: "The Peak Performer",
+          summary:
+            "Your cognitive architecture is well-tuned. You've built habits that protect attention, manage energy, and sustain output without accumulating debt. The opportunity at your stage isn't fixing broken fundamentals — it's optimizing the ceiling and building resilience against the edge cases that still destabilize you.",
+          mistakes: [
+            "Ceiling Complacency: Peak performers often plateau because their system is good enough to prevent pain — but not optimized for the next tier of output.",
+            "Single-Point Dependency: Your performance likely relies on a small number of key conditions. When those conditions break (travel, illness, conflict), performance drops sharply.",
+            "Skill Horizon Blindness: The cognitive demands of your next level of ambition are different from what got you here — and preparation for those demands requires deliberate, proactive work.",
+          ],
+          actionTitle: "Your First Move: Map Your Performance Edge Cases",
+          actionDesc:
+            "Identify the 3 conditions that most reliably knock you off your game. Build explicit pre-protocols for each scenario. Elite cognitive performance is less about average state and more about minimum state — how good are you when conditions are hard?",
+          ctaText: "Get Full Peak Performer Protocol →",
+        },
+      ];
+
+      // ── QUIZ STATE ─────────────────────────────
+      const STATE = {
+        currentQuestion: 0,
+        answers: {},
+        score: 0,
+        userEmail: "",
+        flairElements: [],
+        flairIndex: 0,
+        mousePos: { x: 0, y: 0 },
+        lastMousePos: { x: 0, y: 0 },
+      };
+
+      const questionContainer = document.getElementById("questionContainer");
+      const progressFill = document.getElementById("progressFill");
+      const currentQEl = document.getElementById("currentQ");
+      const prevBtn = document.getElementById("prevBtn");
+      const nextBtn = document.getElementById("nextBtn");
+      const emailGateModal = document.getElementById("emailGateModal");
+      const resultModal = document.getElementById("resultModal");
+      const resultContent = document.getElementById("resultContent");
+
+      function renderQuestion() {
+        const q = quizData[STATE.currentQuestion];
+        questionContainer.innerHTML = `
+    <h2 class="question-title initial-hidden" style="font-family:var(--font-heading);font-weight:700;font-size:1.45rem;letter-spacing:-0.03em;margin-bottom:20px;line-height:1.25;opacity:0;transform:translateY(20px)">${q.question}</h2>
+    ${q.options
+      .map(
+        (opt, idx) => `
+      <div class="question-card initial-hidden" data-index="${idx}" style="opacity:0;transform:translateY(20px)">
+        <div class="option-icon">${idx + 1}</div>
+        <span class="option-text">${opt.text}</span>
+      </div>`,
+      )
+      .join("")}`;
+
+        gsap.to(questionContainer.querySelector(".question-title"), {
+          opacity: 1,
+          y: 0,
+          duration: 0.4,
+          ease: "power3.out",
+        });
+        gsap.to(questionContainer.querySelectorAll(".question-card"), {
+          opacity: 1,
+          y: 0,
+          duration: 0.4,
+          stagger: 0.08,
+          ease: "back.out(1.2)",
+        });
+
+        questionContainer.querySelectorAll(".question-card").forEach((card) => {
+          card.addEventListener("click", () =>
+            selectAnswer(parseInt(card.dataset.index)),
+          );
+          // re-apply selected state
+          if (
+            STATE.answers[STATE.currentQuestion] ===
+            parseInt(card.dataset.index)
+          ) {
+            card.classList.add("selected");
+          }
+        });
+
+        const progress = ((STATE.currentQuestion + 1) / quizData.length) * 100;
+        progressFill.style.width = progress + "%";
+        currentQEl.textContent = STATE.currentQuestion + 1;
+        prevBtn.disabled = STATE.currentQuestion === 0;
+        nextBtn.textContent =
+          STATE.currentQuestion === quizData.length - 1
+            ? "See Results →"
+            : "Next →";
+      }
+
+      function selectAnswer(index) {
+        document.querySelectorAll(".question-card").forEach((c) => {
+          c.classList.toggle("selected", parseInt(c.dataset.index) === index);
+        });
+        STATE.answers[STATE.currentQuestion] = index;
+        if (STATE.currentQuestion < quizData.length - 1) {
+          setTimeout(() => {
+            STATE.currentQuestion++;
+            renderQuestion();
+          }, 400);
+        }
+      }
+
+      function goToNextQuestion() {
+        if (STATE.answers[STATE.currentQuestion] === undefined) return;
+        if (STATE.currentQuestion < quizData.length - 1) {
+          STATE.currentQuestion++;
+          renderQuestion();
+        } else {
+          openEmailGate();
+        }
+      }
+
+      nextBtn.addEventListener("click", () => {
+        if (STATE.currentQuestion === quizData.length - 1) {
+          openEmailGate();
+        } else if (STATE.answers[STATE.currentQuestion] !== undefined) {
+          STATE.currentQuestion++;
+          renderQuestion();
+        }
+      });
+
+      prevBtn.addEventListener("click", () => {
+        if (STATE.currentQuestion > 0) {
+          STATE.currentQuestion--;
+          renderQuestion();
+        }
+      });
+
+      renderQuestion();
+
+      // ── EMAIL GATE ─────────────────────────────
+      function openEmailGate() {
+        emailGateModal.style.display = "flex";
+        document.body.style.overflow = "hidden";
+        lenis.stop();
+        gsap.from("#emailGateModal .modal-content", {
+          duration: 0.5,
+          scale: 0.9,
+          opacity: 0,
+          ease: "elastic.out(1,0.75)",
+        });
+      }
+
+      document.getElementById("closeEmailBtn").addEventListener("click", () => {
+        emailGateModal.style.display = "none";
+        document.body.style.overflow = "";
+        lenis.start();
+      });
+
+      document.getElementById("emailForm").addEventListener("submit", (e) => {
+        e.preventDefault();
+        STATE.userEmail = document.getElementById("emailInput").value;
+        emailGateModal.style.display = "none";
+        calculateAndShowResults();
+        document.body.style.overflow = "hidden";
+      });
+
+      // ── RESULTS ───────────────────────────────
+      function calculateAndShowResults() {
+        let totalPoints = 0;
+        Object.entries(STATE.answers).forEach(([qi, ai]) => {
+          totalPoints += quizData[parseInt(qi)].options[ai].points;
+        });
+        STATE.score = totalPoints;
+        const max = quizData.length * 4;
+        const pct = totalPoints / max;
+        let resultIdx = 0;
+        if (pct >= 0.85) resultIdx = 3;
+        else if (pct >= 0.6) resultIdx = 2;
+        else if (pct >= 0.38) resultIdx = 1;
+        showResults(resultIdx, totalPoints);
+      }
+
+      function showResults(resultIdx) {
+        const r = resultsData[resultIdx];
+        const imgs = [
+          "https://assets.cdn.filesafe.space/3Mh94ewIWZaOQuAxTDt4/media/69b439beeba48751402641db.png",
+          "https://assets.cdn.filesafe.space/3Mh94ewIWZaOQuAxTDt4/media/69b439be070c58e28e626115.png",
+          "https://assets.cdn.filesafe.space/3Mh94ewIWZaOQuAxTDt4/media/69b439bebfc81f54f4f24807.png",
+          "https://assets.cdn.filesafe.space/3Mh94ewIWZaOQuAxTDt4/media/69b439be070c582337626116.png",
+        ];
+        resultContent.innerHTML = `
+    <div class="result-avatar-container">
+      <img src="${imgs[resultIdx]}" alt="" class="result-avatar-img" style="width:100px;height:100px;border-radius:50%;object-fit:cover;border:4px solid rgba(255,255,255,0.8);box-shadow:var(--clay-shadow);transform:scale(0.8);opacity:0">
+      <span class="result-badge" style="position:absolute;left:120px;top:16px;background:var(--grad-accent);color:#fff;font-size:0.72rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;padding:6px 14px;border-radius:50px;transform:translateY(10px);opacity:0">${r.emoji} ${r.category}</span>
+    </div>
+    <h2 class="result-headline" style="font-family:var(--font-heading);font-weight:800;font-size:1.8rem;letter-spacing:-0.04em;margin-bottom:12px;transform:scale(0.95);opacity:0">${r.title}</h2>
+    <p class="result-summary" style="color:var(--secondary);font-size:0.92rem;line-height:1.7;margin-bottom:20px;transform:translateX(-10px);opacity:0">${r.summary}</p>
+    <div class="result-mistakes" style="background:rgba(39,60,57,0.05);border:1px solid rgba(39,60,57,0.15);border-radius:20px;padding:20px;margin-bottom:20px;opacity:0">
+      <div class="mistake-title" style="font-weight:700;font-size:0.9rem;margin-bottom:12px;display:flex;align-items:center;gap:8px"><span style="color:var(--accent)">⚠️</span> Your Top 3 Cognitive Leaks</div>
+      <ul class="mistake-list" style="list-style:none">
+        ${r.mistakes.map((m) => `<li class="mistake-item" style="display:flex;gap:10px;padding:8px 0;font-size:0.88rem;border-bottom:1px solid rgba(39,60,57,0.1);transform:translateX(-10px);opacity:0"><span style="color:var(--accent);font-size:0.9rem">•</span><span>${m}</span></li>`).join("")}
+      </ul>
+    </div>
+    <div class="recommended-action" style="background:linear-gradient(135deg,rgba(39,60,57,0.07),rgba(39,60,57,0.02));border:2px solid rgba(39,60,57,0.15);border-radius:20px;padding:20px;margin-bottom:16px;transform:translateY(10px);opacity:0">
+      <div class="action-title" style="font-weight:700;font-size:0.95rem;margin-bottom:8px;color:var(--accent)">${r.actionTitle}</div>
+      <p class="action-desc" style="color:var(--secondary);font-size:0.88rem;line-height:1.65;margin-bottom:14px">${r.actionDesc}</p>
+      <a href="#" class="action-btn" style="display:inline-block;background:var(--grad-accent);color:#fff;padding:11px 22px;border-radius:50px;font-weight:700;font-size:0.85rem;text-decoration:none;box-shadow:0 4px 12px rgba(39,60,57,0.3)">${r.ctaText}</a>
+    </div>
+    <p class="sent-notice" style="color:var(--success);font-size:0.82rem;font-weight:500;margin-bottom:10px;opacity:0;text-align:center">📧 Full report sent to ${STATE.userEmail}</p>
+    <div class="reset-link" style="text-align:center;opacity:0"><a href="#quiz" style="color:var(--secondary);font-size:0.82rem;text-decoration:underline" id="retakeLink">Retake the Diagnostic</a></div>`;
+
+        resultModal.style.display = "flex";
+
+        const tl = gsap.timeline();
+        tl.fromTo(
+          resultModal.querySelector(".result-modal"),
+          { clipPath: "polygon(0 0,0% 0,0% 100%,0% 100%)" },
+          {
+            clipPath: "polygon(0 0,100% 0,100% 100%,0% 100%)",
+            duration: 0.5,
+            ease: "power2.out",
+          },
+        )
+          .to(
+            ".result-avatar-img",
+            { scale: 1, opacity: 1, duration: 0.45, ease: "back.out(1.7)" },
+            "-=0.1",
+          )
+          .to(".result-badge", { y: 0, opacity: 1, duration: 0.35 }, "-=0.25")
+          .to(
+            ".result-headline",
+            { scale: 1, opacity: 1, duration: 0.35 },
+            "-=0.2",
+          )
+          .to(".result-summary", { x: 0, opacity: 1, duration: 0.35 }, "-=0.2")
+          .to(".result-mistakes", { opacity: 1, duration: 0.3 }, "-=0.15")
+          .to(".mistake-item", { x: 0, opacity: 1, stagger: 0.08 }, "-=0.2")
+          .to(
+            ".recommended-action",
+            { y: 0, opacity: 1, duration: 0.35 },
+            "-=0.15",
+          )
+          .to([".sent-notice", ".reset-link"], { opacity: 1, duration: 0.3 });
+
+        const retakeLink = document.getElementById("retakeLink");
+        if (retakeLink) {
+          retakeLink.addEventListener("click", (e) => {
+            e.preventDefault();
+            resultModal.style.display = "none";
+            document.body.style.overflow = "";
+            lenis.start();
+            STATE.currentQuestion = 0;
+            STATE.answers = {};
+            STATE.score = 0;
+            renderQuestion();
+            document
+              .getElementById("quiz")
+              .scrollIntoView({ behavior: "smooth" });
+          });
+        }
+      }
+
+      document
+        .getElementById("closeResultBtn")
+        .addEventListener("click", () => {
+          resultModal.style.display = "none";
+          document.body.style.overflow = "";
+          lenis.start();
+        });
+
+      // ── LENIS ↔ SCROLLTRIGGER SYNC ────────────
+      lenis.on("scroll", ScrollTrigger.update);
+      gsap.ticker.add((time) => {
+        lenis.raf(time * 1000);
+      });
+      gsap.ticker.lagSmoothing(0);
+
+      // ── BENTO HERO FLIP ────────────────────────
+      const galleryElement = document.getElementById("gallery-8");
+      const galleryItems = galleryElement.querySelectorAll(".gallery__item");
+      const heroOverlay = document.getElementById("heroOverlay");
+
+      const tlReveal = gsap.timeline({ delay: 0.3 });
+      tlReveal
+        .to(".hero-initial-overlay .reveal-text span", {
+          y: "0%",
+          duration: 1.2,
+          stagger: 0.12,
+          ease: "power4.out",
+        })
+        .to(
+          ".hero-initial-overlay .reveal-sub",
+          { opacity: 1, y: 0, duration: 0.8 },
+          "-=0.7",
+        );
+
+      // 1. Record the bento (initial) state
+      const initialState = Flip.getState(galleryItems);
+
+      // 2. Apply the final class so the grid snaps to full-screen layout
+      galleryElement.classList.add("gallery--final");
+
+      // 3. Animate FROM the recorded bento state back to now (the full layout)
+      //    This creates a paused timeline that goes bento → full
+      const flipAnim = Flip.from(initialState, {
+        ease: "none",
+        simple: true,
+        paused: true,
+        duration: 1,
+      });
+
+      ScrollTrigger.create({
+        trigger: galleryElement.parentNode,
+        start: "top top",
+        end: "+=120%",
+        scrub: 0,
+        pin: true,
+        onUpdate: (self) => {
+          flipAnim.progress(self.progress);
+          gsap.set(heroOverlay, {
+            opacity: Math.max(0, 1 - self.progress * 2.2),
+          });
+        },
+      });
+
+      // ── FALLING ICON TRAIL ─────────────────────
+      const flairAssets = [
+        "https://assets.codepen.io/16327/Revised+Flair.png",
+        "https://assets.codepen.io/16327/Revised+Flair-1.png",
+        "https://assets.codepen.io/16327/Revised+Flair-2.png",
+        "https://assets.codepen.io/16327/Revised+Flair-3.png",
+        "https://assets.codepen.io/16327/Revised+Flair-4.png",
+        "https://assets.codepen.io/16327/Revised+Flair-5.png",
+        "https://assets.codepen.io/16327/Revised+Flair-6.png",
+        "https://assets.codepen.io/16327/Revised+Flair-7.png",
+        "https://assets.codepen.io/16327/Revised+Flair-8.png",
+      ];
+
+      const quizSection = document.getElementById("quiz");
+      const flairContainer = document.getElementById("flair-container");
+
+      function initFlairs() {
+        for (let i = 0; i < 100; i++) {
+          const img = document.createElement("img");
+          img.className = "flair";
+          img.src = flairAssets[i % flairAssets.length];
+          flairContainer.appendChild(img);
+          STATE.flairElements.push(img);
+        }
+      }
+      initFlairs();
+
+      function playFlairAnimation(shape, x, y) {
+        gsap.killTweensOf(shape);
+        gsap.set(shape, {
+          opacity: 1,
+          scale: 1,
+          left: x,
+          top: y,
+          xPercent: -50,
+          yPercent: -50,
+          rotation: 0,
+          y: 0,
+          display: "block",
+          position: "absolute",
+        });
+        const tl = gsap.timeline();
+        tl.from(shape, {
+          opacity: 0,
+          scale: 0,
+          ease: "elastic.out(1,0.3)",
+          duration: 0.3,
+        })
+          .to(shape, { rotation: "random([-360,360])", duration: 1 }, 0)
+          .to(shape, { y: "120vh", ease: "back.in(.4)", duration: 1 }, 0);
+      }
+
+      function updateImageTrail() {
+        const d = Math.hypot(
+          STATE.lastMousePos.x - STATE.mousePos.x,
+          STATE.lastMousePos.y - STATE.mousePos.y,
+        );
+        if (d > 60) {
+          const idx = STATE.flairIndex % STATE.flairElements.length;
+          playFlairAnimation(
+            STATE.flairElements[idx],
+            STATE.mousePos.x,
+            STATE.mousePos.y,
+          );
+          STATE.lastMousePos = { ...STATE.mousePos };
+          STATE.flairIndex++;
+        }
+      }
+
+      quizSection.addEventListener("mousemove", (e) => {
+        const rect = quizSection.getBoundingClientRect();
+        STATE.mousePos = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+      });
+
+      gsap.ticker.add(updateImageTrail);
+
+      // ── CURSOR GLOW ───────────────────────────
+      function initCursorGlow(sectionEl, glowEl) {
+        sectionEl.addEventListener("mousemove", (e) => {
+          const rect = sectionEl.getBoundingClientRect();
+          gsap.to(glowEl, {
+            x: e.clientX - rect.left,
+            y: e.clientY - rect.top,
+            opacity: 1,
+            duration: 0.3,
+          });
+        });
+        sectionEl.addEventListener("mouseleave", () =>
+          gsap.to(glowEl, { opacity: 0, duration: 0.3 }),
+        );
+      }
+      const featSect = document.getElementById("how-it-works");
+      const featGlow = document.getElementById("featuresGlow");
+      if (featSect && featGlow) initCursorGlow(featSect, featGlow);
+
+      // ── SCROLL ANIMATIONS ─────────────────────
+      gsap.utils.toArray(".feature-card").forEach((card, i) => {
+        gsap.from(card, {
+          scrollTrigger: { trigger: card, start: "top 85%" },
+          opacity: 0,
+          y: 40,
+          duration: 0.7,
+          delay: i * 0.1,
+          ease: "power3.out",
+        });
+      });
+      gsap.utils.toArray(".testimonial-card").forEach((card, i) => {
+        gsap.from(card, {
+          scrollTrigger: { trigger: card, start: "top 85%" },
+          opacity: 0,
+          y: 40,
+          duration: 0.7,
+          delay: i * 0.1,
+        });
+      });
+      gsap.utils.toArray(".pricing-card").forEach((card, i) => {
+        gsap.from(card, {
+          scrollTrigger: { trigger: card, start: "top 85%" },
+          opacity: 0,
+          y: 40,
+          duration: 0.7,
+          delay: i * 0.1,
+        });
+      });
+      gsap.utils
+        .toArray(".section-title, .section-subtitle, .section-label")
+        .forEach((el) => {
+          gsap.from(el, {
+            scrollTrigger: { trigger: el, start: "top 88%" },
+            opacity: 0,
+            y: 30,
+            duration: 0.6,
+          });
+        });
+      gsap.from(".banner-title, .banner-subtitle", {
+        scrollTrigger: { trigger: ".cta-banner", start: "top 80%" },
+        opacity: 0,
+        y: 40,
+        duration: 0.8,
+        stagger: 0.15,
+      });
+
+      // ── FAQ HOVER + ACCORDION ─────────────────
+      gsap.set(".hover-trigger .follower-element", {
+        yPercent: -100,
+        xPercent: 0,
+      });
+      let isInitialFrame;
+
+      gsap.utils.toArray(".hover-trigger").forEach((trigger) => {
+        const followerMedia = trigger.querySelector(".follower-element");
+        if (!followerMedia) return;
+        const syncX = gsap.quickTo(followerMedia, "x", {
+          duration: 0.4,
+          ease: "power3",
+        });
+        const syncY = gsap.quickTo(followerMedia, "y", {
+          duration: 0.4,
+          ease: "power3",
+        });
+        const reconcilePointer = (e) => {
+          if (isInitialFrame) {
+            syncX(e.clientX);
+            syncY(e.clientY);
+            isInitialFrame = false;
+          } else {
+            syncX(e.clientX);
+            syncY(e.clientY);
+          }
+        };
+        const enableGlobal = () =>
+          document.addEventListener("mousemove", reconcilePointer);
+        const disableGlobal = () =>
+          document.removeEventListener("mousemove", reconcilePointer);
+        const opTl = gsap.to(followerMedia, {
+          autoAlpha: 1,
+          ease: "none",
+          paused: true,
+          duration: 0.1,
+          onReverseComplete: disableGlobal,
+        });
+        trigger.addEventListener("mouseenter", (e) => {
+          isInitialFrame = true;
+          opTl.play();
+          enableGlobal();
+          reconcilePointer(e);
+        });
+        trigger.addEventListener("mouseleave", () => opTl.reverse());
+      });
+
+      document.querySelectorAll(".faq-question").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const item = btn.parentElement;
+          const answer = item.querySelector(".faq-answer");
+          const opening = !item.classList.contains("active");
+          document.querySelectorAll(".faq-item.active").forEach((i) => {
+            if (i !== item) {
+              i.classList.remove("active");
+              i.querySelector(".faq-question").setAttribute(
+                "aria-expanded",
+                "false",
+              );
+              gsap.to(i.querySelector(".faq-answer"), {
+                maxHeight: 0,
+                duration: 0.3,
+                ease: "power2.inOut",
+              });
+            }
+          });
+          item.classList.toggle("active");
+          btn.setAttribute("aria-expanded", opening);
+          gsap.to(answer, {
+            maxHeight: opening ? answer.scrollHeight + 40 : 0,
+            duration: 0.4,
+            ease: "power2.inOut",
+          });
+        });
+      });
+
+      // ── NAV / CTA BUTTONS ─────────────────────
+      document.getElementById("startQuizBtn").addEventListener("click", () => {
+        document.getElementById("quiz").scrollIntoView({ behavior: "smooth" });
+      });
+      document.getElementById("navStartBtn").addEventListener("click", () => {
+        document.getElementById("quiz").scrollIntoView({ behavior: "smooth" });
+      });
+
+      // ── ESCAPE KEY CLOSE ──────────────────────
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+          emailGateModal.style.display = "none";
+          resultModal.style.display = "none";
+          document.body.style.overflow = "";
+          lenis.start();
+        }
+      });
+
+      // ── LEGAL MODAL ───────────────────────────
+      document.addEventListener("click", (e) => {
+        if (e.target.classList.contains("legal-btn")) {
+          const type = e.target.dataset.legal;
+          alert(
+            `${type.charAt(0).toUpperCase() + type.slice(1)} Policy — Contact legal@neuropeak.com for details.`,
+          );
+        }
+      });
+    </script>
+  </body>
+</html>

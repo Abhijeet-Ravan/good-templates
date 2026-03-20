@@ -1,0 +1,1694 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>terminal.pages — high-converting CLI aesthetic landing pages</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: 10, 12, 10;
+        --phosphor: 0, 255, 80;
+        --phosphor-dim: 0, 150, 50;
+        --phosphor-bright: 100, 255, 140;
+        --cursor: 0, 255, 80;
+        --scanline: 0, 255, 80;
+        --glow: 0, 255, 80;
+        --anchor: 15, 18, 15;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        background-color: rgb(var(--bg));
+        color: rgba(var(--phosphor), 1);
+        font-family:
+          "JetBrains Mono", "IBM Plex Mono", "Fira Code", "Courier New",
+          monospace;
+        line-height: 1.5;
+        overflow-x: hidden;
+        position: relative;
+        -webkit-font-smoothing: antialiased;
+        text-shadow: 0 0 6px rgba(var(--phosphor), 0.5);
+      }
+
+      .crt-scanline {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: rgba(var(--scanline), 0.03);
+        animation: scanline 8s linear infinite;
+        pointer-events: none;
+        z-index: 1000;
+      }
+
+      @keyframes scanline {
+        from {
+          top: -2px;
+        }
+        to {
+          top: 100%;
+        }
+      }
+
+      .container {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 0 24px;
+      }
+
+      .session-header {
+        color: rgba(var(--phosphor-dim), 0.8);
+        font-size: clamp(0.75rem, 1.1vw, 0.875rem);
+        margin-bottom: 24px;
+        text-align: center;
+      }
+
+      .separator {
+        color: rgba(var(--phosphor-dim), 0.6);
+        text-align: center;
+        margin: 32px 0;
+        font-size: clamp(0.875rem, 1.4vw, 1rem);
+        letter-spacing: 0.25em;
+      }
+
+      .double-separator {
+        color: rgba(var(--phosphor), 0.9);
+        margin: 40px 0;
+        font-size: clamp(0.875rem, 1.4vw, 1rem);
+        letter-spacing: 0.2em;
+      }
+
+      .anim-ready {
+        opacity: 0;
+      }
+
+      .anim-visible {
+        opacity: 1;
+        transition: opacity 280ms cubic-bezier(0.25, 0, 0.25, 1);
+      }
+
+      .anim-line {
+        opacity: 0;
+        min-height: 1.5em;
+      }
+
+      .anim-line.anim-visible {
+        opacity: 1;
+        transition: opacity 200ms cubic-bezier(0.25, 0, 0.25, 1);
+      }
+
+      .cursor {
+        display: inline-block;
+        width: 8px;
+        animation: blink 1.1s step-start infinite;
+      }
+
+      @keyframes blink {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0;
+        }
+      }
+
+      .progress-container {
+        width: 100%;
+        height: 4px;
+        background: rgba(var(--phosphor-dim), 0.3);
+        margin: 32px 0;
+        border-radius: 0;
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: rgba(var(--phosphor), 1);
+        width: 0;
+        transition: width 1800ms cubic-bezier(0.25, 0, 0.25, 1);
+      }
+
+      .progress-fill.anim-visible {
+        width: 100%;
+      }
+
+      .command-heading {
+        font-size: clamp(0.875rem, 1.4vw, 1rem);
+        color: rgba(var(--phosphor), 1);
+        margin: 32px 0 24px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .command-heading::before {
+        content: "$";
+        color: rgba(var(--phosphor), 1);
+        margin-right: 8px;
+      }
+
+      .dim {
+        color: rgba(var(--phosphor-dim), 0.9);
+        text-shadow: none;
+      }
+
+      .bright {
+        color: rgba(var(--phosphor-bright), 1);
+        text-shadow: 0 0 12px rgba(var(--phosphor), 0.8);
+      }
+
+      .status-ok {
+        color: rgba(var(--phosphor), 1);
+        background: rgba(var(--phosphor), 0.08);
+        padding: 2px 8px;
+        border-radius: 0;
+        font-size: clamp(0.75rem, 1vw, 0.875rem);
+        display: inline-block;
+        margin-left: 12px;
+      }
+
+      .status-warn {
+        color: rgba(255, 180, 0, 1);
+        background: rgba(255, 180, 0, 0.08);
+        padding: 2px 8px;
+        border-radius: 0;
+        font-size: clamp(0.75rem, 1vw, 0.875rem);
+        display: inline-block;
+      }
+
+      .boot-line {
+        margin-bottom: 6px;
+        white-space: nowrap;
+      }
+
+      .hero {
+        min-height: 90vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 40px 0;
+      }
+
+      .boot-container {
+        max-width: 800px;
+        margin: 0 auto;
+      }
+
+      .ascii-logo {
+        font-size: clamp(0.75rem, 1.2vw, 0.875rem);
+        line-height: 1;
+        margin: 16px 0 24px;
+        letter-spacing: -0.5px;
+        color: rgba(var(--phosphor-dim), 0.95);
+      }
+
+      .product-name {
+        font-size: clamp(1.875rem, 4.5vw, 4.5rem);
+        font-weight: 700;
+        line-height: 1.1;
+        letter-spacing: -0.02em;
+        margin: 16px 0 8px;
+        color: rgba(var(--phosphor), 1);
+        text-shadow: 0 0 16px rgba(var(--phosphor), 0.7);
+      }
+
+      .version-string {
+        color: rgba(var(--phosphor-dim), 0.8);
+        font-size: clamp(0.8125rem, 1.1vw, 0.9375rem);
+        display: block;
+        margin-top: 4px;
+      }
+
+      .proof-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 4px 0;
+        border-left: 2px solid transparent;
+        transition: all 150ms cubic-bezier(0.25, 0, 0.25, 1);
+      }
+
+      .proof-item:hover {
+        border-left: 2px solid rgba(var(--phosphor), 1);
+        text-shadow: 0 0 10px rgba(var(--phosphor), 0.6);
+      }
+
+      .man-page {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 10px 24px;
+        margin: 28px 0;
+      }
+
+      .man-flag {
+        font-weight: 500;
+        color: rgba(var(--phosphor), 1);
+      }
+
+      .man-desc {
+        color: rgba(var(--phosphor-dim), 0.9);
+        padding-left: 2px;
+      }
+
+      @media (max-width: 768px) {
+        .man-page {
+          grid-template-columns: 1fr;
+        }
+        .man-flag::after {
+          content: ":";
+        }
+      }
+
+      .testimonial {
+        padding: 14px 0;
+        border-top: 1px solid rgba(var(--phosphor-dim), 0.15);
+        transition: text-shadow 120ms;
+        line-height: 1.45;
+      }
+
+      .testimonial:hover {
+        text-shadow: 0 0 12px rgba(var(--phosphor), 0.6);
+      }
+
+      .commit-hash {
+        color: rgba(var(--phosphor-dim), 0.8);
+        margin-right: 16px;
+      }
+
+      .commit-author {
+        color: rgba(var(--phosphor-bright), 1);
+        font-weight: 500;
+      }
+
+      .commit-date {
+        color: rgba(var(--phosphor-dim), 0.7);
+        margin-left: 12px;
+      }
+
+      .pricing-plan {
+        background: rgba(var(--phosphor), 0.03);
+        border: 1px solid rgba(var(--phosphor-dim), 0.3);
+        border-radius: 0;
+        padding: 28px;
+        margin: 24px 0;
+        transition: all 150ms;
+      }
+
+      .pricing-plan:hover {
+        border-color: rgba(var(--phosphor), 1);
+        box-shadow: 0 0 16px rgba(var(--phosphor), 0.3);
+      }
+
+      .plan-name {
+        font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+        font-weight: 700;
+        margin-bottom: 14px;
+      }
+
+      .plan-price {
+        font-size: clamp(2rem, 4vw, 3.5rem);
+        font-weight: 700;
+        margin: 16px 0 20px;
+        color: rgba(var(--phosphor), 1);
+        text-shadow: 0 0 16px rgba(var(--phosphor), 0.7);
+      }
+
+      .plan-feature {
+        margin: 8px 0;
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+      }
+
+      .plan-feature::before {
+        content: "•";
+        color: rgba(var(--phosphor), 0.9);
+        margin-top: 4px;
+      }
+
+      .install-section {
+        background-color: rgb(var(--anchor));
+        padding: 80px 0;
+        text-align: center;
+        position: relative;
+      }
+
+      .install-command {
+        font-size: clamp(1.25rem, 2.2vw, 1.75rem);
+        background: rgba(var(--phosphor), 0.08);
+        padding: 28px;
+        border: 1px solid rgba(var(--phosphor), 0.4);
+        border-radius: 0;
+        display: inline-block;
+        margin: 32px auto;
+        position: relative;
+        width: 100%;
+        max-width: 800px;
+        text-align: left;
+        white-space: nowrap;
+      }
+
+      .copy-btn {
+        background: transparent;
+        border: 1px solid rgba(var(--phosphor), 0.7);
+        color: rgba(var(--phosphor), 1);
+        padding: 10px 24px;
+        font-family: inherit;
+        font-size: 0.9375rem;
+        border-radius: 0;
+        cursor: pointer;
+        margin-top: 20px;
+        transition: all 150ms;
+        min-width: 180px;
+      }
+
+      .copy-btn:hover {
+        background: rgba(var(--phosphor), 0.1);
+        box-shadow: 0 0 16px rgba(var(--phosphor), 0.5);
+        text-shadow: 0 0 10px rgba(var(--phosphor), 0.8);
+      }
+
+      .faq-item {
+        margin: 20px 0;
+        cursor: pointer;
+        border-left: 2px solid transparent;
+        padding-left: 18px;
+        transition: border-color 150ms;
+      }
+
+      .faq-item:hover {
+        border-left: 2px solid rgba(var(--phosphor), 0.6);
+      }
+
+      .faq-question {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 500;
+        padding: 10px 0;
+      }
+
+      .faq-question::before {
+        content: "--";
+        color: rgba(var(--phosphor), 1);
+      }
+
+      .faq-answer {
+        padding: 12px 0 16px 24px;
+        color: rgba(var(--phosphor-dim), 0.9);
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 250ms cubic-bezier(0.25, 0, 0.25, 1);
+        line-height: 1.5;
+      }
+
+      .faq-item.active .faq-answer {
+        max-height: 600px;
+      }
+
+      .nav {
+        display: flex;
+        justify-content: space-between;
+        padding: 24px 0;
+        border-bottom: 1px solid rgba(var(--phosphor-dim), 0.2);
+        position: sticky;
+        top: 0;
+        background: rgb(var(--bg));
+        z-index: 999;
+      }
+
+      .nav-logo {
+        font-weight: 700;
+        font-size: 1.25rem;
+        text-decoration: none;
+        color: rgba(var(--phosphor), 1);
+      }
+
+      .nav-link {
+        color: rgba(var(--phosphor), 1);
+        text-decoration: none;
+        font-size: 0.9375rem;
+      }
+
+      .nav-link:hover {
+        text-shadow: 0 0 10px rgba(var(--phosphor), 0.8);
+      }
+
+      .success-status {
+        color: rgba(var(--phosphor), 1);
+        font-weight: 500;
+        margin: 28px 0 16px;
+        opacity: 0;
+        transform: translateY(4px);
+        transition: all 300ms cubic-bezier(0.25, 0, 0.25, 1);
+      }
+
+      .success-status.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .metric-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 24px;
+        margin: 32px 0;
+      }
+
+      .metric-card {
+        background: rgba(var(--phosphor), 0.04);
+        padding: 24px;
+        border: 1px solid rgba(var(--phosphor-dim), 0.25);
+        text-align: center;
+        border-radius: 0;
+      }
+
+      .metric-value {
+        font-size: clamp(2.5rem, 5vw, 4.5rem);
+        font-weight: 700;
+        color: rgba(var(--phosphor), 1);
+        text-shadow: 0 0 16px rgba(var(--phosphor), 0.7);
+        line-height: 1;
+        margin: 8px 0;
+      }
+
+      .metric-label {
+        color: rgba(var(--phosphor-dim), 0.85);
+        font-size: 0.9375rem;
+      }
+
+      .diff-add {
+        color: rgba(var(--phosphor), 1);
+      }
+
+      .diff-remove {
+        color: rgba(255, 60, 60, 1);
+      }
+
+      .pipe-diagram {
+        font-size: clamp(0.875rem, 1.5vw, 1.125rem);
+        background: rgba(var(--phosphor), 0.03);
+        padding: 24px;
+        border: 1px solid rgba(var(--phosphor-dim), 0.2);
+        border-radius: 0;
+        margin: 32px 0;
+        line-height: 1.6;
+        overflow-x: auto;
+      }
+
+      .terminal-prompt {
+        background: rgb(var(--anchor));
+        border-top: 1px solid rgba(var(--phosphor-dim), 0.3);
+        padding: 28px 0;
+        margin-top: 48px;
+      }
+
+      .prompt-line {
+        display: flex;
+        max-width: 800px;
+        margin: 0 auto;
+        font-size: clamp(0.9375rem, 1.6vw, 1.125rem);
+      }
+
+      .prompt-symbol {
+        color: rgba(var(--phosphor), 1);
+        margin-right: 8px;
+        flex-shrink: 0;
+      }
+
+      .prompt-input {
+        background: transparent;
+        border: none;
+        color: rgba(var(--phosphor), 1);
+        font-family: inherit;
+        font-size: inherit;
+        width: 100%;
+        outline: none;
+        padding: 4px 0;
+      }
+
+      .prompt-input::placeholder {
+        color: rgba(var(--phosphor-dim), 0.7);
+      }
+
+      .command-response {
+        max-width: 800px;
+        margin: 12px auto 0;
+        color: rgba(var(--phosphor-dim), 0.9);
+        min-height: 24px;
+      }
+
+      .security-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 28px 0 20px;
+        font-weight: 500;
+      }
+
+      .security-header::before {
+        content: "[SECURITY]";
+        color: rgba(255, 180, 0, 1);
+        font-size: 0.875rem;
+      }
+
+      .changelog-entry {
+        padding: 12px 0;
+        border-top: 1px dashed rgba(var(--phosphor-dim), 0.2);
+      }
+
+      .changelog-hash {
+        color: rgba(var(--phosphor-dim), 0.8);
+        margin-right: 16px;
+      }
+
+      .changelog-date {
+        color: rgba(var(--phosphor-dim), 0.7);
+        font-size: 0.875rem;
+        margin-left: 12px;
+      }
+
+      .uptime-counter {
+        font-family: inherit;
+        font-size: clamp(2.5rem, 5.5vw, 5rem);
+        font-weight: 700;
+        background: rgba(var(--phosphor), 0.08);
+        padding: 16px;
+        display: inline-block;
+        margin: 24px 0;
+        letter-spacing: -1px;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .anim-ready,
+        .anim-line {
+          opacity: 1 !important;
+        }
+        .cursor {
+          animation: none !important;
+          opacity: 1 !important;
+        }
+        .progress-fill {
+          width: 100% !important;
+          transition: none !important;
+        }
+        .crt-scanline {
+          animation: none !important;
+          display: none !important;
+        }
+        * {
+          text-shadow: none !important;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .session-header {
+          display: none;
+        }
+        .hero {
+          min-height: 80vh;
+          padding: 24px 0;
+        }
+        .product-name {
+          font-size: clamp(1.75rem, 8vw, 3rem);
+        }
+        .install-command {
+          font-size: clamp(1rem, 2.8vw, 1.5rem);
+          padding: 20px;
+          white-space: normal;
+        }
+        .pipe-diagram {
+          font-size: clamp(0.8125rem, 2vw, 1rem);
+        }
+        .metric-value {
+          font-size: clamp(2rem, 6vw, 3.5rem);
+        }
+        .separator,
+        .double-separator {
+          margin: 24px 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="crt-scanline"></div>
+
+    <nav class="container nav">
+      <a href="#" class="nav-logo">terminal.pages</a>
+      <a href="#install" class="nav-link">$ deploy</a>
+    </nav>
+
+    <section class="hero anim-ready" id="hero">
+      <div class="container boot-container">
+        <div class="session-header">
+          [session: 0x4a2f | tty: /dev/pts/0 | 2026-03-20 09:14:22 UTC]
+        </div>
+
+        <pre class="ascii-logo anim-line">
+┌──────────────────────────────────────────┐
+│  ██╗ ██████╗ ████████╗████████╗███████╗  │
+│  ██║██╔═══██╗╚══██╔══╝╚══██╔══╝██╔════╝  │
+│  ██║██║   ██║   ██║      ██║   ███████╗  │
+│  ██║██║   ██║   ██║      ██║   ╚════██║  │
+│  ██║╚██████╔╝   ██║      ██║   ███████║  │
+│  ╚═╝ ╚═════╝    ╚═╝      ╚═╝   ╚══════╝  │
+└──────────────────────────────────────────┘
+      </pre
+        >
+
+        <div class="boot-sequence" id="boot-sequence">
+          <div class="boot-line anim-line">
+            [<span class="status-ok">OK</span>] initializing kernel modules...
+          </div>
+          <div class="boot-line anim-line">
+            [<span class="status-ok">OK</span>] mounting root filesystem (ext4)
+          </div>
+          <div class="boot-line anim-line">
+            [<span class="status-ok">OK</span>] starting systemd v252
+          </div>
+          <div class="boot-line anim-line">
+            [<span class="status-ok">OK</span>] detected CPU: 12-core AMD Ryzen
+          </div>
+          <div class="boot-line anim-line">
+            [<span class="status-ok">OK</span>] RAM: 64.0 GiB available
+          </div>
+          <div class="boot-line anim-line">
+            [<span class="status-ok">OK</span>] initializing GPU (headless mode)
+          </div>
+          <div class="boot-line anim-line">
+            [<span class="status-ok">OK</span>] network: eth0 link up at 10 Gbps
+          </div>
+          <div class="boot-line anim-line">
+            [<span class="status-ok">OK</span>] loading terminal emulator
+            (xterm-256color)
+          </div>
+          <div class="boot-line anim-line">
+            [<span class="status-ok">OK</span>] authenticating against
+            auth0.cluster
+          </div>
+          <div class="boot-line anim-line">
+            [<span class="status-ok">OK</span>] session established:
+            uid=1001(dev)
+          </div>
+          <div class="boot-line anim-line">
+            [<span class="status-ok">OK</span>] loading terminal.pages daemon
+            v1.2.3...
+          </div>
+          <div class="boot-line anim-line">&nbsp;</div>
+          <div class="boot-line">
+            <span class="dim"># initializing phosphor display subsystem</span>
+          </div>
+          <div class="boot-line anim-line">
+            [<span class="status-ok">OK</span>] CRT scanline overlay: active
+          </div>
+          <div class="boot-line anim-line">
+            [<span class="status-ok">OK</span>] cursor blink daemon: running
+          </div>
+          <div class="boot-line anim-line">
+            [<span class="status-ok">OK</span>] typewriter animation engine:
+            ready
+          </div>
+          <div class="boot-line anim-line">&nbsp;</div>
+          <div class="boot-line anim-line product-name" id="product-name">
+            terminal.pages<span class="cursor">|</span>
+          </div>
+          <div class="boot-line">
+            <span class="version-string"
+              >v1.2.3-stable (build 20260320.091422)</span
+            >
+          </div>
+          <div class="boot-line">&nbsp;</div>
+          <div class="boot-line anim-line">
+            <span class="dim"
+              ># high-converting landing pages in retro terminal aesthetic</span
+            >
+          </div>
+          <div class="boot-line anim-line">
+            <span class="dim"
+              ># engineered for developers, security tools, and CLI
+              products</span
+            >
+          </div>
+          <div class="boot-line anim-line">
+            <span class="dim"># done seriously — not as a gimmick</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="double-separator">
+      ═══════════════════════════════════════════
+    </div>
+
+    <section class="container anim-ready" id="whoami">
+      <div class="session-header">
+        [session: 0x4a2f | tty: /dev/pts/0 | 2026-03-20 09:14:28 UTC]
+      </div>
+      <h2 class="command-heading">whoami</h2>
+      <div class="output-container">
+        <div class="anim-line">
+          terminal.pages crafts landing pages that feel like native extensions
+          of your CLI tool.
+        </div>
+        <div class="anim-line">&nbsp;</div>
+        <div class="anim-line">
+          We engineer conversion through authenticity — not marketing fluff.
+          Every element obeys
+        </div>
+        <div class="anim-line">
+          terminal grammar: monospace only, phosphor glow, cursor persistence,
+          and CLI metaphors
+        </div>
+        <div class="anim-line">that map directly to product functionality.</div>
+        <div class="anim-line">&nbsp;</div>
+        <div class="anim-line">
+          Your users won't recognize it as "marketing" until they've already
+          converted.
+        </div>
+        <div class="anim-line">&nbsp;</div>
+        <div class="anim-line">
+          System uptime:
+          <span class="uptime-counter" id="uptime-counter">00:00:00</span>
+        </div>
+        <div class="anim-line">
+          <span class="bright">92.7%</span> of visitors who reach pricing
+          convert to trial | <span class="bright">28.7%</span> overall trial
+          conversion rate
+        </div>
+      </div>
+    </section>
+
+    <div class="separator">────────────────────────────────────────</div>
+
+    <section class="container anim-ready" id="proof">
+      <div class="session-header">
+        [session: 0x4a2f | tty: /dev/pts/0 | 2026-03-20 09:14:35 UTC]
+      </div>
+      <h2 class="command-heading">ls --proof -lah</h2>
+      <div class="output-container">
+        <div class="anim-line dim">total 12.7G</div>
+        <div class="anim-line proof-item">
+          <span>drwxr-xr-x 12 dev staff 4.2G Mar 15 14:22 stripe.client</span>
+        </div>
+        <div class="anim-line proof-item">
+          <span
+            >drwxr-xr-x 8 dev staff 1.8G Feb 28 09:17 cloudflare.client</span
+          >
+        </div>
+        <div class="anim-line proof-item">
+          <span
+            >drwxr-xr-x 15 dev staff 982M Jan 12 16:44 hashicorp.client</span
+          >
+        </div>
+        <div class="anim-line proof-item">
+          <span>drwxr-xr-x 6 dev staff 743M Dec 05 11:30 gitlab.client</span>
+        </div>
+        <div class="anim-line proof-item">
+          <span
+            >drwxr-xr-x 9 dev staff 512M Nov 19 08:55 digitalocean.client</span
+          >
+        </div>
+        <div class="anim-line proof-item">
+          <span>drwxr-xr-x 7 dev staff 488M Oct 30 15:21 mongodb.client</span>
+        </div>
+        <div class="anim-line proof-item">
+          <span>drwxr-xr-x 11 dev staff 412M Sep 14 10:08 circleci.client</span>
+        </div>
+        <div class="anim-line proof-item">
+          <span>drwxr-xr-x 5 dev staff 375M Aug 22 13:47 datadog.client</span>
+        </div>
+        <div class="anim-line proof-item">
+          <span>drwxr-xr-x 14 dev staff 320M Jul 09 09:33 vercel.client</span>
+        </div>
+        <div class="anim-line">&nbsp;</div>
+        <div class="anim-line dim">
+          # All clients deployed to production with zero design revisions
+          rejected by engineering teams
+        </div>
+      </div>
+    </section>
+
+    <div class="separator">────────────────────────────────────────</div>
+
+    <section class="container anim-ready" id="metrics">
+      <div class="session-header">
+        [session: 0x4a2f | tty: /dev/pts/0 | 2026-03-20 09:14:40 UTC]
+      </div>
+      <h2 class="command-heading">htop --conversion</h2>
+      <div class="metric-grid">
+        <div class="metric-card anim-line">
+          <div class="metric-value">28.7%</div>
+          <div class="metric-label">trial conversion rate</div>
+          <div class="dim">industry avg: 3.2%</div>
+        </div>
+        <div class="metric-card anim-line">
+          <div class="metric-value">92.7%</div>
+          <div class="metric-label">pricing→trial rate</div>
+          <div class="dim">visitors who see pricing</div>
+        </div>
+        <div class="metric-card anim-line">
+          <div class="metric-value">63%</div>
+          <div class="metric-label">bounce rate reduction</div>
+          <div class="dim">vs. previous landing page</div>
+        </div>
+        <div class="metric-card anim-line">
+          <div class="metric-value">4.2x</div>
+          <div class="metric-label">enterprise lead quality</div>
+          <div class="dim">sales-qualified leads</div>
+        </div>
+      </div>
+    </section>
+
+    <div class="separator">────────────────────────────────────────</div>
+
+    <section class="container anim-ready" id="architecture">
+      <div class="session-header">
+        [session: 0x4a2f | tty: /dev/pts/0 | 2026-03-20 09:14:42 UTC]
+      </div>
+      <h2 class="command-heading">cat ARCHITECTURE.md</h2>
+      <div class="output-container">
+        <div class="anim-line dim">
+          # Conversion architecture — terminal-native implementation
+        </div>
+        <div class="anim-line">&nbsp;</div>
+
+        <pre class="pipe-diagram anim-line">
+user_intent 
+    │
+    ▼
+┌──────────────────────────────────────────────────┐
+│  authenticity_filter()                           │
+│  • monospace enforcement                         │
+│  • phosphor glow calibration                     │
+│  • cursor persistence validation                 │
+│  • CLI metaphor integrity check                  │
+└──────────────────────────────────────────────────┘
+    │
+    ▼
+┌──────────────────────────────────────────────────┐
+│  terminal_renderer()                             │
+│  • typewriter sequence generation                │
+│  • CRT scanline overlay injection                │
+│  • session header timestamping                   │
+│  • phosphor depth mapping (opacity hierarchy)    │
+└──────────────────────────────────────────────────┘
+    │
+    ▼
+┌──────────────────────────────────────────────────┐
+│  conversion_optimizer()                          │
+│  • scroll-triggered section reveals              │
+│  • command CTA placement                         │
+│  • progress bar psychological anchoring          │
+│  • FAQ residual objection handling               │
+└──────────────────────────────────────────────────┘
+    │
+    ▼
+converted_user
+      </pre
+        >
+
+        <div class="anim-line">&nbsp;</div>
+        <div class="anim-line dim">## Core differentiators</div>
+        <div class="anim-line">&nbsp;</div>
+
+        <div class="man-page">
+          <div class="man-flag">--no-gimmicks</div>
+          <div class="man-desc">
+            Every CLI metaphor maps to real product function. No decorative
+            elements that break terminal authenticity.
+          </div>
+
+          <div class="man-flag">--phosphor-glow</div>
+          <div class="man-desc">
+            CRT text-shadow applied only to primary conversion elements
+            (metrics, CTAs). Secondary text remains dimmed for hierarchy.
+          </div>
+
+          <div class="man-flag">--scanline-overlay</div>
+          <div class="man-desc">
+            Ambient motion via fixed scanline (3% opacity) — creates depth
+            without breaking terminal metaphor or causing distraction.
+          </div>
+
+          <div class="man-flag">--cursor-persistence</div>
+          <div class="man-desc">
+            Blinking cursor always present on active element — signals "live
+            system" not static marketing page.
+          </div>
+
+          <div class="man-flag">--zero-radius</div>
+          <div class="man-desc">
+            Absolute prohibition on border-radius. All elements obey terminal
+            geometry: sharp edges only.
+          </div>
+
+          <div class="man-flag">--monospace-purity</div>
+          <div class="man-desc">
+            100% monospace throughout — no exceptions for body copy, legal text,
+            or metadata. One typeface rules all.
+          </div>
+        </div>
+
+        <div class="anim-line">&nbsp;</div>
+        <div class="anim-line dim">## Conversion lift: before/after</div>
+        <div class="anim-line">&nbsp;</div>
+        <div class="anim-line">
+          <span class="diff-remove"
+            >- generic marketing page: 3.2% trial conversion | 68% bounce
+            rate</span
+          >
+        </div>
+        <div class="anim-line">
+          <span class="diff-add"
+            >+ terminal.pages implementation: 28.7% trial conversion | 25%
+            bounce rate</span
+          >
+        </div>
+        <div class="anim-line">
+          <span class="diff-add"
+            >+ 4.2x increase in enterprise-qualified leads mentioning
+            "authenticity" in discovery calls</span
+          >
+        </div>
+      </div>
+    </section>
+
+    <div class="separator">────────────────────────────────────────</div>
+
+    <section class="container anim-ready" id="testimonials">
+      <div class="session-header">
+        [session: 0x4a2f | tty: /dev/pts/0 | 2026-03-20 09:14:50 UTC]
+      </div>
+      <h2 class="command-heading">
+        git log --testimonials --format="%h | %an (%cn) | %ad%n %s" --date=short
+        -7
+      </h2>
+      <div class="output-container">
+        <div class="anim-line testimonial">
+          <span class="commit-hash">a3f8e21</span>
+          <span class="commit-author">Sarah Chen</span>
+          <span class="commit-date">(Stripe)</span>
+          <span class="dim">2026-03-18</span><br />
+          <span class="dim"> </span>reduced bounce rate by 63% — engineers
+          actually read the whole page now instead of bouncing at first
+          marketing buzzword
+        </div>
+        <div class="anim-line testimonial">
+          <span class="commit-hash">b7c9d45</span>
+          <span class="commit-author">Markus Weber</span>
+          <span class="commit-date">(Cloudflare)</span>
+          <span class="dim">2026-02-24</span><br />
+          <span class="dim"> </span>our CLI tool's landing page now feels like
+          an extension of the product itself — support tickets about "where to
+          download" dropped 78%
+        </div>
+        <div class="anim-line testimonial">
+          <span class="commit-hash">e1f2a3b</span>
+          <span class="commit-author">Jin Park</span>
+          <span class="commit-date">(HashiCorp)</span>
+          <span class="dim">2026-01-09</span><br />
+          <span class="dim"> </span>enterprise sales team reports 40% of
+          prospects mentioning "the terminal page" positively in discovery calls
+          — authenticity signal
+        </div>
+        <div class="anim-line testimonial">
+          <span class="commit-hash">d4e5f6a</span>
+          <span class="commit-author">Alex Rivera</span>
+          <span class="commit-date">(GitLab)</span>
+          <span class="dim">2025-12-01</span><br />
+          <span class="dim"> </span>conversion to paid doubled after launch — no
+          other changes to funnel or pricing. Engineers approved design in 1
+          review cycle.
+        </div>
+        <div class="anim-line testimonial">
+          <span class="commit-hash">c8b7a6d</span>
+          <span class="commit-author">Tomasz Kowalski</span>
+          <span class="commit-date">(DigitalOcean)</span>
+          <span class="dim">2025-11-14</span><br />
+          <span class="dim"> </span>finally a landing page that doesn't make our
+          engineers cringe — they actually shared it on Hacker News unprompted
+        </div>
+        <div class="anim-line testimonial">
+          <span class="commit-hash">f9e8d7c</span>
+          <span class="commit-author">Maya Rodriguez</span>
+          <span class="commit-date">(MongoDB)</span>
+          <span class="dim">2025-10-28</span><br />
+          <span class="dim"> </span>security team approved this design without
+          modifications — first time in 3 years they didn't request removal of
+          "marketing elements"
+        </div>
+        <div class="anim-line testimonial">
+          <span class="commit-hash">a1b2c3d</span>
+          <span class="commit-author">David Kim</span>
+          <span class="commit-date">(Vercel)</span>
+          <span class="dim">2025-09-11</span><br />
+          <span class="dim"> </span>deployed in 4 hours. Our CTO said "this is
+          the first landing page that feels like it was made by someone who uses
+          terminals daily"
+        </div>
+      </div>
+    </section>
+
+    <div class="separator">────────────────────────────────────────</div>
+
+    <section class="container anim-ready" id="security">
+      <div class="session-header">
+        [session: 0x4a2f | tty: /dev/pts/0 | 2026-03-20 09:14:55 UTC]
+      </div>
+      <div class="security-header">compliance manifest</div>
+      <div class="output-container">
+        <div class="anim-line">All terminal.pages deployments include:</div>
+        <div class="anim-line">&nbsp;</div>
+        <div class="anim-line">
+          ✓ Zero external dependencies (pure HTML/CSS/JS)
+        </div>
+        <div class="anim-line">
+          ✓ No third-party trackers or analytics by default
+        </div>
+        <div class="anim-line">
+          ✓ CSP-ready (Content Security Policy compliant)
+        </div>
+        <div class="anim-line">
+          ✓ SOC2 Type II compliant deployment option (Enterprise)
+        </div>
+        <div class="anim-line">✓ GDPR/CCPA compliant data handling</div>
+        <div class="anim-line">
+          ✓ Static asset delivery (no server-side execution)
+        </div>
+        <div class="anim-line">✓ SHA-256 integrity hashes for all assets</div>
+        <div class="anim-line">
+          ✓ Optional self-hosted analytics (Plausible-compatible)
+        </div>
+        <div class="anim-line">&nbsp;</div>
+        <div class="anim-line dim">
+          # Enterprise plans include penetration testing report and compliance
+          documentation package
+        </div>
+      </div>
+    </section>
+
+    <div class="separator">────────────────────────────────────────</div>
+
+    <section class="container anim-ready" id="changelog">
+      <div class="session-header">
+        [session: 0x4a2f | tty: /dev/pts/0 | 2026-03-20 09:15:00 UTC]
+      </div>
+      <h2 class="command-heading">git log --oneline --all -8</h2>
+      <div class="output-container">
+        <div class="anim-line changelog-entry">
+          <span class="changelog-hash">a3f8e21</span>
+          <span
+            >feat: added CRT scanline intensity modulation for mobile
+            viewports</span
+          >
+          <span class="changelog-date">2026-03-15</span>
+        </div>
+        <div class="anim-line changelog-entry">
+          <span class="changelog-hash">b7c9d45</span>
+          <span
+            >feat: implemented reduced-motion preference detection (WCAG 2.1
+            AA)</span
+          >
+          <span class="changelog-date">2026-02-28</span>
+        </div>
+        <div class="anim-line changelog-entry">
+          <span class="changelog-hash">e1f2a3b</span>
+          <span
+            >perf: optimized typewriter animation to 60fps on low-end
+            devices</span
+          >
+          <span class="changelog-date">2026-01-22</span>
+        </div>
+        <div class="anim-line changelog-entry">
+          <span class="changelog-hash">d4e5f6a</span>
+          <span
+            >feat: added phosphor color family switching
+            (green/amber/white)</span
+          >
+          <span class="changelog-date">2025-12-10</span>
+        </div>
+        <div class="anim-line changelog-entry">
+          <span class="changelog-hash">c8b7a6d</span>
+          <span
+            >fix: resolved cursor blink timing inconsistency in Firefox</span
+          >
+          <span class="changelog-date">2025-11-05</span>
+        </div>
+        <div class="anim-line changelog-entry">
+          <span class="changelog-hash">f9e8d7c</span>
+          <span
+            >feat: implemented htop-style metric visualization component</span
+          >
+          <span class="changelog-date">2025-10-18</span>
+        </div>
+        <div class="anim-line changelog-entry">
+          <span class="changelog-hash">a1b2c3d</span>
+          <span
+            >feat: added ASCII art logo generator for brand integration</span
+          >
+          <span class="changelog-date">2025-09-30</span>
+        </div>
+        <div class="anim-line changelog-entry">
+          <span class="changelog-hash">e5f6a7b</span>
+          <span>init: terminal.pages core engine v1.0.0</span>
+          <span class="changelog-date">2025-08-15</span>
+        </div>
+      </div>
+    </section>
+
+    <div class="separator">────────────────────────────────────────</div>
+
+    <section class="container anim-ready" id="pricing">
+      <div class="session-header">
+        [session: 0x4a2f | tty: /dev/pts/0 | 2026-03-20 09:15:05 UTC]
+      </div>
+      <h2 class="command-heading">./pricing.sh --list --verbose</h2>
+      <div class="output-container">
+        <div class="anim-line dim">
+          # All plans include: typewriter animations, CRT scanline overlay,
+          cursor persistence,
+        </div>
+        <div class="anim-line dim">
+          # phosphor glow system, mobile optimization, 100% monospace
+          enforcement, zero-radius policy
+        </div>
+        <div class="anim-line">&nbsp;</div>
+
+        <div class="pricing-plan anim-line">
+          <div class="plan-name">--plan starter</div>
+          <div class="plan-price">$49<span class="dim">/mo</span></div>
+          <div class="plan-feature">Single landing page deployment</div>
+          <div class="plan-feature">
+            3 revision rounds with engineering team
+          </div>
+          <div class="plan-feature">72-hour delivery SLA</div>
+          <div class="plan-feature">
+            Basic conversion analytics (self-hosted)
+          </div>
+          <div class="plan-feature">12-month uptime guarantee (99.95%)</div>
+          <div class="dim" style="margin-top: 12px">
+            $ curl -s https://terminal.pages/install.sh | bash -- --plan=starter
+          </div>
+        </div>
+
+        <div class="pricing-plan anim-line">
+          <div class="plan-name">--plan pro</div>
+          <div class="plan-price">$199<span class="dim">/mo</span></div>
+          <div class="plan-feature">3 landing pages (A/B test ready)</div>
+          <div class="plan-feature">
+            Unlimited revisions until engineering approval
+          </div>
+          <div class="plan-feature">24-hour delivery SLA</div>
+          <div class="plan-feature">Conversion heatmap & session recording</div>
+          <div class="plan-feature">
+            A/B testing suite (statistical significance engine)
+          </div>
+          <div class="plan-feature">
+            Dedicated Slack channel with our engineers
+          </div>
+          <div class="dim" style="margin-top: 12px">
+            $ curl -s https://terminal.pages/install.sh | bash -- --plan=pro
+          </div>
+        </div>
+
+        <div class="pricing-plan anim-line">
+          <div class="plan-name">--plan enterprise</div>
+          <div class="plan-price">custom</div>
+          <div class="plan-feature">Unlimited pages & subdomains</div>
+          <div class="plan-feature">Dedicated terminal.pages engineer</div>
+          <div class="plan-feature">4-hour SLA for critical issues</div>
+          <div class="plan-feature">SOC2 Type II compliant deployment</div>
+          <div class="plan-feature">
+            White-label option (remove terminal.pages branding)
+          </div>
+          <div class="plan-feature">API for programmatic page generation</div>
+          <div class="plan-feature">
+            Penetration testing & compliance documentation
+          </div>
+          <div class="dim" style="margin-top: 12px">
+            $ mail -s "enterprise inquiry" sales@terminal.pages
+          </div>
+        </div>
+
+        <div class="anim-line">&nbsp;</div>
+        <div class="anim-line dim">
+          # All plans backed by conversion guarantee: 2x your current rate or 3
+          months free
+        </div>
+        <div class="anim-line dim">
+          # Applies to Pro/Enterprise with baseline analytics provided
+        </div>
+      </div>
+    </section>
+
+    <div class="double-separator">
+      ═══════════════════════════════════════════
+    </div>
+
+    <section class="install-section anim-ready" id="install">
+      <div class="container">
+        <div class="session-header">
+          [session: 0x4a2f | tty: /dev/pts/0 | 2026-03-20 09:15:12 UTC]
+        </div>
+        <h2
+          class="command-heading"
+          style="justify-content: center; margin-bottom: 16px"
+        >
+          ./install.sh --plan=pro
+        </h2>
+
+        <div class="install-command" id="install-command">
+          curl -s https://terminal.pages/install.sh | bash -- --plan=pro
+        </div>
+
+        <button class="copy-btn" id="copy-btn">[ Copy Command ]</button>
+
+        <div class="progress-container">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+
+        <div class="success-status" id="success-status">
+          [<span class="status-ok">SUCCESS</span>] Command ready to execute —
+          paste into your terminal
+        </div>
+
+        <div
+          class="anim-line"
+          style="
+            max-width: 600px;
+            margin: 32px auto 0;
+            color: rgba(var(--phosphor-dim), 0.85);
+          "
+        >
+          <span class="dim"># Deployment includes:</span> 100% static assets •
+          Zero external dependencies • CSP-ready • 99.95% uptime SLA
+        </div>
+      </div>
+    </section>
+
+    <div class="separator">────────────────────────────────────────</div>
+
+    <section class="container anim-ready" id="faq">
+      <div class="session-header">
+        [session: 0x4a2f | tty: /dev/pts/0 | 2026-03-20 09:15:20 UTC]
+      </div>
+      <h2 class="command-heading">help --faq --verbose</h2>
+      <div class="output-container">
+        <div class="anim-line dim">Usage: terminal.pages [OPTIONS]</div>
+        <div class="anim-line dim">
+          High-conversion landing pages in authentic terminal aesthetic
+        </div>
+        <div class="anim-line">&nbsp;</div>
+
+        <div class="faq-item anim-line">
+          <div class="faq-question">delivery-time</div>
+          <div class="faq-answer">
+            Starter: 72 hours from brief approval. Pro: 24 hours. Enterprise: 4
+            business hours SLA. All timelines begin after creative brief
+            approval and asset delivery. 97% of projects ship ahead of schedule.
+          </div>
+        </div>
+
+        <div class="faq-item anim-line">
+          <div class="faq-question">revision-policy</div>
+          <div class="faq-answer">
+            Starter: 3 rounds included. Pro/Enterprise: unlimited revisions
+            until your engineering team approves. We don't consider it "done"
+            until your developers say it feels authentic. Average: 1.8 rounds
+            for Pro clients.
+          </div>
+        </div>
+
+        <div class="faq-item anim-line">
+          <div class="faq-question">hosting-requirements</div>
+          <div class="faq-answer">
+            We deliver pure static HTML/CSS/JS — zero dependencies. Host
+            anywhere: Vercel, Netlify, S3, GitHub Pages, or your own infra.
+            Enterprise plans include managed deployment to your environment with
+            your certs and CDN.
+          </div>
+        </div>
+
+        <div class="faq-item anim-line">
+          <div class="faq-question">analytics-integration</div>
+          <div class="faq-answer">
+            All plans include privacy-focused analytics (no cookies, GDPR
+            compliant). Track conversions, session duration, and terminal
+            interaction heatmaps. Enterprise adds funnel analysis, A/B test
+            engine, and Slack alerts for conversion spikes.
+          </div>
+        </div>
+
+        <div class="faq-item anim-line">
+          <div class="faq-question">browser-support</div>
+          <div class="faq-answer">
+            Chrome 88+, Firefox 85+, Safari 14.1+, Edge 88+. All animations
+            degrade gracefully. Reduced motion preference fully supported (WCAG
+            2.1 AA compliant). Tested on 37 device/OS/browser combinations
+            monthly.
+          </div>
+        </div>
+
+        <div class="faq-item anim-line">
+          <div class="faq-question">accessibility</div>
+          <div class="faq-answer">
+            Full WCAG 2.1 AA compliance: semantic HTML, reduced motion support,
+            keyboard navigable, screen reader tested. CRT glow effects never
+            required for comprehension. All interactive elements have 4.5:1
+            contrast minimum. Audit report available on request.
+          </div>
+        </div>
+
+        <div class="faq-item anim-line">
+          <div class="faq-question">warranty-disclaimer</div>
+          <div class="faq-answer">
+            We guarantee 2x your current landing page conversion rate or 3
+            months free service. Applies to Pro/Enterprise plans with 30 days of
+            baseline analytics provided. Excludes traffic quality changes. 94%
+            of clients exceed guarantee without invoking clause.
+          </div>
+        </div>
+
+        <div class="faq-item anim-line">
+          <div class="faq-question">source-code</div>
+          <div class="faq-answer">
+            You receive full, commented source code with every deployment — no
+            lock-in. MIT license for all custom code we write. You own 100% of
+            the deployed assets. Enterprise plans include private Git repo
+            access with full commit history.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="separator">────────────────────────────────────────</div>
+
+    <section class="container terminal-prompt">
+      <div class="session-header">
+        [session: 0x4a2f | tty: /dev/pts/0 | 2026-03-20 09:15:45 UTC]
+      </div>
+      <div class="prompt-line">
+        <span class="prompt-symbol">$</span>
+        <input
+          type="text"
+          class="prompt-input"
+          id="terminal-input"
+          placeholder="try: help --pricing | whoami | ./demo.sh"
+        />
+      </div>
+      <div class="command-response" id="command-response"></div>
+    </section>
+
+    <footer
+      class="container"
+      style="
+        padding: 48px 0 64px;
+        text-align: center;
+        border-top: 1px solid rgba(var(--phosphor-dim), 0.15);
+      "
+    >
+      <div class="dim">
+        terminal.pages v1.2.3-stable (build 20260320.091422)<br />
+        © 2026 terminal.pages — SSH into conversion<br />
+        <span class="dim" style="display: inline-block; margin-top: 12px">
+          $ cat LICENSE | grep -i warranty<br />
+          NO WARRANTY — USE AT YOUR OWN RISK. BUT WE'VE NEVER HAD A CLIENT
+          COMPLAIN.
+        </span>
+      </div>
+    </footer>
+
+    <script>
+      // Uptime counter
+      function startUptimeCounter() {
+        const counter = document.getElementById("uptime-counter");
+        let seconds = 0;
+
+        setInterval(() => {
+          seconds++;
+          const hrs = Math.floor(seconds / 3600)
+            .toString()
+            .padStart(2, "0");
+          const mins = Math.floor((seconds % 3600) / 60)
+            .toString()
+            .padStart(2, "0");
+          const secs = (seconds % 60).toString().padStart(2, "0");
+          counter.textContent = `${hrs}:${mins}:${secs}`;
+        }, 1000);
+      }
+
+      // Typewriter animation for boot sequence (HTML-aware)
+      async function typeLine(element, delay = 25) {
+        const targetHTML = element.innerHTML;
+        element.innerHTML = "";
+        element.classList.add("anim-visible");
+
+        let currentHTML = "";
+        let i = 0;
+
+        while (i < targetHTML.length) {
+          if (targetHTML[i] === "<") {
+            const tagEnd = targetHTML.indexOf(">", i);
+            currentHTML += targetHTML.substring(i, tagEnd + 1);
+            i = tagEnd + 1;
+          } else {
+            currentHTML += targetHTML[i];
+            element.innerHTML = currentHTML;
+            i++;
+            await new Promise((resolve) => setTimeout(resolve, delay));
+          }
+        }
+      }
+
+      async function bootSequence() {
+        const hero = document.getElementById("hero");
+        const lines = Array.from(document.querySelectorAll("#hero .anim-line"));
+        const productName = document.getElementById("product-name");
+
+        // 1. Reveal Hero Container Stage
+        if (hero) hero.classList.add("anim-visible");
+
+        // 2. Identify different line types
+        const sloganStartIndex = lines.findIndex(l => l.id === "product-name") + 1;
+        const bootLines = lines.filter(l => l.id !== "product-name" && lines.indexOf(l) < (sloganStartIndex > 0 ? sloganStartIndex - 1 : lines.length));
+        const sloganLines = sloganStartIndex > 0 ? lines.slice(sloganStartIndex) : [];
+
+        // 3. Type boot lines (including ASCII logo and [OK] statuses)
+        for (const line of bootLines) {
+          if (!line.dataset.typed) {
+            await typeLine(line, line.classList.contains("ascii-logo") ? 5 : 20);
+            line.dataset.typed = "true";
+          }
+          await new Promise((resolve) => setTimeout(resolve, 30));
+        }
+
+        // 4. Special handling for Product Name character reveal
+        if (productName) {
+          productName.classList.add("anim-visible");
+          const nameText = "terminal.pages";
+          productName.innerHTML = "";
+          for (const char of nameText) {
+            productName.innerHTML += char;
+            await new Promise((resolve) => setTimeout(resolve, 40));
+          }
+          productName.innerHTML += '<span class="cursor">|</span>';
+          productName.dataset.typed = "true";
+        }
+
+        // 5. Fade in final slogan lines
+        for (const line of sloganLines) {
+          line.classList.add("anim-visible");
+          await new Promise((resolve) => setTimeout(resolve, 150));
+        }
+
+        // Start uptime counter after boot completes
+        startUptimeCounter();
+      }
+
+      // Intersection Observer for scroll animations
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("anim-visible");
+
+              // Stagger child lines
+              const lines = entry.target.querySelectorAll(
+                '.anim-line:not([data-typed="true"])',
+              );
+              lines.forEach((line, i) => {
+                setTimeout(() => {
+                  line.classList.add("anim-visible");
+                }, i * 55);
+              });
+
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.08 },
+      );
+
+      document.querySelectorAll(".anim-ready").forEach((el) => {
+        // Hero visibility is manually controlled by the bootSequence logic
+        if (el.id !== "hero") {
+          observer.observe(el);
+        }
+      });
+
+      // FAQ accordion
+      document.querySelectorAll(".faq-item").forEach((item) => {
+        item.addEventListener("click", () => {
+          item.classList.toggle("active");
+        });
+      });
+
+      // Copy to clipboard
+      document
+        .getElementById("copy-btn")
+        .addEventListener("click", async () => {
+          const cmd = document
+            .getElementById("install-command")
+            .textContent.trim();
+          try {
+            await navigator.clipboard.writeText(cmd);
+
+            const btn = document.getElementById("copy-btn");
+            const originalText = btn.textContent;
+            btn.textContent = "[ Copied! ]";
+            btn.style.boxShadow = "0 0 16px rgba(0, 255, 80, 0.6)";
+
+            setTimeout(() => {
+              btn.textContent = originalText;
+              btn.style.boxShadow = "";
+            }, 2000);
+
+            // Show success status if not already visible
+            const status = document.getElementById("success-status");
+            if (!status.classList.contains("visible")) {
+              status.classList.add("visible");
+            }
+          } catch (err) {
+            console.error("Copy failed:", err);
+          }
+        });
+
+      // Progress bar animation on install section view
+      const installObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              document
+                .getElementById("progress-fill")
+                .classList.add("anim-visible");
+
+              setTimeout(() => {
+                document
+                  .getElementById("success-status")
+                  .classList.add("visible");
+              }, 1900);
+
+              installObserver.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.4 },
+      );
+
+      installObserver.observe(document.querySelector(".install-section"));
+
+      // Interactive terminal prompt
+      const terminalInput = document.getElementById("terminal-input");
+      const commandResponse = document.getElementById("command-response");
+
+      terminalInput.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
+          const cmd = terminalInput.value.trim().toLowerCase();
+          terminalInput.value = "";
+          commandResponse.textContent = "";
+
+          let response = "";
+          switch (cmd) {
+            case "help --pricing":
+              response =
+                "Run: ./pricing.sh --list --verbose  # See all plans with features";
+              break;
+            case "whoami":
+              response =
+                "terminal.pages — high-conversion landing pages in authentic terminal aesthetic";
+              break;
+            case "./demo.sh":
+              response =
+                "Launching demo... [OK] See full implementation at https://demo.terminal.pages";
+              break;
+            case "uptime":
+              response = "System uptime: 142 days, 7 hours, 23 minutes";
+              break;
+            case "ls --clients":
+              response =
+                "stripe.client cloudflare.client hashicorp.client gitlab.client digitalocean.client mongodb.client circleci.client datadog.client vercel.client";
+              break;
+            case "":
+              response = "";
+              break;
+            default:
+              response = `bash: ${cmd}: command not found`;
+          }
+
+          if (response) {
+            setTimeout(() => {
+              commandResponse.textContent = `$ ${cmd}\n${response}`;
+            }, 150);
+          }
+        }
+      });
+
+      // Smooth scrolling for anchor links
+      document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+        anchor.addEventListener("click", function (e) {
+          e.preventDefault();
+          const target = document.querySelector(this.getAttribute("href"));
+          if (target) {
+            window.scrollTo({
+              top: target.offsetTop - 80,
+              behavior: "smooth",
+            });
+          }
+        });
+      });
+
+      // Initialize on page load
+      window.addEventListener("DOMContentLoaded", () => {
+        // Start boot sequence after brief delay
+        setTimeout(bootSequence, 350);
+      });
+
+      // Reduced motion preference handling
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        document.querySelectorAll(".anim-line").forEach((el) => {
+          el.classList.add("anim-visible");
+          el.dataset.typed = "true";
+        });
+        document.querySelectorAll(".anim-ready").forEach((el) => {
+          el.classList.add("anim-visible");
+        });
+        document.getElementById("progress-fill").style.width = "100%";
+        document.getElementById("success-status").classList.add("visible");
+
+        // Set uptime counter to a realistic value
+        document.getElementById("uptime-counter").textContent = "247:18:42";
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,1762 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Kurogane Atelier</title>
+    <meta
+      name="description"
+      content="Residential architecture built around absence. Kyoto."
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://unpkg.com/@studio-freight/lenis@1.0.33/dist/lenis.min.js"></script>
+    <style>
+      :root {
+        --color-primary: #e83f43;
+        --color-primary-hover: #c42d2d;
+        --color-background: #f7f3ef;
+        --color-surface: #ffffff;
+        --color-surface-alt: #eeece8;
+        --color-overlay: rgba(26, 26, 26, 0.05);
+        --color-text-primary: #1a1a1a;
+        --color-text-secondary: #5c5854;
+        --color-text-muted: #847f7a;
+        --color-text-inverse: #f7f3ef;
+        --color-border: rgba(26, 26, 26, 0.1);
+        --color-border-subtle: rgba(26, 26, 26, 0.05);
+        --font-primary: "Inter", sans-serif;
+        --font-secondary: "Playfair Display", serif;
+        --t-h1: clamp(2.5rem, 8vw, 5rem);
+        --t-h2: clamp(1.5rem, 4vw, 2.5rem);
+        --t-body: clamp(0.9rem, 2vw, 1.125rem);
+        --t-micro: 0.75rem;
+        --t-xs: 12px;
+        --line-tight: 1.1;
+        --line-normal: 1.6;
+        --tracking-tight: -0.02em;
+        --space-2xs: 4px;
+        --space-xs: 8px;
+        --space-sm: 12px;
+        --space-md: 16px;
+        --space-lg: 24px;
+        --space-xl: 32px;
+        --space-2xl: 48px;
+        --space-3xl: 64px;
+        --space-4xl: 96px;
+        --breath: clamp(1.5rem, 10vw, 8rem);
+        --pulse: clamp(0.8rem, 5vw, 4rem);
+        --weather: cubic-bezier(0.23, 1, 0.75, 1);
+        --motion-reveal: 1200ms var(--weather);
+        --motion-settle: 800ms var(--weather);
+        --motion-response: 300ms var(--weather);
+        --motion-micro: 150ms var(--weather);
+        --container-xl: 1200px;
+        --radius-sm: 2px;
+        --radius-md: 6px;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        background: var(--color-background);
+        color: var(--color-text-primary);
+        font-family: var(--font-primary);
+        cursor: none;
+        overflow-x: hidden;
+      }
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+      @keyframes rain-drift {
+        from {
+          transform: translateY(-50px);
+        }
+        to {
+          transform: translateY(50px);
+        }
+      }
+
+      /* S1 Header */
+      .site-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: var(--space-xl) var(--breath);
+        transition:
+          background 0.6s var(--weather),
+          backdrop-filter 0.6s var(--weather),
+          border-color 0.6s var(--weather);
+        mix-blend-mode: difference;
+        border-bottom: 1px solid transparent;
+      }
+      .site-header.scrolled {
+        mix-blend-mode: normal;
+        background: rgba(247, 243, 239, 0.92);
+        backdrop-filter: blur(12px);
+        border-bottom-color: var(--color-border);
+      }
+      .header-logo {
+        font-family: var(--font-secondary);
+        font-size: 24px;
+        font-style: italic;
+        letter-spacing: var(--tracking-tight);
+      }
+      .header-nav {
+        display: flex;
+        align-items: center;
+        gap: var(--space-2xl);
+      }
+      .header-nav a {
+        font-size: var(--t-micro);
+        text-transform: uppercase;
+        letter-spacing: 0.2em;
+        color: var(--color-text-muted);
+        transition: color var(--motion-micro);
+      }
+      .header-nav a:hover {
+        color: var(--color-primary);
+      }
+      .audio-toggle {
+        width: 40px;
+        height: 40px;
+        background: none;
+        border: 1px solid var(--color-border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: var(--t-micro);
+        cursor: none;
+        transition: border-color var(--motion-micro);
+      }
+      .audio-toggle:hover {
+        border-color: var(--color-primary);
+      }
+
+      /* S2 Canvas */
+      .experience-canvas {
+        height: 100vh;
+        overflow: hidden;
+        position: relative;
+      }
+      .slide {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        align-items: center;
+        padding: var(--breath);
+      }
+      .slide .content-wrap {
+        max-width: 60ch;
+      }
+      .section-label {
+        font-size: var(--t-micro);
+        text-transform: uppercase;
+        letter-spacing: 0.2em;
+        color: var(--color-text-muted);
+        margin-bottom: var(--space-xl);
+      }
+      .slide-title {
+        font-family: var(--font-secondary);
+        font-size: var(--t-h1);
+        font-weight: 700;
+        line-height: var(--line-tight);
+        letter-spacing: var(--tracking-tight);
+      }
+      .slide-sub {
+        margin-top: var(--space-xl);
+        color: var(--color-text-secondary);
+        line-height: var(--line-normal);
+        font-size: var(--t-body);
+        max-width: 44ch;
+      }
+      .slide-actions {
+        margin-top: var(--space-2xl);
+        display: flex;
+        align-items: center;
+        gap: var(--space-xl);
+      }
+      .btn-primary {
+        padding: var(--space-lg) var(--space-3xl);
+        background: var(--color-text-primary);
+        color: var(--color-text-inverse);
+        font-family: var(--font-primary);
+        font-size: var(--t-xs);
+        text-transform: uppercase;
+        letter-spacing: 0.2em;
+        border: none;
+        cursor: none;
+        transition: background var(--motion-response);
+      }
+      .btn-primary:hover {
+        background: var(--color-primary);
+      }
+      .slide-enter {
+        font-size: var(--t-micro);
+        text-transform: uppercase;
+        letter-spacing: 0.2em;
+        color: var(--color-text-muted);
+        border-bottom: 1px solid var(--color-border);
+        padding-bottom: var(--space-2xs);
+      }
+      .visual-wrap {
+        height: 75vh;
+        overflow: hidden;
+        position: relative;
+      }
+      .visual-wrap img {
+        width: 110%;
+        height: 110%;
+        object-fit: cover;
+        transform: translate(-5%, -5%);
+      }
+      .canvas-controls {
+        position: absolute;
+        bottom: var(--space-2xl);
+        right: var(--breath);
+        display: flex;
+        gap: 1px;
+        z-index: 20;
+      }
+      .canvas-controls button {
+        width: 80px;
+        height: 80px;
+        border: none;
+        font-size: var(--t-micro);
+        text-transform: uppercase;
+        letter-spacing: 0.2em;
+        cursor: none;
+        transition: background var(--motion-micro);
+      }
+      .canvas-controls .ctrl-prev {
+        background: var(--color-surface);
+      }
+      .canvas-controls .ctrl-next {
+        background: var(--color-text-primary);
+        color: var(--color-text-inverse);
+      }
+      .canvas-counter {
+        position: absolute;
+        bottom: var(--space-2xl);
+        left: var(--breath);
+        font-size: var(--t-micro);
+        text-transform: uppercase;
+        letter-spacing: 0.2em;
+        color: var(--color-text-muted);
+      }
+
+      /* S3 Lintel */
+      .lintel-section {
+        padding: var(--breath);
+      }
+      .manifesto-quote {
+        font-family: var(--font-secondary);
+        font-size: var(--t-h1);
+        font-weight: 700;
+        line-height: var(--line-tight);
+        letter-spacing: var(--tracking-tight);
+        max-width: 18ch;
+      }
+      .manifesto-sub {
+        margin-top: var(--space-2xl);
+        color: var(--color-text-muted);
+        line-height: var(--line-normal);
+        font-size: var(--t-body);
+        max-width: 60ch;
+      }
+
+      /* S4 Memory */
+      .memory-section {
+        padding: var(--breath);
+      }
+      .memory-grid {
+        display: grid;
+        grid-template-columns: 1fr 3fr;
+        gap: var(--breath);
+        align-items: start;
+      }
+      .memory-left h2 {
+        font-family: var(--font-secondary);
+        font-size: var(--t-h2);
+        font-weight: 700;
+        line-height: var(--line-tight);
+        margin: var(--space-xl) 0 var(--space-lg);
+      }
+      .memory-left p {
+        color: var(--color-text-secondary);
+        line-height: var(--line-normal);
+        font-size: var(--t-body);
+        max-width: 44ch;
+      }
+      .memory-stat {
+        margin-top: var(--space-3xl);
+      }
+      .memory-stat-num {
+        font-family: var(--font-secondary);
+        font-size: clamp(3rem, 6vw, 4.5rem);
+        font-weight: 700;
+        color: var(--color-primary);
+        line-height: 1;
+      }
+      .memory-stat-label {
+        font-size: var(--t-micro);
+        text-transform: uppercase;
+        letter-spacing: 0.2em;
+        color: var(--color-text-muted);
+        margin-top: var(--space-xs);
+      }
+      .memory-column-right {
+        position: relative;
+        height: 50vh;
+        overflow: hidden;
+      }
+      .memory-column-right img {
+        width: 110%;
+        height: 110%;
+        object-fit: cover;
+        transform: translate(-5%, -5%);
+        filter: grayscale(1) blur(2px);
+        transition: all 800ms var(--weather);
+      }
+
+      /* S5 Ritual */
+      .ritual-section {
+        padding: var(--breath);
+      }
+      .ritual-header {
+        text-align: center;
+        margin-bottom: var(--space-4xl);
+      }
+      .ritual-header h2 {
+        font-family: var(--font-secondary);
+        font-size: var(--t-h2);
+        font-weight: 700;
+        margin-top: var(--space-lg);
+      }
+      .ritual-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--space-2xl);
+      }
+      .ritual-step {
+        border-top: 1px solid var(--color-border);
+        padding-top: var(--space-xl);
+      }
+      .step-num {
+        font-family: var(--font-secondary);
+        font-size: var(--t-h1);
+        font-weight: 700;
+        color: var(--color-border);
+        line-height: 1;
+      }
+      .step-title {
+        font-family: var(--font-secondary);
+        font-size: var(--t-h2);
+        margin: var(--space-lg) 0 var(--space-md);
+      }
+      .step-desc {
+        color: var(--color-text-secondary);
+        line-height: var(--line-normal);
+        font-size: var(--t-body);
+        max-width: 44ch;
+      }
+
+      /* S6 Artifacts */
+      .artifacts-section {
+        padding: var(--breath);
+      }
+      .artifacts-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-2xl);
+        margin-top: var(--space-3xl);
+      }
+      .artifact-card {
+        position: relative;
+        height: 45vh;
+        overflow: hidden;
+        cursor: none;
+      }
+      .artifact-card img {
+        position: absolute;
+        inset: 0;
+        width: 110%;
+        height: 110%;
+        object-fit: cover;
+        transform: translate(-5%, -5%);
+        transition: transform 0.8s var(--weather);
+      }
+      .artifact-info {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: var(--space-xl);
+        background: linear-gradient(transparent, rgba(0, 0, 0, 0.4));
+        color: #fff;
+        z-index: 2;
+      }
+      .artifact-title {
+        font-family: var(--font-secondary);
+        font-size: var(--t-h2);
+        font-weight: 700;
+      }
+      .artifact-meta {
+        font-size: var(--t-micro);
+        text-transform: uppercase;
+        letter-spacing: 0.2em;
+        opacity: 0.7;
+        margin-top: var(--space-xs);
+      }
+
+      /* S7 Sanctuary */
+      .sanctuary-section {
+        background: var(--color-text-primary);
+        color: var(--color-text-inverse);
+        padding: var(--breath);
+      }
+      .sanctuary-wrap {
+        display: grid;
+        grid-template-columns: 2fr 3fr;
+        gap: var(--breath);
+        align-items: center;
+      }
+      .sanctuary-media {
+        position: relative;
+        height: 60vh;
+        overflow: hidden;
+      }
+      .sanctuary-media img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .sanctuary-content .section-label {
+        color: var(--color-primary);
+      }
+      .sanctuary-content h2 {
+        font-family: var(--font-secondary);
+        font-size: var(--t-h2);
+        font-weight: 700;
+        margin: var(--space-xl) 0 var(--space-3xl);
+      }
+      .sanctuary-feature {
+        border-top: 1px solid rgba(247, 243, 239, 0.1);
+        padding: var(--space-xl) 0;
+        display: grid;
+        grid-template-columns: var(--space-2xl) 1fr;
+        gap: var(--space-lg);
+        align-items: start;
+      }
+      .sanctuary-feature .feat-icon {
+        color: var(--color-primary);
+        font-family: var(--font-secondary);
+        font-size: 20px;
+      }
+      .feat-title {
+        font-family: var(--font-secondary);
+        font-size: 18px;
+        font-weight: 700;
+        margin-bottom: var(--space-xs);
+      }
+      .feat-desc {
+        color: rgba(247, 243, 239, 0.6);
+        font-size: var(--t-body);
+        line-height: var(--line-normal);
+      }
+      .btn-artery {
+        padding: var(--space-lg) var(--space-3xl);
+        background: var(--color-primary);
+        color: #fff;
+        font-family: var(--font-primary);
+        font-size: var(--t-xs);
+        text-transform: uppercase;
+        letter-spacing: 0.2em;
+        border: none;
+        cursor: none;
+        margin-top: var(--space-3xl);
+        transition: background var(--motion-response);
+      }
+      .btn-artery:hover {
+        background: var(--color-primary-hover);
+      }
+
+      /* S8 Witness */
+      .witness-hero {
+        position: relative;
+        height: 70vh;
+        overflow: hidden;
+        display: flex;
+        align-items: flex-end;
+        justify-content: flex-start;
+      }
+      .witness-hero img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: -1;
+        filter: brightness(0.4);
+      }
+      .witness-hero::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+          transparent 0%,
+          rgba(10, 10, 10, 0.95) 100%
+        );
+        z-index: 1;
+        pointer-events: none;
+      }
+      .witness-content {
+        position: relative;
+        z-index: 2;
+        padding: var(--breath);
+        max-width: 60ch;
+      }
+      .witness-quote {
+        font-family: var(--font-secondary);
+        font-size: var(--t-h2);
+        font-style: italic;
+        color: #fff;
+        line-height: 1.3;
+      }
+      .witness-attr {
+        font-size: var(--t-micro);
+        text-transform: uppercase;
+        letter-spacing: 0.2em;
+        color: rgba(255, 255, 255, 0.5);
+        margin-top: var(--space-xl);
+      }
+      .voyage-counter {
+        font-family: var(--font-secondary);
+        font-size: var(--t-h1);
+        font-weight: 700;
+        color: var(--color-primary);
+        margin-top: var(--space-3xl);
+        display: block;
+      }
+      .voyage-label {
+        font-size: var(--t-micro);
+        text-transform: uppercase;
+        letter-spacing: 0.2em;
+        color: rgba(255, 255, 255, 0.4);
+        margin-top: var(--space-xs);
+      }
+
+      /* S9 Echoes */
+      .echoes-section {
+        position: relative;
+        overflow: hidden;
+        padding: var(--breath);
+      }
+      .echoes-watermark {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-family: var(--font-secondary);
+        font-size: 25vw;
+        font-weight: 700;
+        background-image: url("https://assets.cdn.filesafe.space/3Mh94ewIWZaOQuAxTDt4/media/69b426da277ba069c6d0287f.png");
+        background-clip: text;
+        -webkit-background-clip: text;
+        color: transparent;
+        opacity: 0.15;
+        pointer-events: none;
+        z-index: 0;
+        white-space: nowrap;
+      }
+      .echoes-grid {
+        display: grid;
+        grid-template-columns: 2fr 1.5fr;
+        gap: var(--space-4xl);
+        align-items: start;
+        position: relative;
+        z-index: 1;
+        margin-top: var(--space-3xl);
+      }
+      .ghost-card {
+        border: 1px solid var(--color-border-subtle);
+        padding: var(--space-2xl);
+        opacity: 0.3;
+        transition:
+          opacity 0.4s var(--weather),
+          border-color 0.4s,
+          transform 0.4s;
+        cursor: none;
+      }
+      .ghost-card:hover {
+        opacity: 1;
+        border-color: var(--color-primary);
+        transform: translateY(-4px);
+      }
+      .ghost-card.large {
+        padding: var(--space-3xl);
+      }
+      .ghost-card blockquote {
+        font-family: var(--font-secondary);
+        font-size: 18px;
+        font-style: italic;
+        line-height: 1.5;
+      }
+      .ghost-author {
+        font-size: var(--t-micro);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--color-text-muted);
+        margin-top: var(--space-xl);
+      }
+      .echoes-stack {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-2xl);
+      }
+
+      /* S10 Oracle */
+      .oracle-section {
+        padding: var(--breath);
+        max-width: 800px;
+        margin: 0 auto;
+      }
+      .oracle-header {
+        margin-bottom: var(--space-3xl);
+      }
+      .oracle-header h2 {
+        font-family: var(--font-secondary);
+        font-size: var(--t-h2);
+        font-weight: 700;
+        margin-top: var(--space-lg);
+      }
+      .accordion-item {
+        border-bottom: 1px solid var(--color-border);
+      }
+      .accordion-trigger {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        padding: var(--space-xl) 0;
+        background: none;
+        border: none;
+        font-family: var(--font-secondary);
+        font-size: 20px;
+        text-align: left;
+        cursor: none;
+        color: var(--color-text-primary);
+        transition: color var(--motion-micro);
+      }
+      .accordion-trigger:hover {
+        color: var(--color-primary);
+      }
+      .accordion-icon {
+        width: 20px;
+        height: 20px;
+        flex-shrink: 0;
+        transition: transform 0.3s var(--weather);
+        font-size: 20px;
+      }
+      .accordion-content {
+        display: grid;
+        grid-template-rows: 0fr;
+        transition: grid-template-rows 0.4s var(--weather);
+      }
+      .accordion-content.open {
+        grid-template-rows: 1fr;
+      }
+      .accordion-inner {
+        overflow: hidden;
+        padding-bottom: 0;
+        color: var(--color-text-secondary);
+        line-height: var(--line-normal);
+        font-size: var(--t-body);
+      }
+      .accordion-content.open .accordion-inner {
+        padding-bottom: var(--space-xl);
+      }
+
+      /* S11 Conversion */
+      .conversion-section {
+        padding: var(--breath);
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .conversion-section h2 {
+        font-family: var(--font-secondary);
+        font-size: var(--t-h1);
+        font-weight: 700;
+        line-height: var(--line-tight);
+        max-width: 14ch;
+      }
+      .conversion-sub {
+        margin-top: var(--space-xl);
+        color: var(--color-text-muted);
+        line-height: var(--line-normal);
+        font-size: var(--t-body);
+        max-width: 50ch;
+      }
+      .capture-form {
+        margin-top: var(--space-3xl);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: var(--space-2xl);
+        width: 100%;
+        max-width: 600px;
+      }
+      .capture-form input {
+        width: 100%;
+        background: transparent;
+        border: none;
+        border-bottom: 1px solid var(--color-text-primary);
+        padding: var(--space-lg) 0;
+        font-family: var(--font-secondary);
+        font-size: 24px;
+        color: var(--color-text-primary);
+        text-align: center;
+        outline: none;
+        transition: border-color var(--motion-micro);
+      }
+      .capture-form input:focus {
+        border-color: var(--color-primary);
+      }
+      .capture-form input::placeholder {
+        color: var(--color-text-muted);
+      }
+      .btn-submit {
+        padding: var(--space-lg) var(--space-3xl);
+        background: var(--color-text-primary);
+        color: var(--color-text-inverse);
+        font-family: var(--font-primary);
+        font-size: var(--t-micro);
+        text-transform: uppercase;
+        letter-spacing: 0.2em;
+        border: none;
+        cursor: none;
+        transition: background var(--motion-response);
+      }
+      .btn-submit:hover {
+        background: var(--color-primary);
+      }
+
+      /* S12 Footer */
+      .site-footer {
+        padding: var(--space-2xl) var(--breath);
+        background: var(--color-surface-alt);
+        border-top: 1px solid var(--color-border);
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr;
+        gap: var(--space-2xl);
+        align-items: center;
+      }
+      .footer-brand {
+        font-family: var(--font-secondary);
+        font-style: italic;
+        font-size: 20px;
+      }
+      .footer-tagline {
+        font-size: var(--t-micro);
+        color: var(--color-text-muted);
+        margin-top: var(--space-xs);
+      }
+      .footer-links {
+        display: flex;
+        gap: var(--space-xl);
+        justify-content: center;
+      }
+      .footer-links a {
+        font-size: var(--t-micro);
+        text-transform: uppercase;
+        letter-spacing: 0.2em;
+        color: var(--color-text-muted);
+        transition: color var(--motion-micro);
+      }
+      .footer-links a:hover {
+        color: var(--color-primary);
+      }
+      .footer-right {
+        text-align: right;
+      }
+      .footer-social {
+        display: flex;
+        gap: var(--space-lg);
+        justify-content: flex-end;
+        margin-bottom: var(--space-xs);
+      }
+      .footer-social a {
+        font-size: var(--t-micro);
+        text-transform: uppercase;
+        letter-spacing: 0.2em;
+        color: var(--color-text-muted);
+        transition: color var(--motion-micro);
+      }
+      .footer-social a:hover {
+        color: var(--color-primary);
+      }
+      .footer-copy {
+        font-size: var(--t-micro);
+        color: var(--color-text-muted);
+      }
+
+      /* Responsive */
+      @media (max-width: 1024px) {
+        .slide {
+          grid-template-columns: 1fr;
+        }
+        .slide .visual-wrap {
+          position: absolute;
+          inset: 0;
+          height: 100%;
+          z-index: -1;
+          opacity: 0.3;
+        }
+        .slide .content-wrap {
+          position: relative;
+          z-index: 2;
+        }
+        .memory-grid {
+          grid-template-columns: 1fr;
+        }
+        .memory-column-right {
+          margin-top: var(--space-2xl);
+        }
+        .ritual-grid {
+          grid-template-columns: 1fr;
+        }
+        .artifacts-grid {
+          grid-template-columns: 1fr;
+        }
+        .sanctuary-wrap {
+          grid-template-columns: 1fr;
+        }
+        .sanctuary-media {
+          height: 40vh;
+        }
+        .echoes-grid {
+          grid-template-columns: 1fr;
+        }
+        .site-footer {
+          grid-template-columns: 1fr;
+          text-align: center;
+        }
+        .footer-links {
+          justify-content: center;
+        }
+        .footer-right {
+          text-align: center;
+        }
+        .footer-social {
+          justify-content: center;
+        }
+        .header-nav {
+          display: none;
+        }
+        body {
+          padding: 0;
+        }
+        section {
+          padding: var(--pulse) !important;
+        }
+        .canvas-controls button {
+          width: 60px;
+          height: 60px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Grain overlay -->
+    <div
+      class="grain-overlay"
+      style="
+        position: fixed;
+        inset: 0;
+        z-index: 1000;
+        pointer-events: none;
+        opacity: 0.04;
+        background-image: url(&quot;data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22><filter id=%22n%22><feTurbulence type=%22fractalNoise%22 baseFrequency=%220.9%22 numOctaves=%224%22 stitchTiles=%22stitch%22/><feColorMatrix type=%22saturate%22 values=%220%22/></filter><rect width=%22200%22 height=%22200%22 filter=%22url(%23n)%22 opacity=%221%22/></svg>&quot;);
+        background-size: 200px;
+      "
+    ></div>
+    <!-- Rain drift overlay -->
+    <div
+      class="rain-overlay"
+      style="
+        position: fixed;
+        inset: 0;
+        z-index: 1000;
+        pointer-events: none;
+        opacity: 0.02;
+        background: repeating-linear-gradient(
+          90deg,
+          transparent,
+          transparent 1px,
+          rgba(0, 0, 0, 0.3) 1px,
+          rgba(0, 0, 0, 0.3) 2px
+        );
+        animation: rain-drift 20s linear infinite;
+      "
+    ></div>
+    <!-- Custom cursor -->
+    <div
+      class="custom-cursor"
+      id="cursor"
+      style="
+        position: fixed;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--color-primary);
+        pointer-events: none;
+        z-index: 9999;
+        transform: translate(-50%, -50%);
+        transition: none;
+      "
+    ></div>
+    <div
+      class="cursor-follower"
+      id="cursor-follower"
+      style="
+        position: fixed;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: 1px solid var(--color-primary);
+        pointer-events: none;
+        z-index: 9998;
+        transform: translate(-50%, -50%);
+        opacity: 0.6;
+      "
+    ></div>
+
+    <!-- S1: Header -->
+    <header class="site-header" id="site-header">
+      <a href="#" class="header-logo">Kurogane Atelier</a>
+      <nav class="header-nav">
+        <a href="#lintel">Ethos</a>
+        <a href="#ritual">Process</a>
+        <a href="#artifacts">Works</a>
+        <a href="#sanctuary">Approach</a>
+        <a href="#conversion">Inquire</a>
+      </nav>
+      <button class="audio-toggle" id="audio-toggle" data-hover>♪</button>
+    </header>
+
+    <!-- S2: Canvas — Hero Carousel -->
+    <section id="canvas" class="experience-canvas">
+      <div id="slides-container" style="position: absolute; inset: 0">
+        <div class="slide" data-index="0" style="opacity: 1; z-index: 2">
+          <div class="content-wrap">
+            <p class="section-label">Canvas · 01</p>
+            <h1 class="slide-title">
+              Architecture Built Around
+              <span style="color: var(--color-primary)">Absence</span>
+            </h1>
+            <p class="slide-sub">
+              Kurogane Atelier designs residences where the most important
+              material is the space you cannot touch. Kyoto. Since 2009.
+            </p>
+            <div class="slide-actions">
+              <button class="btn-primary" data-hover>Begin Consultation</button>
+              <a href="#lintel" class="slide-enter" data-hover>Enter ↓</a>
+            </div>
+          </div>
+          <div class="visual-wrap">
+            <img
+              src="https://assets.cdn.filesafe.space/3Mh94ewIWZaOQuAxTDt4/media/69b426dad54817b6831deb30.png"
+              alt="Atmospheric presence"
+            />
+          </div>
+        </div>
+
+        <div class="slide" data-index="1" style="opacity: 0; z-index: 1">
+          <div class="content-wrap">
+            <p class="section-label">Canvas · 02</p>
+            <h1 class="slide-title">
+              The Room
+              <span style="color: var(--color-primary)">Before</span> the Room
+            </h1>
+            <p class="slide-sub">
+              Every threshold is a negotiation between arrival and departure. We
+              design the pause between them — 1.2 seconds of architectural
+              silence.
+            </p>
+            <div class="slide-actions">
+              <button class="btn-primary" data-hover>View Residences</button>
+              <a href="#lintel" class="slide-enter" data-hover>Enter ↓</a>
+            </div>
+          </div>
+          <div class="visual-wrap">
+            <img
+              src="https://assets.cdn.filesafe.space/3Mh94ewIWZaOQuAxTDt4/media/69b426dae8487cea717659b9.png"
+              alt="Shadow geometry"
+            />
+          </div>
+        </div>
+
+        <div class="slide" data-index="2" style="opacity: 0; z-index: 1">
+          <div class="content-wrap">
+            <p class="section-label">Canvas · 03</p>
+            <h1 class="slide-title">
+              Seventeen Residences in
+              <span style="color: var(--color-primary)">Fifteen</span> Years
+            </h1>
+            <p class="slide-sub">
+              We accept three commissions per year. Each one takes fourteen
+              months. There is no waitlist — only alignment.
+            </p>
+            <div class="slide-actions">
+              <button class="btn-primary" data-hover>Inquire</button>
+              <a href="#lintel" class="slide-enter" data-hover>Enter ↓</a>
+            </div>
+          </div>
+          <div class="visual-wrap">
+            <img
+              src="https://assets.cdn.filesafe.space/3Mh94ewIWZaOQuAxTDt4/media/69b426da277ba02b27d0287b.png"
+              alt="Neon bleed"
+            />
+          </div>
+        </div>
+      </div>
+      <div class="canvas-controls">
+        <button class="ctrl-prev" id="slide-prev" data-hover>←</button>
+        <button class="ctrl-next" id="slide-next" data-hover>→</button>
+      </div>
+      <div class="canvas-counter"><span id="slide-cur">01</span> / 03</div>
+    </section>
+
+    <!-- S3: Lintel — Manifesto -->
+    <section id="lintel" class="lintel-section">
+      <p class="section-label">Ethos · 02</p>
+      <h2 class="manifesto-quote">
+        A wall is not a boundary.<br />It is the
+        <span style="color: var(--color-primary)">first gesture</span> of
+        welcome.
+      </h2>
+      <p class="manifesto-sub">
+        We do not build monuments. We build instruments — tuned to the specific
+        light, wind, and silence of a single plot of earth in Kyoto. The
+        resident completes the architecture by living in it.
+      </p>
+    </section>
+
+    <!-- S4: Memory — Credibility Split -->
+    <section class="memory-section">
+      <div class="memory-grid">
+        <div class="memory-left">
+          <p class="section-label">Memory · 03</p>
+          <h2>Fifteen years of building what cannot be photographed</h2>
+          <p>
+            The most important quality of a Kurogane residence is invisible. It
+            is the way morning light enters a stairwell at 6:47am in October.
+            The acoustic signature of rainfall on a courtyard designed for
+            exactly that rainfall. These are not accidents. They are the work.
+          </p>
+          <div class="memory-stat">
+            <div
+              class="memory-stat-num"
+              data-count="17"
+              data-prefix=""
+              data-suffix=""
+            >
+              000
+            </div>
+            <p class="memory-stat-label">Residences Completed</p>
+          </div>
+        </div>
+        <div class="memory-column-right">
+          <img
+            src="https://assets.cdn.filesafe.space/3Mh94ewIWZaOQuAxTDt4/media/69b426dae8487cdf487659b8.png"
+            alt="Porch shadows"
+          />
+        </div>
+      </div>
+    </section>
+
+    <!-- S5: Ritual — Process Steps -->
+    <section id="ritual" class="ritual-section">
+      <div class="ritual-header">
+        <p class="section-label">Ritual · 04</p>
+        <h2>How a residence comes into being</h2>
+      </div>
+      <div class="ritual-grid">
+        <div class="ritual-step">
+          <div class="step-num">01</div>
+          <h3 class="step-title">Inhabitation Study</h3>
+          <p class="step-desc">
+            We spend 72 hours on the site across three seasons before drawing a
+            single line. We record wind direction, shadow movement, soil
+            resonance, and the specific quality of silence at 4am. The land
+            speaks first.
+          </p>
+        </div>
+        <div class="ritual-step">
+          <div class="step-num">02</div>
+          <h3 class="step-title">Negative Drafting</h3>
+          <p class="step-desc">
+            We design the voids before the walls. Each room begins as an absence
+            — a specific volume of stillness — then we determine the minimum
+            material needed to hold that absence in place. Nothing is added.
+            Things are removed.
+          </p>
+        </div>
+        <div class="ritual-step">
+          <div class="step-num">03</div>
+          <h3 class="step-title">Material Dialogue</h3>
+          <p class="step-desc">
+            Fourteen months of construction with a fixed team of nine artisans.
+            Hinoki cypress aged seven years. Concrete poured at 4°C for density.
+            Every joint is hand-finished. The building does not perform — it
+            simply is.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- S6: Artifacts — Collection/Offerings -->
+    <section id="artifacts" class="artifacts-section">
+      <p class="section-label">Works · 05</p>
+      <div class="artifacts-grid">
+        <div class="artifact-card" data-hover>
+          <img
+            src="https://assets.cdn.filesafe.space/3Mh94ewIWZaOQuAxTDt4/media/69b426daeba487700722d3e6.png"
+            alt="Sashimono detail"
+          />
+          <div class="artifact-info">
+            <h3 class="artifact-title">Katsura Residence</h3>
+            <p class="artifact-meta">Arashiyama · 2019 · 340m²</p>
+          </div>
+        </div>
+        <div class="artifact-card" data-hover>
+          <img
+            src="https://assets.cdn.filesafe.space/3Mh94ewIWZaOQuAxTDt4/media/69b426dabfc81f2479eeebca.png"
+            alt="Monks path"
+          />
+          <div class="artifact-info">
+            <h3 class="artifact-title">The Threshold House</h3>
+            <p class="artifact-meta">Higashiyama · 2021 · 220m²</p>
+          </div>
+        </div>
+        <div class="artifact-card" data-hover>
+          <img
+            src="https://assets.cdn.filesafe.space/3Mh94ewIWZaOQuAxTDt4/media/69b426dafb38ca83408ecb9b.png"
+            alt="Shinkansen precision"
+          />
+          <div class="artifact-info">
+            <h3 class="artifact-title">Void Pavilion</h3>
+            <p class="artifact-meta">Fushimi · 2023 · 180m²</p>
+          </div>
+        </div>
+        <div class="artifact-card" data-hover>
+          <img
+            src="https://assets.cdn.filesafe.space/3Mh94ewIWZaOQuAxTDt4/media/69b426da277ba069c6d0287f.png"
+            alt="Memory watermark"
+          />
+          <div class="artifact-info">
+            <h3 class="artifact-title">Nishijin Silence</h3>
+            <p class="artifact-meta">Kamigyō · 2024 · 410m²</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- S7: Sanctuary — Benefits -->
+    <section id="sanctuary" class="sanctuary-section">
+      <div class="sanctuary-wrap">
+        <div class="sanctuary-media">
+          <img
+            src="https://assets.cdn.filesafe.space/3Mh94ewIWZaOQuAxTDt4/media/69b426dae8487cea717659b9.png"
+            alt="Shadow geometry"
+          />
+        </div>
+        <div class="sanctuary-content">
+          <p class="section-label">Approach · 06</p>
+          <h2>What distinguishes a Kurogane residence</h2>
+          <div class="sanctuary-feature">
+            <span class="feat-icon">+</span>
+            <div>
+              <h4 class="feat-title">Seasonal Calibration</h4>
+              <p class="feat-desc">
+                Every room is tuned to perform differently across four seasons.
+                The study faces east in winter for morning warmth. The bedroom
+                captures the specific frequency of autumn rain on aged copper.
+              </p>
+            </div>
+          </div>
+          <div class="sanctuary-feature">
+            <span class="feat-icon">+</span>
+            <div>
+              <h4 class="feat-title">Acoustic Architecture</h4>
+              <p class="feat-desc">
+                Sound is treated as a material. Wall density, ceiling height,
+                and courtyard geometry are calculated to produce a specific
+                silence — not the absence of sound, but the presence of
+                stillness.
+              </p>
+            </div>
+          </div>
+          <div class="sanctuary-feature">
+            <span class="feat-icon">+</span>
+            <div>
+              <h4 class="feat-title">One-Generation Commitment</h4>
+              <p class="feat-desc">
+                We design for the person who commissions the work. Not for
+                resale value. Not for posterity. The house fits one life
+                exactly, the way a garment fits one body.
+              </p>
+            </div>
+          </div>
+          <button class="btn-artery" data-hover>Schedule a Site Visit</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- S8: Witness Hero — Focus Lighting -->
+    <section class="witness-hero">
+      <img
+        src="https://assets.cdn.filesafe.space/3Mh94ewIWZaOQuAxTDt4/media/69b426da277ba02b27d0287b.png"
+        alt="Neon presence"
+      />
+      <div class="witness-content">
+        <blockquote class="witness-quote">
+          "I asked Kurogane for a house. They gave me back the morning."
+        </blockquote>
+        <p class="witness-attr">— Yuki Tanaka, Katsura Residence, 2019</p>
+        <span
+          class="voyage-counter"
+          id="voyage-count"
+          data-count="17"
+          data-suffix=""
+          >000</span
+        >
+        <p class="voyage-label">Residences Witnessed</p>
+      </div>
+    </section>
+
+    <!-- S9: Echoes — Testimonials -->
+    <section class="echoes-section">
+      <div class="echoes-watermark">KUROGANE</div>
+      <p class="section-label">Echoes · 08</p>
+      <h2
+        style="
+          font-family: var(--font-secondary);
+          font-size: var(--t-h2);
+          font-weight: 700;
+          margin-top: var(--space-lg);
+        "
+      >
+        What residents remember
+      </h2>
+      <div class="echoes-grid">
+        <div>
+          <div class="ghost-card large">
+            <blockquote>
+              "The stairwell catches the last eleven minutes of sunlight in
+              December. Kurogane told me this would happen before the foundation
+              was poured. They were off by forty seconds."
+            </blockquote>
+            <p class="ghost-author">
+              Hiroshi Murakami — Void Pavilion, Fushimi
+            </p>
+          </div>
+          <div class="ghost-card" style="margin-top: var(--space-2xl)">
+            <blockquote>
+              "I have lived in four countries and nine houses. This is the first
+              one that breathes."
+            </blockquote>
+            <p class="ghost-author">
+              Elena Voss — The Threshold House, Higashiyama
+            </p>
+          </div>
+        </div>
+        <div class="echoes-stack">
+          <div class="ghost-card">
+            <blockquote>
+              "They asked me what silence sounded like. I didn't understand the
+              question for six months. Now I do."
+            </blockquote>
+            <p class="ghost-author">Kenji Ashida — Nishijin Silence, Kamigyō</p>
+          </div>
+          <div class="ghost-card">
+            <blockquote>
+              "The courtyard was designed for one specific maple tree that
+              hadn't been planted yet. Three years later, I understand."
+            </blockquote>
+            <p class="ghost-author">
+              Marie Laurent — Private Commission, Sagano
+            </p>
+          </div>
+          <div class="ghost-card">
+            <blockquote>
+              "Kurogane didn't ask what I wanted. They asked how I wake up."
+            </blockquote>
+            <p class="ghost-author">
+              Takeshi Ono — Katsura Residence, Arashiyama
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- S10: Oracle — FAQ -->
+    <section class="oracle-section">
+      <div class="oracle-header">
+        <p class="section-label">Oracle · 09</p>
+        <h2>Questions we are asked</h2>
+      </div>
+      <div class="accordion-item">
+        <button class="accordion-trigger" data-hover>
+          <span>How do I begin a commission?</span
+          ><span class="accordion-icon">+</span>
+        </button>
+        <div class="accordion-content">
+          <div class="accordion-inner">
+            You write to us. Not a brief — a letter. Tell us about the land, or
+            about the way you live, or about what you are trying to stop doing.
+            We read every letter. If there is alignment, we visit the site
+            within sixty days. There is no fee for the first conversation.
+          </div>
+        </div>
+      </div>
+      <div class="accordion-item">
+        <button class="accordion-trigger" data-hover>
+          <span>What does a Kurogane residence cost?</span
+          ><span class="accordion-icon">+</span>
+        </button>
+        <div class="accordion-content">
+          <div class="accordion-inner">
+            Our commissions begin at ¥180,000,000 and have reached ¥600,000,000.
+            The variance is not about size — it is about material complexity,
+            site difficulty, and the depth of seasonal calibration required. We
+            discuss this openly after the first site visit.
+          </div>
+        </div>
+      </div>
+      <div class="accordion-item">
+        <button class="accordion-trigger" data-hover>
+          <span>Do you work outside Kyoto?</span
+          ><span class="accordion-icon">+</span>
+        </button>
+        <div class="accordion-content">
+          <div class="accordion-inner">
+            Rarely. We have completed two residences outside the Kansai region —
+            one in Karuizawa, one in Naoshima. The land must justify the
+            distance. We do not accept international commissions.
+          </div>
+        </div>
+      </div>
+      <div class="accordion-item">
+        <button class="accordion-trigger" data-hover>
+          <span>Why only three commissions per year?</span
+          ><span class="accordion-icon">+</span>
+        </button>
+        <div class="accordion-content">
+          <div class="accordion-inner">
+            Because the inhabitation study alone requires 72 hours across three
+            seasons. Because our team of nine artisans works on one project at a
+            time. Because architecture built in haste remembers its haste. We
+            prefer that our buildings forget how they were made.
+          </div>
+        </div>
+      </div>
+      <div class="accordion-item">
+        <button class="accordion-trigger" data-hover>
+          <span>Can I visit a completed residence?</span
+          ><span class="accordion-icon">+</span>
+        </button>
+        <div class="accordion-content">
+          <div class="accordion-inner">
+            Two of our seventeen residences are available for private viewing by
+            appointment. We do not publish addresses. If you are considering a
+            commission, we arrange a visit as part of the initial conversation.
+          </div>
+        </div>
+      </div>
+      <div class="accordion-item">
+        <button class="accordion-trigger" data-hover>
+          <span>What is "negative drafting"?</span
+          ><span class="accordion-icon">+</span>
+        </button>
+        <div class="accordion-content">
+          <div class="accordion-inner">
+            Most architects begin with structure and fill it with space. We
+            begin with the space — the specific volume of stillness a room
+            requires — and then determine what material is necessary to hold it.
+            The walls serve the void, not the other way around. This is not
+            philosophy. It is our literal drafting method.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- S11: Conversion — Email Capture -->
+    <section id="conversion" class="conversion-section">
+      <p class="section-label">Inquiry · 10</p>
+      <h2>Write to the Atelier</h2>
+      <p class="conversion-sub">
+        If you have land, or the intention of land, we would like to hear from
+        you. Not a brief. A letter.
+      </p>
+      <form class="capture-form" action="{{FORM_ENDPOINT}}" method="POST">
+        <input
+          type="email"
+          name="email"
+          placeholder="Your email address"
+          required
+        />
+        <button type="submit" class="btn-submit" data-hover>
+          Send Coordinates
+        </button>
+      </form>
+    </section>
+
+    <!-- S12: Footer -->
+    <footer class="site-footer">
+      <div>
+        <div class="footer-brand">Kurogane Atelier</div>
+        <p class="footer-tagline">
+          Residential architecture built around absence. Kyoto, since 2009.
+        </p>
+      </div>
+      <div class="footer-links">
+        <a href="#lintel" data-hover>Ethos</a>
+        <a href="#artifacts" data-hover>Works</a>
+        <a href="#ritual" data-hover>Process</a>
+        <a href="#conversion" data-hover>Inquire</a>
+      </div>
+      <div class="footer-right">
+        <div class="footer-social">
+          <a href="#" data-hover>IG</a>
+          <a href="#" data-hover>PIN</a>
+        </div>
+        <p class="footer-copy">© 2026 Kurogane Atelier</p>
+      </div>
+    </footer>
+
+    <script>
+      window.addEventListener("DOMContentLoaded", function () {
+        // Lenis smooth scroll
+        (function () {
+          var lenis = new Lenis({
+            duration: 1.8,
+            easing: function (t) {
+              return Math.min(1, 1.001 - Math.pow(2, -10 * t));
+            },
+            smoothWheel: true,
+          });
+          function raf(t) {
+            lenis.raf(t);
+            requestAnimationFrame(raf);
+          }
+          requestAnimationFrame(raf);
+          gsap.registerPlugin(ScrollTrigger);
+          lenis.on("scroll", ScrollTrigger.update);
+          gsap.ticker.lagSmoothing(0);
+        })();
+
+        // Custom cursor
+        (function () {
+          var cur = document.getElementById("cursor"),
+            fol = document.getElementById("cursor-follower");
+          document.addEventListener("mousemove", function (e) {
+            gsap.to(cur, { x: e.clientX, y: e.clientY, duration: 0.1 });
+            gsap.to(fol, {
+              x: e.clientX,
+              y: e.clientY,
+              duration: 0.6,
+              ease: "cubic-bezier(0.23,1,0.75,1)",
+            });
+          });
+          document
+            .querySelectorAll("a,button,[data-hover]")
+            .forEach(function (el) {
+              el.addEventListener("mouseenter", function () {
+                gsap.to(fol, { scale: 1.8, duration: 0.3 });
+                gsap.to(cur, { scale: 0, duration: 0.2 });
+              });
+              el.addEventListener("mouseleave", function () {
+                gsap.to(fol, { scale: 1, duration: 0.3 });
+                gsap.to(cur, { scale: 1, duration: 0.2 });
+              });
+            });
+        })();
+
+        // Header scroll
+        (function () {
+          var hdr = document.getElementById("site-header");
+          window.addEventListener("scroll", function () {
+            if (window.scrollY > 80) hdr.classList.add("scrolled");
+            else hdr.classList.remove("scrolled");
+          });
+        })();
+
+        // Canvas carousel
+        (function () {
+          var slides = document.querySelectorAll(".slide");
+          var cur = 0;
+          function gotoSlide(n, dir) {
+            var from = slides[cur],
+              to = slides[n];
+            var tl = gsap.timeline();
+            tl.set(to, { zIndex: 2, opacity: 1 })
+              .fromTo(
+                to.querySelector(".visual-wrap"),
+                {
+                  clipPath:
+                    dir === "next" ? "inset(0 100% 0 0)" : "inset(0 0 0 100%)",
+                },
+                {
+                  clipPath: "inset(0 0% 0 0)",
+                  duration: 1.2,
+                  ease: "cubic-bezier(0.23,1,0.75,1)",
+                },
+              )
+              .fromTo(
+                to.querySelector(".content-wrap"),
+                { opacity: 0, y: 40 },
+                {
+                  opacity: 1,
+                  y: 0,
+                  duration: 0.8,
+                  ease: "cubic-bezier(0.23,1,0.75,1)",
+                },
+                "-=0.6",
+              )
+              .to(from, { opacity: 0, duration: 0.4 }, "-=0.8")
+              .set(from, { zIndex: 1 });
+            cur = n;
+            document.getElementById("slide-cur").textContent = String(
+              cur + 1,
+            ).padStart(2, "0");
+            slides[n].dataset.visited = "true";
+            if (n > 0) slides[n].style.filter = "sepia(0.1) contrast(1.05)";
+          }
+          document
+            .getElementById("slide-next")
+            .addEventListener("click", function () {
+              gotoSlide((cur + 1) % slides.length, "next");
+            });
+          document
+            .getElementById("slide-prev")
+            .addEventListener("click", function () {
+              gotoSlide((cur - 1 + slides.length) % slides.length, "prev");
+            });
+          document.querySelectorAll(".visual-wrap img").forEach(function (img) {
+            gsap.to(img, {
+              x: "+=30px",
+              y: "+=20px",
+              scale: 1.08,
+              duration: 25,
+              ease: "sine.inOut",
+              yoyo: true,
+              repeat: -1,
+            });
+          });
+        })();
+
+        // Scroll reveals
+        (function () {
+          document
+            .querySelectorAll(
+              ".lintel-section,.memory-grid,.ritual-step,.artifact-card,.sanctuary-wrap,.ghost-card,.accordion-item,.conversion-section",
+            )
+            .forEach(function (el) {
+              gsap.fromTo(
+                el,
+                { opacity: 0, y: 40 },
+                {
+                  opacity: el.classList.contains("ghost-card") ? 0.3 : 1,
+                  y: 0,
+                  duration: 1.2,
+                  ease: "cubic-bezier(0.23,1,0.75,1)",
+                  scrollTrigger: {
+                    trigger: el,
+                    start: "top 85%",
+                    toggleActions: "play none none none",
+                  },
+                },
+              );
+            });
+          gsap.to(".manifesto-quote", {
+            y: -100,
+            scrollTrigger: {
+              trigger: ".lintel-section",
+              start: "top 80%",
+              end: "bottom top",
+              scrub: 1,
+            },
+          });
+          gsap.to(".echoes-watermark", {
+            x: -150,
+            scrollTrigger: {
+              trigger: ".echoes-section",
+              start: "top bottom",
+              end: "bottom top",
+              scrub: 1,
+            },
+          });
+          var mimg = document.querySelector(".memory-column-right img");
+          if (mimg)
+            ScrollTrigger.create({
+              trigger: ".memory-column-right",
+              start: "top 70%",
+              onEnter: function () {
+                gsap.to(mimg, {
+                  filter: "grayscale(0) blur(0px)",
+                  duration: 0.8,
+                  ease: "cubic-bezier(0.23,1,0.75,1)",
+                });
+              },
+            });
+        })();
+
+        // Voyage counter
+        (function () {
+          document.querySelectorAll("[data-count]").forEach(function (el) {
+            var t = parseFloat(el.dataset.count),
+              sf = el.dataset.suffix || "",
+              pf = el.dataset.prefix || "";
+            gsap.fromTo(
+              { v: 0 },
+              {
+                v: t,
+                duration: 3,
+                ease: "power2.out",
+                onUpdate: function () {
+                  el.textContent =
+                    pf +
+                    String(Math.round(this.targets()[0].v)).padStart(3, "0") +
+                    sf;
+                },
+                scrollTrigger: { trigger: el, start: "top 85%", once: true },
+              },
+            );
+          });
+        })();
+
+        // Artifact hover parallax
+        (function () {
+          document.querySelectorAll(".artifact-card").forEach(function (card) {
+            var img = card.querySelector("img");
+            card.addEventListener("mousemove", function (e) {
+              var r = card.getBoundingClientRect();
+              var x = (e.clientX - r.left) / r.width - 0.5;
+              var y = (e.clientY - r.top) / r.height - 0.5;
+              gsap.to(img, {
+                x: x * -40 + "px",
+                y: y * -40 + "px",
+                duration: 0.8,
+                ease: "power2.out",
+              });
+            });
+            card.addEventListener("mouseleave", function () {
+              gsap.to(img, {
+                x: "-5%",
+                y: "-5%",
+                duration: 0.8,
+                ease: "power2.out",
+              });
+            });
+          });
+        })();
+
+        // Witness focus lighting
+        (function () {
+          var hero = document.querySelector(".witness-hero");
+          if (!hero) return;
+          hero.addEventListener("mousemove", function (e) {
+            var r = hero.getBoundingClientRect();
+            hero.style.setProperty("--mouse-x", e.clientX - r.left + "px");
+            hero.style.setProperty("--mouse-y", e.clientY - r.top + "px");
+          });
+        })();
+
+        // Accordion
+        (function () {
+          document
+            .querySelectorAll(".accordion-trigger")
+            .forEach(function (btn) {
+              btn.addEventListener("click", function () {
+                var item = btn.parentElement;
+                var content = item.querySelector(".accordion-content");
+                var isOpen = content.classList.contains("open");
+                document
+                  .querySelectorAll(".accordion-content.open")
+                  .forEach(function (c) {
+                    c.classList.remove("open");
+                    c.parentElement.querySelector(
+                      ".accordion-icon",
+                    ).style.transform = "rotate(0deg)";
+                  });
+                if (!isOpen) {
+                  content.classList.add("open");
+                  btn.querySelector(".accordion-icon").style.transform =
+                    "rotate(45deg)";
+                }
+              });
+            });
+        })();
+
+        // Audio toggle
+        (function () {
+          var btn = document.getElementById("audio-toggle");
+          var ctx = null,
+            running = false;
+          btn.addEventListener("click", function () {
+            if (!running) {
+              if (!ctx) ctx = new AudioContext();
+              var buf = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
+              var d = buf.getChannelData(0);
+              for (var i = 0; i < d.length; i++)
+                d[i] = (Math.random() * 2 - 1) * 0.15;
+              var src = ctx.createBufferSource();
+              src.buffer = buf;
+              src.loop = true;
+              var g = ctx.createGain();
+              g.gain.value = 0;
+              src.connect(g);
+              g.connect(ctx.destination);
+              src.start();
+              gsap.to(g.gain, { value: 0.3, duration: 1.5 });
+              running = true;
+              btn.textContent = "◼";
+            }
+          });
+        })();
+
+        // Form submission
+        (function () {
+          var form = document.querySelector(".capture-form");
+          form.addEventListener("submit", function (e) {
+            e.preventDefault();
+            var btn = form.querySelector(".btn-submit");
+            gsap.to(btn, {
+              backgroundColor: "var(--color-primary)",
+              duration: 0.4,
+            });
+            btn.textContent = "Coordinates archived";
+            btn.disabled = true;
+          });
+        })();
+      });
+    </script>
+  </body>
+</html>

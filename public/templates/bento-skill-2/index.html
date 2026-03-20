@@ -1,0 +1,672 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TerraHeirloom | Seeds with Stories</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --surface: #fff5e6;
+        --text: #111827;
+        --text-muted: #6b7280;
+        --hue-indigo: 99, 102, 241;
+        --hue-amber: 245, 158, 11;
+        --hue-emerald: 16, 185, 129;
+        --hue-rose: 244, 63, 94;
+        --hue-fuchsia: 217, 70, 239;
+        --hue-cyan: 6, 182, 212;
+        --hue-blue: 59, 130, 246;
+        --solid-from: #3b82f6;
+        --solid-to: #4338ca;
+        --success: #16a34a;
+        --warning: #d97706;
+        --danger: #dc2626;
+        --primary: #fad4c0;
+        --secondary: #80a1c1;
+        --font-primary: "Inter", system-ui, sans-serif;
+        --font-mono: "JetBrains Mono", monospace;
+        --space-1: 4px;
+        --space-2: 8px;
+        --space-3: 12px;
+        --space-4: 16px;
+        --space-6: 24px;
+        --space-8: 32px;
+        --space-12: 48px;
+        --space-16: 64px;
+        --radius-sm: 8px;
+        --radius-md: 12px;
+        --radius-lg: 16px;
+        --radius-xl: 24px;
+        --radius-2xl: 32px;
+        --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+        --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.06);
+        --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.08);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        background-color: var(--surface);
+        font-family: var(--font-primary);
+        color: var(--text);
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+        overflow-x: hidden;
+        position: relative;
+      }
+
+      .page-texture {
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        opacity: 0.07;
+        background-image: radial-gradient(var(--text) 1px, transparent 1px);
+        background-size: 32px 32px;
+      }
+      .page-texture-fade {
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        background: linear-gradient(
+          to bottom,
+          transparent 30%,
+          var(--surface) 100%
+        );
+        pointer-events: none;
+      }
+
+      .bento-grid {
+        display: grid;
+        grid-template-columns: repeat(12, 1fr);
+        grid-auto-rows: 240px;
+        gap: var(--space-4);
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 var(--space-4) var(--space-16);
+      }
+
+      .col-3 {
+        grid-column: span 3;
+      }
+      .col-4 {
+        grid-column: span 4;
+      }
+      .col-6 {
+        grid-column: span 6;
+      }
+      .col-8 {
+        grid-column: span 8;
+      }
+      .col-9 {
+        grid-column: span 9;
+      }
+      .col-12 {
+        grid-column: span 12;
+      }
+      .row-1 {
+        grid-row: span 1;
+      }
+      .row-2 {
+        grid-row: span 2;
+      }
+
+      .card-tint {
+        position: relative;
+        overflow: hidden;
+        border-radius: var(--radius-xl);
+        padding: var(--space-8);
+        transition: transform 0.3s ease;
+      }
+      .card-tint:hover {
+        transform: translateY(-2px);
+      }
+
+      .card-tint.hue-amber {
+        background: linear-gradient(
+          to bottom right,
+          rgba(var(--hue-amber), 0.1),
+          var(--surface)
+        );
+        border: 1px solid rgba(var(--hue-amber), 0.2);
+      }
+      .card-tint.hue-emerald {
+        background: linear-gradient(
+          to top right,
+          rgba(var(--hue-emerald), 0.1),
+          var(--surface)
+        );
+        border: 1px solid rgba(var(--hue-emerald), 0.2);
+      }
+      .card-tint.hue-rose {
+        background: linear-gradient(
+          to bottom,
+          rgba(var(--hue-rose), 0.06),
+          var(--surface)
+        );
+        border: 1px solid rgba(var(--hue-rose), 0.18);
+      }
+      .card-tint.hue-fuchsia {
+        background: linear-gradient(
+          135deg,
+          rgba(var(--hue-fuchsia), 0.08),
+          rgba(var(--hue-fuchsia), 0.03),
+          var(--surface)
+        );
+        border: 1px solid rgba(var(--hue-fuchsia), 0.18);
+      }
+      .card-tint.hue-cyan {
+        background: linear-gradient(
+          135deg,
+          rgba(var(--hue-cyan), 0.1),
+          var(--surface)
+        );
+        border: 1px solid rgba(var(--hue-cyan), 0.18);
+      }
+      .card-tint.hue-indigo {
+        background: linear-gradient(
+          135deg,
+          rgba(var(--hue-indigo), 0.08),
+          rgba(var(--hue-indigo), 0.02),
+          var(--surface)
+        );
+        border: 1px solid rgba(var(--hue-indigo), 0.15);
+      }
+
+      .card-solid {
+        background: linear-gradient(135deg, var(--solid-from), var(--solid-to));
+        border: 1px solid rgba(59, 130, 246, 0.3);
+        border-radius: var(--radius-xl);
+        padding: var(--space-8);
+        color: white;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+      .card-solid::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          circle at center,
+          rgba(96, 165, 250, 0.3),
+          transparent 70%
+        );
+        pointer-events: none;
+        opacity: 0.5;
+      }
+      .card-solid .card-title {
+        color: white;
+        font-weight: 600;
+      }
+      .card-solid .card-text {
+        color: rgba(255, 255, 255, 0.75);
+        margin-top: var(--space-3);
+      }
+
+      .card-vivid {
+        background: linear-gradient(135deg, #06b6d4, #3b82f6);
+        border: none;
+        border-radius: var(--radius-xl);
+        padding: var(--space-6);
+        color: white;
+        cursor: pointer;
+        transition:
+          transform 0.2s ease,
+          box-shadow 0.2s ease;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        text-align: center;
+      }
+      .card-vivid:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(6, 182, 212, 0.25);
+      }
+
+      .blur-orb {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(40px);
+        pointer-events: none;
+        opacity: 0.12;
+        transition: opacity 0.5s ease;
+      }
+      .card-tint:hover .blur-orb {
+        opacity: 0.22;
+      }
+
+      .text-hero {
+        font-size: clamp(36px, 5vw, 56px);
+        font-weight: 600;
+        line-height: 1.1;
+        letter-spacing: -0.02em;
+        margin-bottom: var(--space-4);
+      }
+      .text-title {
+        font-size: 20px;
+        font-weight: 600;
+        line-height: 1.3;
+        margin-bottom: var(--space-3);
+        display: block;
+      }
+      .text-large {
+        font-size: 28px;
+        font-weight: 600;
+        line-height: 1.2;
+        letter-spacing: -0.01em;
+        margin-bottom: var(--space-3);
+      }
+      .text-body {
+        font-size: 16px;
+        color: var(--text-muted);
+        line-height: 1.6;
+        margin-bottom: var(--space-4);
+      }
+      .text-small {
+        font-size: 14px;
+        color: var(--text-muted);
+        line-height: 1.5;
+      }
+      .text-label {
+        font-size: 12px;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-muted);
+        margin-bottom: var(--space-2);
+        display: block;
+      }
+
+      .icon-container {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: var(--space-4);
+      }
+      .icon-amber {
+        background: rgba(var(--hue-amber), 0.12);
+      }
+      .icon-emerald {
+        background: rgba(var(--hue-emerald), 0.12);
+      }
+      .icon-rose {
+        background: rgba(var(--hue-rose), 0.12);
+      }
+      .icon-fuchsia {
+        background: rgba(var(--hue-fuchsia), 0.12);
+      }
+      .icon-cyan {
+        background: rgba(var(--hue-cyan), 0.12);
+      }
+      .icon-indigo {
+        background: rgba(var(--hue-indigo), 0.12);
+      }
+      .icon-svg {
+        width: 20px;
+        height: 20px;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        fill: none;
+      }
+      .icon-amber .icon-svg {
+        stroke: rgb(var(--hue-amber));
+      }
+      .icon-emerald .icon-svg {
+        stroke: rgb(var(--hue-emerald));
+      }
+      .icon-rose .icon-svg {
+        stroke: rgb(var(--hue-rose));
+      }
+      .icon-fuchsia .icon-svg {
+        stroke: rgb(var(--hue-fuchsia));
+      }
+      .icon-cyan .icon-svg {
+        stroke: rgb(var(--hue-cyan));
+      }
+      .icon-indigo .icon-svg {
+        stroke: rgb(var(--hue-indigo));
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-2);
+        height: 48px;
+        padding: 0 var(--space-6);
+        border-radius: 9999px;
+        font-family: var(--font-primary);
+        font-size: 15px;
+        font-weight: 500;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        margin-top: var(--space-3);
+      }
+      .btn-dark {
+        background: var(--text);
+        color: white;
+        box-shadow: 0 4px 12px rgba(17, 24, 39, 0.12);
+      }
+      .btn-dark:hover {
+        transform: scale(1.03);
+      }
+      .btn-dark:active {
+        transform: scale(0.97);
+      }
+      .btn-dark:focus {
+        outline: 2px solid var(--secondary);
+        outline-offset: 3px;
+      }
+
+      nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: var(--space-6) var(--space-4) var(--space-12);
+      }
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+        font-weight: 600;
+        font-size: 16px;
+        letter-spacing: -0.01em;
+        text-decoration: none;
+        color: var(--text);
+      }
+      .logo-mark {
+        width: 32px;
+        height: 32px;
+        border-radius: var(--radius-sm);
+        background: var(--primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 14px;
+        color: var(--text);
+      }
+      .nav-login {
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--text-muted);
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: var(--space-2) var(--space-4);
+        border-radius: var(--radius-md);
+        transition: color 0.2s;
+      }
+      .nav-login:hover {
+        color: var(--text);
+      }
+      .nav-login:focus {
+        outline: 2px solid var(--secondary);
+        outline-offset: 2px;
+      }
+
+      @media (max-width: 768px) {
+        .bento-grid {
+          grid-template-columns: 1fr;
+          grid-auto-rows: auto;
+          gap: var(--space-6);
+        }
+        [class*="col-"],
+        [class*="row-"] {
+          grid-column: span 1 !important;
+          grid-row: span 1 !important;
+          width: 100%;
+        }
+        .card-solid,
+        .card-vivid {
+          grid-column: span 1 !important;
+          width: 100%;
+        }
+        .text-hero {
+          font-size: clamp(32px, 8vw, 48px);
+        }
+        nav {
+          padding-bottom: var(--space-8);
+        }
+        .page-texture,
+        .page-texture-fade {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page-texture"></div>
+    <div class="page-texture-fade"></div>
+
+    <nav>
+      <a href="#" class="logo">
+        <div class="logo-mark">T</div>
+        <span>TerraHeirloom</span>
+      </a>
+      <button class="nav-login">Log in</button>
+    </nav>
+
+    <div class="bento-grid">
+      <!-- Card 1: Heirloom Seeds (amber) -->
+      <div class="card-tint hue-amber col-3 row-1">
+        <div
+          class="blur-orb"
+          style="
+            top: -20px;
+            right: -20px;
+            width: 120px;
+            height: 120px;
+            background: rgba(var(--hue-amber), 0.15);
+          "
+        ></div>
+        <div class="icon-container icon-amber">
+          <svg class="icon-svg" viewBox="0 0 24 24">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+          </svg>
+        </div>
+        <span class="text-label">Ethically Sourced</span>
+        <span class="text-title">Heirloom Seeds</span>
+        <p class="text-body">
+          Sourced from seed savers and small farms across 12 countries. Each
+          variety carries generations of stewardship.
+        </p>
+      </div>
+
+      <!-- Card 2: Solid Anchor (Mission) -->
+      <div class="card-solid col-6 row-2">
+        <span class="text-hero"
+          >Preserving Biodiversity, One Seed at a Time</span
+        >
+        <p class="card-text">
+          We partner directly with indigenous seed keepers and heritage farms.
+          Every packet sustains living agricultural history—and your garden
+          becomes part of the story.
+        </p>
+      </div>
+
+      <!-- Card 3: Grower Stories (emerald) -->
+      <div class="card-tint hue-emerald col-3 row-1">
+        <div
+          class="blur-orb"
+          style="
+            bottom: -24px;
+            left: -24px;
+            width: 160px;
+            height: 160px;
+            background: rgba(var(--hue-emerald), 0.12);
+          "
+        ></div>
+        <div class="icon-container icon-emerald">
+          <svg class="icon-svg" viewBox="0 0 24 24">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+          </svg>
+        </div>
+        <span class="text-label">From the Soil</span>
+        <span class="text-title">Grower Stories</span>
+        <p class="text-body">
+          Read journals from gardeners who saved seeds from our Cherokee Purple
+          tomatoes and replanted them for three generations.
+        </p>
+      </div>
+
+      <!-- Card 4: Seed Stories (rose) -->
+      <div class="card-tint hue-rose col-3 row-1">
+        <div
+          class="blur-orb"
+          style="
+            top: -16px;
+            left: -16px;
+            width: 100px;
+            height: 100px;
+            background: rgba(var(--hue-rose), 0.14);
+          "
+        ></div>
+        <div class="icon-container icon-rose">
+          <svg class="icon-svg" viewBox="0 0 24 24">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+          </svg>
+        </div>
+        <span class="text-label">Cultural Roots</span>
+        <span class="text-title">Seed Stories</span>
+        <p class="text-body">
+          The Moon & Stars watermelon survived droughts in Missouri Ozarks. Its
+          seeds were carried in a pocket during the Great Migration.
+        </p>
+      </div>
+
+      <!-- Card 5: Community (fuchsia) -->
+      <div class="card-tint hue-fuchsia col-3 row-1">
+        <div
+          class="blur-orb"
+          style="
+            bottom: -20px;
+            right: -20px;
+            width: 140px;
+            height: 140px;
+            background: rgba(var(--hue-fuchsia), 0.13);
+          "
+        ></div>
+        <div class="icon-container icon-fuchsia">
+          <svg class="icon-svg" viewBox="0 0 24 24">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+          </svg>
+        </div>
+        <span class="text-label">Shared Harvest</span>
+        <span class="text-title">Community</span>
+        <p class="text-body">
+          Exchange tips and seed-saving techniques in our private forum. Last
+          season, members documented 217 successful saves.
+        </p>
+      </div>
+
+      <!-- Card 6: How It Works (indigo) -->
+      <div class="card-tint hue-indigo col-4 row-1">
+        <div
+          class="blur-orb"
+          style="
+            top: -12px;
+            right: -12px;
+            width: 90px;
+            height: 90px;
+            background: rgba(var(--hue-indigo), 0.11);
+          "
+        ></div>
+        <div class="icon-container icon-indigo">
+          <svg class="icon-svg" viewBox="0 0 24 24">
+            <path d="M3 3v16a2 2 0 0 0 2 2h16" />
+            <path d="M18 17V9" />
+            <path d="M13 17V5" />
+            <path d="M8 17v-3" />
+          </svg>
+        </div>
+        <span class="text-label">Simple Ritual</span>
+        <span class="text-title">How It Works</span>
+        <p class="text-body">
+          <span style="display: block; margin-bottom: var(--space-2)"
+            >1. Select your seasonal box</span
+          ><span style="display: block; margin-bottom: var(--space-2)"
+            >2. Receive seeds + letterpress story cards</span
+          ><span>3. Grow, save seeds, share your journey</span>
+        </p>
+      </div>
+
+      <!-- Card 7: This Season (cyan) -->
+      <div class="card-tint hue-cyan col-4 row-1">
+        <div
+          class="blur-orb"
+          style="
+            bottom: -28px;
+            left: -28px;
+            width: 180px;
+            height: 180px;
+            background: rgba(var(--hue-cyan), 0.1);
+          "
+        ></div>
+        <div class="icon-container icon-cyan">
+          <svg class="icon-svg" viewBox="0 0 24 24">
+            <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z" />
+          </svg>
+        </div>
+        <span class="text-label">Current Offering</span>
+        <span class="text-title">This Season's Collection</span>
+        <p class="text-body">
+          Oaxacan Green Dent Corn • Lebanese Zahle fig cuttings • Magenta Sunset
+          Hollyhock. Includes soil prep guides and moon-phase planting calendar.
+        </p>
+      </div>
+
+      <!-- Card 8: CTA (vivid) -->
+      <div class="card-vivid col-4 row-1">
+        <span
+          class="text-large"
+          style="color: white; margin-bottom: var(--space-2)"
+          >Join TerraHeirloom</span
+        >
+        <p
+          style="
+            color: rgba(255, 255, 255, 0.85);
+            margin-bottom: var(--space-4);
+            font-size: 16px;
+            line-height: 1.5;
+          "
+        >
+          Start your journey with heirloom seeds. Quarterly subscription: $48
+          (includes shipping).
+        </p>
+        <a href="#" class="btn btn-dark">Subscribe Now</a>
+      </div>
+    </div>
+
+    <script>
+      // Simple focus enhancement for accessibility
+      document.querySelectorAll("button, a, input").forEach((el) => {
+        el.addEventListener(
+          "focus",
+          () =>
+            (el.style.outline = `2px solid ${getComputedStyle(document.documentElement).getPropertyValue("--secondary")}`),
+        );
+        el.addEventListener("blur", () => (el.style.outline = ""));
+      });
+    </script>
+  </body>
+</html>

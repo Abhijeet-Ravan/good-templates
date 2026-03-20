@@ -1,0 +1,1411 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AXIS MONITOR | Infrastructure Integrity System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@900&family=Inter:wght@400;500;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --surface: 20, 22, 26;
+        --panel: 32, 35, 42;
+        --panel-deep: 14, 16, 20;
+        --border-dim: 50, 55, 65;
+        --border-mid: 75, 82, 95;
+        --accent: 255, 100, 20;
+        --accent-dim: 180, 70, 14;
+        --text-primary: 220, 225, 232;
+        --text-dim: 110, 118, 132;
+        --grid-line: 38, 42, 50;
+        --anchor: 8, 9, 12;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+        background-color: rgb(var(--surface));
+        background-image:
+          linear-gradient(rgba(var(--grid-line), 0.08) 1px, transparent 1px),
+          linear-gradient(
+            90deg,
+            rgba(var(--grid-line), 0.08) 1px,
+            transparent 1px
+          );
+        background-size: 24px 24px;
+        overflow-x: hidden;
+      }
+
+      body {
+        font-family: "Inter", system-ui, sans-serif;
+        color: rgba(var(--text-dim), 1);
+        line-height: 1.6;
+        overflow-x: hidden;
+      }
+
+      .panel {
+        padding: clamp(48px, 6vw, 80px) clamp(24px, 4vw, 48px);
+        border-top: 1px solid rgba(var(--border-mid), 1);
+        border-bottom: 1px solid rgba(var(--border-mid), 1);
+      }
+
+      .panel-deep {
+        background-color: rgb(var(--panel-deep));
+      }
+
+      .panel-light {
+        background-color: rgb(var(--panel));
+      }
+
+      .section-divider {
+        height: 3px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(var(--accent), 0.3),
+          transparent
+        );
+        margin: 48px 0;
+        border: none;
+      }
+
+      /* Typography */
+      .display {
+        font-family: "Barlow Condensed", "Bebas Neue", "Inter", sans-serif;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: -0.01em;
+        line-height: 0.88;
+        color: rgba(var(--text-primary), 1);
+        font-size: clamp(3rem, 8vw, 12rem);
+        margin-bottom: 16px;
+      }
+
+      .section-head {
+        font-family: "Barlow Condensed", sans-serif;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        font-size: clamp(1.75rem, 3.2vw, 3.75rem);
+        color: rgba(var(--text-primary), 1);
+        margin-bottom: 32px;
+        position: relative;
+        padding-left: 24px;
+      }
+
+      .section-head::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 8px;
+        height: calc(100% - 16px);
+        width: 4px;
+        background-color: rgba(var(--accent), 1);
+      }
+
+      .body-text {
+        font-size: clamp(0.875rem, 1.1vw, 0.9375rem);
+        max-width: 680px;
+        margin-bottom: 24px;
+      }
+
+      .mono {
+        font-family: "JetBrains Mono", monospace;
+        font-variant-numeric: tabular-nums;
+        font-size: clamp(0.75rem, 1vw, 0.875rem);
+      }
+
+      .metric {
+        font-family: "JetBrains Mono", monospace;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+        font-size: clamp(3.5rem, 6vw, 7.5rem);
+        color: rgba(var(--accent), 1);
+        line-height: 1;
+      }
+
+      .label {
+        font-family: "JetBrains Mono", monospace;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        font-size: 0.7rem;
+        color: rgba(var(--text-dim), 1);
+        display: block;
+        margin-top: 8px;
+      }
+
+      /* UI Elements */
+      .btn {
+        display: inline-block;
+        background: transparent;
+        color: rgba(var(--text-primary), 1);
+        border: 2px solid rgba(var(--border-mid), 1);
+        font-family: "JetBrains Mono", monospace;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        padding: 16px 32px;
+        text-decoration: none;
+        font-size: 0.875rem;
+        transition: all 150ms cubic-bezier(0.25, 0, 0.25, 1);
+        cursor: pointer;
+        width: auto;
+      }
+
+      .btn-accent {
+        border-color: rgba(var(--accent), 1);
+        background: rgba(var(--accent), 0.08);
+      }
+
+      .btn-accent:hover {
+        background: rgba(var(--accent), 0.15);
+        transform: translateY(-2px);
+      }
+
+      .spec-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 16px 0;
+        border-bottom: 1px solid rgba(var(--border-dim), 0.6);
+      }
+
+      .spec-name {
+        font-family: "JetBrains Mono", monospace;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: rgba(var(--text-dim), 1);
+      }
+
+      .spec-value {
+        font-family: "JetBrains Mono", monospace;
+        font-weight: 700;
+        color: rgba(var(--text-primary), 1);
+      }
+
+      .led-array {
+        display: flex;
+        gap: 8px;
+        margin: 24px 0 32px;
+      }
+
+      .led {
+        width: 16px;
+        height: 16px;
+        border-radius: 0;
+        background-color: rgba(var(--border-dim), 1);
+        position: relative;
+      }
+
+      .led.active {
+        background-color: rgba(var(--accent), 1);
+        box-shadow: 0 0 0 0 rgba(var(--accent), 0.7);
+        animation: pulse-ring 1.8s infinite;
+      }
+
+      @keyframes pulse-ring {
+        0% {
+          box-shadow: 0 0 0 0 rgba(var(--accent), 0.7);
+        }
+        70% {
+          box-shadow: 0 0 0 10px rgba(var(--accent), 0);
+        }
+        100% {
+          box-shadow: 0 0 0 0 rgba(var(--accent), 0);
+        }
+      }
+
+      .model-badge {
+        position: absolute;
+        top: 24px;
+        right: 24px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.75rem;
+        color: rgba(var(--text-dim), 1);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        z-index: 10;
+      }
+
+      .schematic {
+        display: grid;
+        grid-template-columns: repeat(12, 1fr);
+        gap: 24px;
+        position: relative;
+        margin: 48px 0;
+      }
+
+      .component {
+        background: rgba(var(--panel-deep), 1);
+        border: 1px solid rgba(var(--border-mid), 1);
+        padding: 24px;
+        position: relative;
+      }
+
+      .connector {
+        position: absolute;
+        background: rgba(var(--border-mid), 1);
+        z-index: 1;
+      }
+
+      .log-entry {
+        padding: 16px 0;
+        border-bottom: 1px solid rgba(var(--border-dim), 0.4);
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.875rem;
+      }
+
+      .log-timestamp {
+        color: rgba(var(--accent), 1);
+        margin-right: 12px;
+      }
+
+      .log-source {
+        color: rgba(var(--text-dim), 1);
+        margin-right: 12px;
+      }
+
+      .tier-card {
+        border: 2px solid rgba(var(--border-mid), 1);
+        padding: 32px 24px;
+        text-align: center;
+        transition: all 180ms cubic-bezier(0.25, 0, 0.25, 1);
+      }
+
+      .tier-card:hover {
+        outline: 2px solid rgba(var(--accent), 0.4);
+      }
+
+      .tier-header {
+        border-bottom: 2px solid rgba(var(--border-mid), 1);
+        padding-bottom: 16px;
+        margin-bottom: 24px;
+      }
+
+      .tier-name {
+        font-family: "Barlow Condensed", sans-serif;
+        font-weight: 800;
+        text-transform: uppercase;
+        font-size: 1.75rem;
+        margin-bottom: 8px;
+      }
+
+      .tier-price {
+        font-family: "JetBrains Mono", monospace;
+        font-weight: 700;
+        font-size: 2.5rem;
+      }
+
+      .guarantee-box {
+        border: 2px solid rgba(var(--accent), 0.3);
+        background: rgba(var(--panel-deep), 1);
+        padding: 24px;
+        margin-top: 40px;
+      }
+
+      .guarantee-title {
+        font-family: "JetBrains Mono", monospace;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        font-size: 0.875rem;
+        color: rgba(var(--accent), 1);
+        margin-bottom: 16px;
+        display: block;
+      }
+
+      .faq-item {
+        border-bottom: 1px solid rgba(var(--border-dim), 0.6);
+        padding: 24px 0;
+      }
+
+      .faq-question {
+        font-family: "JetBrains Mono", monospace;
+        font-weight: 700;
+        font-size: 1.125rem;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .faq-answer {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 240ms cubic-bezier(0.25, 0, 0.25, 1);
+        margin-top: 16px;
+      }
+
+      .faq-answer.open {
+        max-height: 500px;
+      }
+
+      .stress-container {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        max-width: 720px;
+        margin: 0 auto;
+      }
+
+      .stress-bar {
+        height: 24px;
+        background: rgba(var(--panel-deep), 1);
+        border: 1px solid rgba(var(--border-mid), 1);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .stress-fill {
+        height: 100%;
+        background: rgba(var(--accent), 1);
+        width: 0%;
+        transition: width 2s cubic-bezier(0.25, 0, 0.25, 1);
+      }
+
+      .stress-label {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 8px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.875rem;
+      }
+
+      .stress-competitor .stress-fill {
+        background: rgba(180, 40, 40, 1);
+      }
+
+      .nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 24px;
+        background: rgba(var(--surface), 0.92);
+        backdrop-filter: blur(4px);
+        z-index: 1000;
+        border-bottom: 1px solid rgba(var(--border-dim), 1);
+      }
+
+      .nav-logo {
+        font-family: "Barlow Condensed", sans-serif;
+        font-weight: 900;
+        text-transform: uppercase;
+        font-size: 1.5rem;
+        color: rgba(var(--text-primary), 1);
+        text-decoration: none;
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 32px;
+      }
+
+      .nav-link {
+        color: rgba(var(--text-dim), 1);
+        text-decoration: none;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        position: relative;
+        padding-left: 8px;
+      }
+
+      .nav-link::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        height: 12px;
+        width: 0;
+        background-color: rgba(var(--accent), 1);
+        transition: width 120ms cubic-bezier(0.25, 0, 0.25, 1);
+      }
+
+      .nav-link:hover {
+        color: rgba(var(--text-primary), 1);
+      }
+
+      .nav-link:hover::before {
+        width: 3px;
+      }
+
+      .hamburger {
+        display: none;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        padding: 4px;
+      }
+
+      .hamburger span {
+        display: block;
+        width: 24px;
+        height: 2px;
+        background: rgba(var(--text-primary), 1);
+        margin: 4px 0;
+        transition: all 150ms cubic-bezier(0.25, 0, 0.25, 1);
+      }
+
+      .scanline {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: rgba(var(--accent), 0.15);
+        pointer-events: none;
+        z-index: 1;
+        animation: scan 6s linear infinite;
+      }
+
+      @keyframes scan {
+        0% {
+          top: 0;
+        }
+        100% {
+          top: 100%;
+        }
+      }
+
+      .anchor-section {
+        background-color: rgb(var(--anchor));
+        position: relative;
+        overflow: hidden;
+      }
+
+      .accent-glow {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 800px;
+        height: 800px;
+        background: radial-gradient(
+          circle,
+          rgba(var(--accent), 0.08) 0%,
+          transparent 70%
+        );
+        z-index: 0;
+        pointer-events: none;
+      }
+
+      .anchor-content {
+        position: relative;
+        z-index: 2;
+        text-align: center;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 80px 24px;
+      }
+
+      .char-cascade {
+        display: inline-block;
+        opacity: 0;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .char-cascade,
+        .anim-ready {
+          opacity: 1 !important;
+          transform: none !important;
+          transition: none !important;
+        }
+        .scanline,
+        .led.active {
+          animation: none !important;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .nav-links {
+          display: none;
+        }
+        .hamburger {
+          display: block;
+        }
+        .mobile-menu {
+          position: fixed;
+          top: 64px;
+          left: 0;
+          right: 0;
+          background: rgb(var(--panel-deep));
+          padding: 32px 24px;
+          border-top: 1px solid rgba(var(--border-mid), 1);
+          display: none;
+        }
+        .mobile-menu.active {
+          display: block;
+        }
+        .mobile-link {
+          display: block;
+          padding: 16px 0;
+          color: rgba(var(--text-primary), 1);
+          text-decoration: none;
+          font-family: "JetBrains Mono", monospace;
+          font-size: 1.125rem;
+          border-bottom: 1px solid rgba(var(--border-dim), 0.4);
+        }
+        .panel {
+          padding: 40px 20px;
+        }
+        .schematic {
+          grid-template-columns: 1fr;
+        }
+        .scanline {
+          display: none;
+        }
+        .stress-container {
+          padding: 0 16px;
+        }
+        .btn {
+          width: 100%;
+        }
+        .led-array {
+          justify-content: center;
+        }
+        .model-badge {
+          position: relative;
+          top: auto;
+          right: auto;
+          display: block;
+          margin-top: 24px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="nav">
+      <a href="#" class="nav-logo">AXIS</a>
+      <div class="nav-links">
+        <a href="#specs" class="nav-link">Specs</a>
+        <a href="#field-data" class="nav-link">Deployments</a>
+        <a href="#schematic" class="nav-link">Architecture</a>
+        <a href="#pricing" class="nav-link">Load Ratings</a>
+      </div>
+      <a href="#commit" class="btn btn-accent">ACTIVATE SYSTEM</a>
+      <button class="hamburger" id="hamburger">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+
+    <div class="mobile-menu" id="mobile-menu">
+      <a href="#specs" class="mobile-link">Specs</a>
+      <a href="#field-data" class="mobile-link">Deployments</a>
+      <a href="#schematic" class="mobile-link">Architecture</a>
+      <a href="#pricing" class="mobile-link">Load Ratings</a>
+      <a
+        href="#commit"
+        class="mobile-link"
+        style="
+          color: rgb(var(--accent));
+          border-color: rgb(var(--accent));
+          margin-top: 24px;
+        "
+        >ACTIVATE SYSTEM</a
+      >
+    </div>
+
+    <section
+      class="panel panel-light anim-ready anim-snap"
+      style="
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        position: relative;
+        border: none;
+      "
+    >
+      <div class="scanline"></div>
+      <span class="model-badge"
+        >SYSTEM: AXIS-MONITOR / CORE v4.2 / RATED: 99.997%</span
+      >
+      <h1 class="display" id="hero-headline">INFRASTRUCTURE INTEGRITY</h1>
+      <div class="led-array">
+        <div class="led active"></div>
+        <div class="led active"></div>
+        <div class="led active"></div>
+        <div class="led active"></div>
+        <div class="led active"></div>
+        <div class="led active"></div>
+        <div class="led active"></div>
+        <div class="led active"></div>
+      </div>
+      <div style="max-width: 600px">
+        <div class="metric" id="uptime-metric">0.000</div>
+        <span class="label">SYSTEM UPTIME (99.997% GUARANTEED)</span>
+      </div>
+      <a
+        href="#commit"
+        class="btn btn-accent"
+        style="margin-top: 40px; max-width: 280px"
+        >DEPLOY MONITOR →</a
+      >
+    </section>
+
+    <section id="specs" class="panel panel-deep anim-ready anim-slide-r">
+      <h2 class="section-head">System Specifications</h2>
+      <div class="spec-grid" style="max-width: 800px">
+        <div class="spec-row stagger-child">
+          <span class="spec-name">Latency</span>
+          <span class="spec-value">≤ 3.8ms</span>
+        </div>
+        <div class="spec-row stagger-child">
+          <span class="spec-name">Prediction Horizon</span>
+          <span class="spec-value">72 hours</span>
+        </div>
+        <div class="spec-row stagger-child">
+          <span class="spec-name">Sensor Density</span>
+          <span class="spec-value">1 per 4.2m³</span>
+        </div>
+        <div class="spec-row stagger-child">
+          <span class="spec-name">Failure Accuracy</span>
+          <span class="spec-value">99.94%</span>
+        </div>
+        <div class="spec-row stagger-child">
+          <span class="spec-name">Orchestration Speed</span>
+          <span class="spec-value">≤ 110ms</span>
+        </div>
+        <div class="spec-row stagger-child">
+          <span class="spec-name">Data Retention</span>
+          <span class="spec-value">7 years</span>
+        </div>
+      </div>
+    </section>
+
+    <hr class="section-divider anim-ready anim-border-grow" />
+
+    <section id="field-data" class="panel panel-light anim-ready anim-slide-l">
+      <h2 class="section-head">Field Deployment Data</h2>
+      <div class="stress-container">
+        <div>
+          <div class="label" style="text-align: center; margin-bottom: 12px">
+            SYSTEM LOAD STRESS TEST
+          </div>
+          <div class="stress-bar">
+            <div class="stress-fill" id="axis-fill"></div>
+          </div>
+          <div class="stress-label">
+            <span>AXIS MONITOR</span>
+            <span id="axis-label">0%</span>
+          </div>
+        </div>
+        <div class="stress-competitor">
+          <div class="stress-bar">
+            <div class="stress-fill" id="comp-fill"></div>
+          </div>
+          <div class="stress-label">
+            <span>Competitor System</span>
+            <span id="comp-label">0%</span>
+          </div>
+        </div>
+      </div>
+      <div
+        style="
+          display: flex;
+          justify-content: space-between;
+          max-width: 720px;
+          margin: 40px auto 0;
+          flex-wrap: wrap;
+          gap: 24px;
+        "
+      >
+        <div
+          class="anim-ready anim-data stagger-child"
+          style="text-align: center; min-width: 180px"
+        >
+          <div class="metric" id="deployments-metric">0</div>
+          <span class="label">Active Deployments</span>
+        </div>
+        <div
+          class="anim-ready anim-data stagger-child"
+          style="text-align: center; min-width: 180px"
+        >
+          <div class="metric" id="facilities-metric">0</div>
+          <span class="label">Facilities Monitored</span>
+        </div>
+        <div
+          class="anim-ready anim-data stagger-child"
+          style="text-align: center; min-width: 180px"
+        >
+          <div class="metric" id="sensors-metric">0</div>
+          <span class="label">Sensors Online</span>
+        </div>
+      </div>
+      <div
+        style="
+          display: flex;
+          flex-wrap: wrap;
+          gap: 24px;
+          margin-top: 48px;
+          justify-content: center;
+        "
+      >
+        <div
+          class="mono"
+          style="
+            color: rgba(var(--text-dim), 1);
+            font-size: 0.875rem;
+            padding: 8px 16px;
+            border: 1px solid rgba(var(--border-dim), 1);
+          "
+        >
+          SIEMENS ENERGY
+        </div>
+        <div
+          class="mono"
+          style="
+            color: rgba(var(--text-dim), 1);
+            font-size: 0.875rem;
+            padding: 8px 16px;
+            border: 1px solid rgba(var(--border-dim), 1);
+          "
+        >
+          AWS INFRASTRUCTURE
+        </div>
+        <div
+          class="mono"
+          style="
+            color: rgba(var(--text-dim), 1);
+            font-size: 0.875rem;
+            padding: 8px 16px;
+            border: 1px solid rgba(var(--border-dim), 1);
+          "
+        >
+          TESLA GIGAFACTORY
+        </div>
+        <div
+          class="mono"
+          style="
+            color: rgba(var(--text-dim), 1);
+            font-size: 0.875rem;
+            padding: 8px 16px;
+            border: 1px solid rgba(var(--border-dim), 1);
+          "
+        >
+          LOCKHEED MARTIN
+        </div>
+      </div>
+    </section>
+
+    <hr class="section-divider anim-ready anim-border-grow" />
+
+    <section id="schematic" class="panel panel-deep anim-ready anim-snap">
+      <h2 class="section-head">System Architecture</h2>
+      <div class="schematic">
+        <div class="component" style="grid-column: 1 / 5">
+          <div
+            class="mono"
+            style="margin-bottom: 12px; color: rgba(var(--accent), 1)"
+          >
+            SENSOR LAYER
+          </div>
+          <div class="body-text">
+            Distributed hardware sensors monitor vibration, thermal, acoustic,
+            and electromagnetic signatures at 10kHz sampling rate.
+          </div>
+        </div>
+        <div class="component" style="grid-column: 5 / 9">
+          <div
+            class="mono"
+            style="margin-bottom: 12px; color: rgba(var(--accent), 1)"
+          >
+            EDGE PROCESSING
+          </div>
+          <div class="body-text">
+            On-premise edge nodes perform real-time FFT analysis and anomaly
+            detection with <4ms latency.
+          </div>
+        </div>
+        <div class="component" style="grid-column: 9 / 13">
+          <div
+            class="mono"
+            style="margin-bottom: 12px; color: rgba(var(--accent), 1)"
+          >
+            CORE ANALYTICS
+          </div>
+          <div class="body-text">
+            Cloud-based LSTM networks correlate cross-facility data to predict
+            cascade failures before local thresholds trigger.
+          </div>
+        </div>
+        <div class="component" style="grid-column: 3 / 8; margin-top: 40px">
+          <div
+            class="mono"
+            style="margin-bottom: 12px; color: rgba(var(--accent), 1)"
+          >
+            ORCHESTRATION ENGINE
+          </div>
+          <div class="body-text">
+            Automated response protocols trigger maintenance workflows, load
+            redistribution, and failover sequences without human intervention.
+          </div>
+        </div>
+        <div class="component" style="grid-column: 8 / 11; margin-top: 40px">
+          <div
+            class="mono"
+            style="margin-bottom: 12px; color: rgba(var(--accent), 1)"
+          >
+            COMMAND INTERFACE
+          </div>
+          <div class="body-text">
+            Engineer-accessible terminal interface with full system telemetry
+            and manual override capability.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <hr class="section-divider anim-ready anim-border-grow" />
+
+    <section class="panel panel-light anim-ready anim-slide-r">
+      <h2 class="section-head">Deployment Log</h2>
+      <div style="max-width: 800px; margin: 0 auto">
+        <div class="log-entry stagger-child">
+          <span class="log-timestamp">2026-03-19T14:22:08Z</span>
+          <span class="log-source">[SIEMENS-DE/BERLIN-PLANT]</span>
+          <span class="log-message"
+            >Predicted main transformer failure 68h prior to thermal threshold
+            breach. Automated load redistribution prevented $4.2M downtime
+            event.</span
+          >
+        </div>
+        <div class="log-entry stagger-child">
+          <span class="log-timestamp">2026-03-18T09:47:33Z</span>
+          <span class="log-source">[AWS-US-EAST-4]</span>
+          <span class="log-message"
+            >Detected cooling system degradation pattern across 3 zones.
+            Pre-emptive maintenance scheduled during next maintenance window,
+            avoiding 99.2% capacity loss.</span
+          >
+        </div>
+        <div class="log-entry stagger-child">
+          <span class="log-timestamp">2026-03-17T22:15:01Z</span>
+          <span class="log-source">[TESLA-GIGA-TEXAS]</span>
+          <span class="log-message"
+            >Identified harmonic resonance in robotic assembly line #7B.
+            Adjusted motor controller parameters in real-time, eliminating 0.8mm
+            positional drift before quality metrics triggered.</span
+          >
+        </div>
+        <div class="log-entry stagger-child">
+          <span class="log-timestamp">2026-03-16T11:03:44Z</span>
+          <span class="log-source">[LOCKHEED-MARTIN/SYRACUSE]</span>
+          <span class="log-message"
+            >Predicted hydraulic pump cascade failure in F-35 assembly jig.
+            Automated parts requisition completed 14h before failure event. Zero
+            production impact.</span
+          >
+        </div>
+      </div>
+    </section>
+
+    <hr class="section-divider anim-ready anim-border-grow" />
+
+    <section id="pricing" class="panel panel-deep anim-ready anim-slide-l">
+      <h2 class="section-head">Load Ratings</h2>
+      <div
+        style="
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+          gap: 32px;
+          max-width: 1200px;
+          margin: 0 auto;
+        "
+      >
+        <div class="tier-card stagger-child">
+          <div class="tier-header">
+            <div class="tier-name">CORE</div>
+            <div class="tier-price">
+              $499<span
+                class="mono"
+                style="font-size: 1.25rem; font-weight: 400"
+                >/mo</span
+              >
+            </div>
+          </div>
+          <div class="spec-row" style="border: none; padding: 8px 0">
+            <span class="spec-name">Sites</span>
+            <span class="spec-value">1</span>
+          </div>
+          <div class="spec-row" style="padding: 8px 0">
+            <span class="spec-name">Sensors</span>
+            <span class="spec-value">≤ 250</span>
+          </div>
+          <div class="spec-row" style="padding: 8px 0">
+            <span class="spec-name">Prediction</span>
+            <span class="spec-value">24h horizon</span>
+          </div>
+          <div class="spec-row" style="padding: 8px 0">
+            <span class="spec-name">SLA</span>
+            <span class="spec-value">99.95%</span>
+          </div>
+          <div class="spec-row" style="padding: 8px 0; border-bottom: none">
+            <span class="spec-name">Support</span>
+            <span class="spec-value">Business hours</span>
+          </div>
+          <a href="#commit" class="btn" style="margin-top: 24px; width: 100%"
+            >DEPLOY CORE</a
+          >
+        </div>
+        <div
+          class="tier-card stagger-child"
+          style="
+            border-color: rgba(var(--accent), 1);
+            background: rgba(var(--accent), 0.03);
+          "
+        >
+          <div class="tier-header">
+            <div class="tier-name">FLEET</div>
+            <div class="tier-price">
+              $1,299<span
+                class="mono"
+                style="font-size: 1.25rem; font-weight: 400"
+                >/mo</span
+              >
+            </div>
+          </div>
+          <div class="spec-row" style="border: none; padding: 8px 0">
+            <span class="spec-name">Sites</span>
+            <span class="spec-value">≤ 5</span>
+          </div>
+          <div class="spec-row" style="padding: 8px 0">
+            <span class="spec-name">Sensors</span>
+            <span class="spec-value">≤ 2,000</span>
+          </div>
+          <div class="spec-row" style="padding: 8px 0">
+            <span class="spec-name">Prediction</span>
+            <span class="spec-value">72h horizon</span>
+          </div>
+          <div class="spec-row" style="padding: 8px 0">
+            <span class="spec-name">SLA</span>
+            <span class="spec-value">99.99%</span>
+          </div>
+          <div class="spec-row" style="padding: 8px 0; border-bottom: none">
+            <span class="spec-name">Support</span>
+            <span class="spec-value">24/7 priority</span>
+          </div>
+          <a
+            href="#commit"
+            class="btn btn-accent"
+            style="margin-top: 24px; width: 100%"
+            >DEPLOY FLEET</a
+          >
+        </div>
+        <div class="tier-card stagger-child">
+          <div class="tier-header">
+            <div class="tier-name">AEGIS</div>
+            <div class="tier-price">Custom</div>
+          </div>
+          <div class="spec-row" style="border: none; padding: 8px 0">
+            <span class="spec-name">Sites</span>
+            <span class="spec-value">Unlimited</span>
+          </div>
+          <div class="spec-row" style="padding: 8px 0">
+            <span class="spec-name">Sensors</span>
+            <span class="spec-value">Unlimited + HW</span>
+          </div>
+          <div class="spec-row" style="padding: 8px 0">
+            <span class="spec-name">Prediction</span>
+            <span class="spec-value">14d horizon</span>
+          </div>
+          <div class="spec-row" style="padding: 8px 0">
+            <span class="spec-name">SLA</span>
+            <span class="spec-value">99.997%</span>
+          </div>
+          <div class="spec-row" style="padding: 8px 0; border-bottom: none">
+            <span class="spec-name">Support</span>
+            <span class="spec-value">Dedicated team</span>
+          </div>
+          <a href="#commit" class="btn" style="margin-top: 24px; width: 100%"
+            >REQUEST BRIEF</a
+          >
+        </div>
+      </div>
+    </section>
+
+    <section id="commit" class="anchor-section">
+      <div class="accent-glow"></div>
+      <div class="anchor-content">
+        <h2
+          class="display"
+          id="commit-headline"
+          style="font-size: clamp(2.5rem, 6vw, 6rem); margin-bottom: 32px"
+        >
+          SYSTEM READY
+        </h2>
+        <p
+          class="body-text"
+          style="max-width: 600px; margin: 0 auto 40px; font-size: 1.125rem"
+        >
+          Deploy AXIS MONITOR to your first facility within 72 hours. Full
+          sensor integration, baseline calibration, and engineer training
+          included.
+        </p>
+        <a
+          href="#commit"
+          class="btn btn-accent"
+          style="padding: 20px 48px; font-size: 1.125rem"
+          >ACTIVATE SYSTEM →</a
+        >
+      </div>
+    </section>
+
+    <section class="panel panel-light anim-ready anim-slide-r">
+      <h2 class="section-head">Tolerance Specifications</h2>
+      <div style="max-width: 800px">
+        <div class="faq-item">
+          <div class="faq-question" onclick="toggleFAQ(this)">
+            <span>What sensor hardware is required?</span>
+            <span class="mono">+</span>
+          </div>
+          <div class="faq-answer">
+            <p class="body-text">
+              AXIS integrates with existing industrial sensor networks (Modbus,
+              OPC UA, BACnet). For greenfield deployments, we provide certified
+              sensor kits rated for -40°C to +85°C operation with 10-year MTBF.
+              All hardware carries ISO 13849 PLd certification.
+            </p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question" onclick="toggleFAQ(this)">
+            <span>How is prediction accuracy validated?</span>
+            <span class="mono">+</span>
+          </div>
+          <div class="faq-answer">
+            <p class="body-text">
+              All predictions are back-tested against 4.2PB of historical
+              failure data from 1,800+ industrial facilities. Accuracy metrics
+              are continuously validated against ground-truth failure events
+              with third-party auditors. Current field-validated accuracy:
+              99.94% for mechanical systems, 99.87% for electrical
+              infrastructure.
+            </p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question" onclick="toggleFAQ(this)">
+            <span>What happens during network partition?</span>
+            <span class="mono">+</span>
+          </div>
+          <div class="faq-answer">
+            <p class="body-text">
+              Edge nodes operate autonomously during network loss with 72 hours
+              of local storage and full prediction capability. All critical
+              alerts trigger local SMS/cellular fallback. Upon reconnection,
+              edge nodes synchronize state with core without data loss. Zero
+              single point of failure in alerting path.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="guarantee-box">
+        <span class="guarantee-title">GUARANTEED TOLERANCES</span>
+        <div class="spec-row" style="border: none; padding: 8px 0">
+          <span class="spec-name">Uptime SLA</span>
+          <span class="spec-value">99.997% (AEGIS tier)</span>
+        </div>
+        <div class="spec-row" style="padding: 8px 0">
+          <span class="spec-name">Alert Latency</span>
+          <span class="spec-value">≤ 220ms P99</span>
+        </div>
+        <div class="spec-row" style="padding: 8px 0; border-bottom: none">
+          <span class="spec-name">Data Durability</span>
+          <span class="spec-value">11x9s (99.999999999%)</span>
+        </div>
+      </div>
+    </section>
+
+    <footer
+      class="panel panel-deep"
+      style="text-align: center; border-top: 3px solid rgba(var(--accent), 0.3)"
+    >
+      <div
+        class="mono"
+        style="margin-bottom: 24px; color: rgba(var(--text-dim), 1)"
+      >
+        AXIS MONITOR SYSTEMS • FERGUSON DRIVE • DETROIT, MI 48202
+      </div>
+      <div
+        style="
+          display: flex;
+          justify-content: center;
+          flex-wrap: wrap;
+          gap: 24px;
+          margin-bottom: 24px;
+        "
+      >
+        <div
+          class="mono"
+          style="
+            padding: 6px 16px;
+            border: 1px solid rgba(var(--border-dim), 1);
+          "
+        >
+          ISO 27001
+        </div>
+        <div
+          class="mono"
+          style="
+            padding: 6px 16px;
+            border: 1px solid rgba(var(--border-dim), 1);
+          "
+        >
+          SOC 2 TYPE II
+        </div>
+        <div
+          class="mono"
+          style="
+            padding: 6px 16px;
+            border: 1px solid rgba(var(--border-dim), 1);
+          "
+        >
+          NIST 800-171
+        </div>
+        <div
+          class="mono"
+          style="
+            padding: 6px 16px;
+            border: 1px solid rgba(var(--border-dim), 1);
+          "
+        >
+          IEC 62443
+        </div>
+      </div>
+      <div
+        class="mono"
+        style="
+          color: rgba(var(--text-dim), 1);
+          max-width: 600px;
+          margin: 0 auto;
+        "
+      >
+        SYSTEM IDENTIFIER: AXIS-MONITOR/PROD/US-EAST-1/SERIAL-A7X9B2
+      </div>
+    </footer>
+
+    <script>
+      // Character cascade animation for hero headline
+      document.addEventListener("DOMContentLoaded", () => {
+        const headline = document.getElementById("hero-headline");
+        const text = headline.textContent;
+        headline.textContent = "";
+
+        text.split("").forEach((char, i) => {
+          const span = document.createElement("span");
+          span.className = "char-cascade";
+          span.textContent = char === " " ? "\u00A0" : char;
+          headline.appendChild(span);
+
+          setTimeout(
+            () => {
+              span.style.opacity = "1";
+            },
+            i * 20 + 300,
+          );
+        });
+
+        // Counter animations
+        const counters = [
+          {
+            el: document.getElementById("uptime-metric"),
+            target: 99.997,
+            duration: 1400,
+            suffix: "%",
+          },
+          {
+            el: document.getElementById("deployments-metric"),
+            target: 142,
+            duration: 1600,
+          },
+          {
+            el: document.getElementById("facilities-metric"),
+            target: 89,
+            duration: 1500,
+          },
+          {
+            el: document.getElementById("sensors-metric"),
+            target: 28740,
+            duration: 1800,
+          },
+        ];
+
+        counters.forEach((counter) => {
+          animateCounter(
+            counter.el,
+            0,
+            counter.target,
+            counter.duration,
+            counter.suffix || "",
+          );
+        });
+
+        // Load stress animation
+        setTimeout(() => {
+          const axisFill = document.getElementById("axis-fill");
+          const compFill = document.getElementById("comp-fill");
+          const axisLabel = document.getElementById("axis-label");
+          const compLabel = document.getElementById("comp-label");
+
+          let axisProgress = 0;
+          let compProgress = 0;
+
+          const axisInterval = setInterval(() => {
+            axisProgress += 2;
+            if (axisProgress >= 100) {
+              axisProgress = 100;
+              clearInterval(axisInterval);
+            }
+            axisFill.style.width = `${axisProgress}%`;
+            axisLabel.textContent = `${axisProgress}%`;
+          }, 35);
+
+          const compInterval = setInterval(() => {
+            compProgress += 2.8;
+            if (compProgress >= 72) {
+              compProgress = 72;
+              clearInterval(compInterval);
+            }
+            compFill.style.width = `${compProgress}%`;
+            compLabel.textContent = `${Math.round(compProgress)}%`;
+          }, 35);
+        }, 800);
+
+        // Mobile menu toggle
+        const hamburger = document.getElementById("hamburger");
+        const mobileMenu = document.getElementById("mobile-menu");
+
+        hamburger.addEventListener("click", () => {
+          mobileMenu.classList.toggle("active");
+          const spans = hamburger.querySelectorAll("span");
+          if (mobileMenu.classList.contains("active")) {
+            spans[0].style.transform = "rotate(45deg) translate(6px, 6px)";
+            spans[1].style.opacity = "0";
+            spans[2].style.transform = "rotate(-45deg) translate(6px, -6px)";
+          } else {
+            spans[0].style.transform = "none";
+            spans[1].style.opacity = "1";
+            spans[2].style.transform = "none";
+          }
+        });
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+          anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute("href"));
+            if (target) {
+              window.scrollTo({
+                top: target.offsetTop - 80,
+                behavior: "smooth",
+              });
+
+              // Close mobile menu if open
+              if (mobileMenu.classList.contains("active")) {
+                mobileMenu.classList.remove("active");
+                const spans = hamburger.querySelectorAll("span");
+                spans[0].style.transform = "none";
+                spans[1].style.opacity = "1";
+                spans[2].style.transform = "none";
+              }
+            }
+          });
+        });
+
+        // Intersection Observer for animations
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add("anim-visible");
+
+                // Stagger children
+                const staggerChildren =
+                  entry.target.querySelectorAll(".stagger-child");
+                if (staggerChildren.length) {
+                  staggerChildren.forEach((child, i) => {
+                    setTimeout(() => {
+                      child.classList.add("anim-visible");
+                    }, i * 65);
+                  });
+                }
+
+                observer.unobserve(entry.target);
+              }
+            });
+          },
+          { threshold: 0.1 },
+        );
+
+        document.querySelectorAll(".anim-ready").forEach((el) => {
+          observer.observe(el);
+        });
+
+        // Parallax effect (desktop only)
+        if (window.innerWidth > 768) {
+          window.addEventListener("scroll", () => {
+            const scrollY = window.scrollY;
+            document.documentElement.style.backgroundPosition = `-${scrollY * 0.08}px -${scrollY * 0.08}px`;
+          });
+        }
+      });
+
+      function animateCounter(element, start, end, duration, suffix = "") {
+        let startTimestamp = null;
+        const step = (timestamp) => {
+          if (!startTimestamp) startTimestamp = timestamp;
+          const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+          const value = Math.floor(progress * (end - start) + start);
+          element.textContent = value + (suffix.includes("%") ? suffix : "");
+          if (progress < 1) {
+            window.requestAnimationFrame(step);
+          } else {
+            // Final precise value
+            element.textContent =
+              end.toFixed(suffix.includes("%") ? 3 : 0) + suffix;
+          }
+        };
+        window.requestAnimationFrame(step);
+      }
+
+      function toggleFAQ(questionEl) {
+        const answerEl = questionEl.nextElementSibling;
+        const isOpen = answerEl.classList.contains("open");
+
+        // Close all others
+        document.querySelectorAll(".faq-answer").forEach((el) => {
+          el.classList.remove("open");
+          el.style.maxHeight = "0";
+        });
+        document
+          .querySelectorAll(".faq-question span:last-child")
+          .forEach((el) => {
+            el.textContent = "+";
+          });
+
+        // Toggle current
+        if (!isOpen) {
+          answerEl.classList.add("open");
+          answerEl.style.maxHeight = answerEl.scrollHeight + "px";
+          questionEl.querySelector("span:last-child").textContent = "−";
+        }
+      }
+    </script>
+  </body>
+</html>

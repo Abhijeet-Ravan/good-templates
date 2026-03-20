@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Markdown Preview | Template Browser</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+    .markdown-container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: var(--bg-primary);
+      padding: 3rem;
+      border: 1px solid var(--border-color);
+    }
+    .markdown-body h1, .markdown-body h2 { border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; margin-top: 2rem; margin-bottom: 1rem; }
+    .markdown-body code { background: var(--bg-secondary); padding: 0.2rem 0.4rem; border-radius: 3px; font-size: 0.9em; }
+    .markdown-body pre { background: var(--bg-secondary); padding: 1rem; overflow-x: auto; border: 1px solid var(--border-color); margin: 1rem 0; }
+    .markdown-body ul, .markdown-body ol { margin-left: 1.5rem; margin-bottom: 1rem; }
+    .markdown-body p { margin-bottom: 1rem; }
+  </style>
+</head>
+<body style="background-color: var(--bg-secondary) !important;">
+  <header style="background-color: var(--bg-primary);">
+    <a href="/" style="text-decoration: none; color: var(--text-primary); font-size: 0.85rem;">&larr; Back to Templates</a>
+  </header>
+  
+  <div class="markdown-container">
+    <div id="content" class="markdown-body">
+      Loading markdown...
+    </div>
+  </div>
+
+  <script>
+    async function loadMarkdown() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const templateId = urlParams.get('template');
+      const contentDiv = document.getElementById('content');
+
+      if (!templateId) {
+        contentDiv.innerHTML = '<p>Error: No template specified.</p>';
+        return;
+      }
+
+      try {
+        const response = await fetch(`/templates/${templateId}/SKILL.md`);
+        if (!response.ok) throw new Error('Could not find SKILL.md for this template');
+        const markdown = await response.text();
+        contentDiv.innerHTML = marked.parse(markdown);
+        document.title = `${templateId} | SKILL.md Preview`;
+      } catch (error) {
+        contentDiv.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+      }
+    }
+
+    loadMarkdown();
+  </script>
+</body>
+</html>

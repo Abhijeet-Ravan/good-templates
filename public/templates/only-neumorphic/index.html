@@ -1,0 +1,2253 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      Somnus Protocol — Clinical Sleep Architecture for High Performers
+    </title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <style>
+      :root {
+        --bg: #e6e9ef;
+        --bg-mid: #d1d5db;
+        --shadow-dark: #b8bcc2;
+        --shadow-light: #ffffff;
+        --accent: #10b981;
+        --accent-dark: #059669;
+        --accent-rgb: 16, 185, 129;
+        --text-primary: #1f2937;
+        --text-muted: #6b7280;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        background: var(--bg);
+        color: var(--text-primary);
+        font-family: "Inter", system-ui, sans-serif;
+        overflow-x: hidden;
+      }
+      .neu-raised {
+        background: linear-gradient(145deg, var(--bg), var(--bg-mid));
+        box-shadow:
+          8px 8px 16px var(--shadow-dark),
+          -8px -8px 16px var(--shadow-light);
+      }
+      .neu-raised-sm {
+        background: linear-gradient(145deg, var(--bg), var(--bg-mid));
+        box-shadow:
+          4px 4px 8px var(--shadow-dark),
+          -4px -4px 8px var(--shadow-light);
+      }
+      .neu-convex {
+        box-shadow:
+          8px 8px 16px var(--shadow-dark),
+          -8px -8px 16px var(--shadow-light),
+          inset 1px 1px 2px rgba(255, 255, 255, 0.4),
+          inset -1px -1px 2px rgba(0, 0, 0, 0.15);
+      }
+      .neu-inset {
+        background: linear-gradient(145deg, var(--bg-mid), var(--bg));
+        box-shadow:
+          inset 4px 4px 8px var(--shadow-dark),
+          inset -4px -4px 8px var(--shadow-light);
+      }
+      .neu-card {
+        background: linear-gradient(145deg, var(--bg), var(--bg-mid));
+        box-shadow:
+          8px 8px 16px var(--shadow-dark),
+          -8px -8px 16px var(--shadow-light);
+        border-radius: 30px;
+        padding: 32px;
+        transition: all 0.3s ease;
+      }
+      .neu-card:hover {
+        transform: translateY(-4px);
+      }
+      .btn-primary {
+        background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+        box-shadow:
+          8px 8px 16px var(--shadow-dark),
+          -8px -8px 16px var(--shadow-light),
+          inset 1px 1px 2px rgba(255, 255, 255, 0.4),
+          inset -1px -1px 2px rgba(0, 0, 0, 0.15);
+        border-radius: 16px;
+        padding: 16px 40px;
+        color: white;
+        border: none;
+        cursor: pointer;
+        font-family: "Outfit", sans-serif;
+        font-weight: 700;
+        font-size: 16px;
+        transition: all 0.15s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 20px 40px rgba(var(--accent-rgb), 0.3);
+      }
+      .btn-primary:active {
+        transform: translateY(1px);
+        box-shadow: inset 4px 4px 8px rgba(0, 0, 0, 0.2);
+      }
+      .btn-secondary {
+        background: linear-gradient(145deg, var(--bg), var(--bg-mid));
+        box-shadow:
+          8px 8px 16px var(--shadow-dark),
+          -8px -8px 16px var(--shadow-light);
+        border-radius: 16px;
+        padding: 16px 40px;
+        color: var(--text-primary);
+        border: none;
+        cursor: pointer;
+        font-family: "Outfit", sans-serif;
+        font-weight: 700;
+        font-size: 16px;
+        transition: all 0.15s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .btn-secondary:hover {
+        transform: translateY(-2px);
+      }
+      #navbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 999;
+        padding: 24px 0;
+        transition: all 0.3s ease;
+      }
+      #navbar.scrolled {
+        padding: 12px 0;
+        background: rgba(230, 233, 239, 0.85);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      }
+      @keyframes float1 {
+        0%,
+        100% {
+          transform: translate(0, 0);
+        }
+        50% {
+          transform: translate(30px, -20px);
+        }
+      }
+      @keyframes float2 {
+        0%,
+        100% {
+          transform: translate(0, 0);
+        }
+        50% {
+          transform: translate(-20px, 30px);
+        }
+      }
+      @keyframes marquee {
+        0% {
+          transform: translateX(0);
+        }
+        100% {
+          transform: translateX(-50%);
+        }
+      }
+      .marquee-track {
+        display: flex;
+        gap: 40px;
+        animation: marquee 25s linear infinite;
+        width: max-content;
+      }
+      .marquee-half {
+        display: flex;
+        gap: 40px;
+        padding-right: 40px;
+      }
+      .marquee-wrap {
+        overflow: hidden;
+        -webkit-mask-image: linear-gradient(
+          to right,
+          transparent,
+          black 10%,
+          black 90%,
+          transparent
+        );
+        mask-image: linear-gradient(
+          to right,
+          transparent,
+          black 10%,
+          black 90%,
+          transparent
+        );
+      }
+      .mobile-menu {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: #e6e9ef;
+        border-top: 1px solid #e5e7eb;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        padding: 24px;
+      }
+      .mobile-menu.active {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- S1: Navbar -->
+    <nav id="navbar">
+      <div
+        class="max-w-7xl mx-auto px-4 md:px-6 flex items-center justify-between relative"
+      >
+        <div class="flex items-center gap-3">
+          <div class="neu-raised p-2 rounded-xl">
+            <svg
+              class="w-6 h-6"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="var(--accent)"
+              stroke-width="2"
+            >
+              <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
+            </svg>
+          </div>
+          <span
+            class="text-xl font-bold tracking-tight"
+            style="font-family: &quot;Outfit&quot;, sans-serif"
+            >Somnus</span
+          >
+        </div>
+        <div class="hidden md:flex items-center gap-8">
+          <a
+            href="#features"
+            class="text-sm font-medium text-gray-600 hover:text-emerald-600 transition-colors"
+            >Method</a
+          >
+          <a
+            href="#how"
+            class="text-sm font-medium text-gray-600 hover:text-emerald-600 transition-colors"
+            >Process</a
+          >
+          <a
+            href="#pricing"
+            class="text-sm font-medium text-gray-600 hover:text-emerald-600 transition-colors"
+            >Programs</a
+          >
+          <a
+            href="#faq"
+            class="text-sm font-medium text-gray-600 hover:text-emerald-600 transition-colors"
+            >FAQ</a
+          >
+        </div>
+        <div class="hidden md:flex items-center gap-4">
+          <button class="btn-primary text-sm py-3 px-6">
+            Book Assessment <span class="ml-1">→</span>
+          </button>
+        </div>
+        <button id="hamburger" class="md:hidden neu-raised-sm p-2 rounded-lg">
+          <svg
+            class="w-6 h-6 text-gray-600"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+          >
+            <path d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+        <div id="mobileMenu" class="mobile-menu md:hidden rounded-2xl">
+          <div class="flex flex-col gap-4">
+            <a href="#features" class="text-base font-medium text-gray-700 py-2"
+              >Method</a
+            >
+            <a href="#how" class="text-base font-medium text-gray-700 py-2"
+              >Process</a
+            >
+            <a href="#pricing" class="text-base font-medium text-gray-700 py-2"
+              >Programs</a
+            >
+            <a href="#faq" class="text-base font-medium text-gray-700 py-2"
+              >FAQ</a
+            >
+            <button class="btn-primary w-full justify-center mt-2 py-4 text-lg">
+              Book Assessment →
+            </button>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <div class="space-y-32">
+      <!-- S2: Hero -->
+      <section class="pt-32 pb-20 lg:pt-48 lg:pb-32 relative">
+        <div
+          class="absolute top-0 right-0 w-[50%] h-[50%] rounded-full opacity-30 -z-10 pointer-events-none"
+          style="
+            background: rgba(var(--accent-rgb), 0.2);
+            filter: blur(120px);
+            animation: float1 8s ease-in-out infinite;
+          "
+        ></div>
+        <div
+          class="absolute bottom-0 left-0 w-[40%] h-[40%] rounded-full opacity-30 -z-10 pointer-events-none"
+          style="
+            background: rgba(59, 130, 246, 0.2);
+            filter: blur(120px);
+            animation: float2 10s ease-in-out infinite;
+          "
+        ></div>
+        <div class="max-w-7xl mx-auto px-4 md:px-6 text-center">
+          <div
+            class="hero-badge inline-flex items-center gap-2 px-4 py-2 rounded-full neu-raised-sm mb-8"
+          >
+            <span style="color: var(--accent)">✦</span>
+            <span
+              class="text-xs font-bold text-gray-600 tracking-wider uppercase"
+              >Clinical Sleep Science</span
+            >
+            <span class="text-gray-400">→</span>
+          </div>
+          <h1
+            class="hero-headline text-5xl md:text-7xl lg:text-8xl font-black tracking-tight text-gray-900 mb-8"
+            style="
+              font-family: &quot;Outfit&quot;, sans-serif;
+              line-height: 1.1;
+            "
+          >
+            Reclaim Your<br /><span style="color: var(--accent)"
+              >Deepest Sleep</span
+            >
+          </h1>
+          <p
+            class="hero-sub text-xl md:text-2xl text-gray-500 max-w-3xl mx-auto leading-relaxed mb-12"
+          >
+            The 90-day clinical protocol that rebuilds your sleep architecture
+            from the ground up. Wearable data. Circadian light therapy.
+            Personalized supplement stacks. 94% of clients report restorative
+            sleep by week six.
+          </p>
+          <div
+            class="hero-ctas flex flex-col sm:flex-row items-center justify-center gap-6"
+          >
+            <button
+              class="btn-primary px-10 py-4 rounded-2xl text-lg shadow-2xl group"
+            >
+              Start Your Assessment
+              <span
+                class="inline-block transition-transform group-hover:translate-x-1"
+                >→</span
+              >
+            </button>
+            <button class="btn-secondary px-10 py-4 rounded-2xl text-lg">
+              <svg
+                class="w-5 h-5"
+                style="color: var(--accent)"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path d="M8 5v14l11-7z" />
+              </svg>
+              Watch the Science
+            </button>
+          </div>
+          <div class="hero-preview mt-24 relative max-w-5xl mx-auto">
+            <div
+              class="neu-raised p-4 md:p-8 rounded-[40px] shadow-2xl"
+              style="border: 1px solid rgba(255, 255, 255, 0.2)"
+            >
+              <div
+                style="background: var(--bg)"
+                class="rounded-[30px] overflow-hidden min-h-[500px] flex items-center justify-center relative"
+                style="
+                  border: 1px solid rgba(255, 255, 255, 0.4);
+                  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+                "
+              >
+                <img
+                  src="https://assets.cdn.filesafe.space/3Mh94ewIWZaOQuAxTDt4/media/69b439bebfc81f54f4f24807.png"
+                  alt="Somnus Protocol Sleep Science"
+                  class="absolute inset-0 w-full h-full object-cover scale-105 hover:scale-100 transition-transform duration-1000 opacity-90"
+                />
+                <div
+                  class="absolute top-10 right-10 neu-raised p-4 rounded-2xl hidden md:block"
+                  style="
+                    backdrop-filter: blur(8px);
+                    background: rgba(255, 255, 255, 0.1);
+                  "
+                >
+                  <span
+                    class="text-xs font-black uppercase tracking-widest"
+                    style="color: var(--accent)"
+                    >LIVE DATA</span
+                  >
+                </div>
+                <div
+                  class="absolute bottom-10 left-10 p-8 rounded-3xl hidden md:flex items-center gap-6 neu-raised text-left"
+                  style="
+                    backdrop-filter: blur(16px);
+                    background: rgba(255, 255, 255, 0.05);
+                    border: 1px solid rgba(255, 255, 255, 0.1);
+                  "
+                >
+                  <div
+                    class="w-12 h-12 rounded-full neu-raised flex items-center justify-center"
+                    style="color: var(--accent)"
+                  >
+                    <svg
+                      class="w-6 h-6"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <div
+                      class="text-xs font-black uppercase tracking-widest mb-1"
+                      style="color: var(--accent)"
+                    >
+                      Deep Sleep Increase
+                    </div>
+                    <div class="text-xl font-bold text-gray-800">
+                      +47 min avg by Day 42
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- S3: Trusted By -->
+      <section
+        class="py-12 border-y border-gray-200"
+        style="background: rgba(209, 213, 219, 0.3)"
+      >
+        <div class="max-w-7xl mx-auto px-4 md:px-6">
+          <p
+            class="text-xs font-black tracking-[0.2em] uppercase text-gray-400 mb-10 text-center"
+          >
+            Trusted by Leading Performance Teams
+          </p>
+          <div
+            class="flex flex-wrap items-center justify-center gap-12 md:gap-20"
+          >
+            <div
+              class="flex items-center gap-2 opacity-40 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-500"
+            >
+              <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" /></svg
+              ><span class="text-sm font-bold text-gray-500">WHOOP</span>
+            </div>
+            <div
+              class="flex items-center gap-2 opacity-40 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-500"
+            >
+              <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                <rect x="3" y="3" width="18" height="18" rx="4" /></svg
+              ><span class="text-sm font-bold text-gray-500">OURA</span>
+            </div>
+            <div
+              class="flex items-center gap-2 opacity-40 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-500"
+            >
+              <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                <polygon points="12,2 22,22 2,22" /></svg
+              ><span class="text-sm font-bold text-gray-500">EIGHT SLEEP</span>
+            </div>
+            <div
+              class="flex items-center gap-2 opacity-40 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-500"
+            >
+              <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                <path
+                  d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
+                /></svg
+              ><span class="text-sm font-bold text-gray-500">HUBERMAN LAB</span>
+            </div>
+            <div
+              class="flex items-center gap-2 opacity-40 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-500"
+            >
+              <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                <path
+                  d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"
+                /></svg
+              ><span class="text-sm font-bold text-gray-500">LEVELS</span>
+            </div>
+            <div
+              class="flex items-center gap-2 opacity-40 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-500"
+            >
+              <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                <rect x="2" y="7" width="20" height="10" rx="5" /></svg
+              ><span class="text-sm font-bold text-gray-500">APOLLO NEURO</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- S4: Features -->
+      <section id="features" class="border-t border-gray-200 pt-20">
+        <div class="max-w-7xl mx-auto px-4 md:px-6">
+          <div class="text-center mb-16">
+            <p
+              class="text-xs font-black tracking-[0.2em] uppercase mb-4"
+              style="color: var(--accent)"
+            >
+              THE METHOD
+            </p>
+            <h2
+              class="text-4xl md:text-5xl font-black tracking-tight mb-6"
+              style="
+                font-family: &quot;Outfit&quot;, sans-serif;
+                line-height: 1.1;
+              "
+            >
+              Six Pillars of<br />Sleep Architecture
+            </h2>
+            <p class="text-xl text-gray-500 max-w-2xl mx-auto leading-relaxed">
+              Each pillar addresses a distinct failure mode. Your protocol is
+              assembled from the pillars your data reveals.
+            </p>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div
+              class="neu-card hover:-translate-y-2 transition-all duration-300"
+            >
+              <div
+                class="w-12 h-12 rounded-xl flex items-center justify-center mb-6"
+                style="background: rgba(var(--accent-rgb), 0.15)"
+              >
+                <svg
+                  class="w-6 h-6"
+                  style="color: var(--accent)"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707"
+                  />
+                  <circle cx="12" cy="12" r="4" />
+                </svg>
+              </div>
+              <h3
+                class="text-lg font-bold mb-3"
+                style="font-family: &quot;Outfit&quot;, sans-serif"
+              >
+                Circadian Recalibration
+              </h3>
+              <p class="text-gray-500 leading-relaxed">
+                Precision light exposure schedules built from your chronotype.
+                We use 10,000 lux panels timed to your cortisol curve.
+              </p>
+            </div>
+            <div
+              class="neu-card hover:-translate-y-2 transition-all duration-300"
+            >
+              <div
+                class="w-12 h-12 rounded-xl flex items-center justify-center mb-6"
+                style="background: rgba(var(--accent-rgb), 0.15)"
+              >
+                <svg
+                  class="w-6 h-6"
+                  style="color: var(--accent)"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M9 19V6l12-3v13" />
+                  <circle cx="6" cy="18" r="3" />
+                  <circle cx="18" cy="16" r="3" />
+                </svg>
+              </div>
+              <h3
+                class="text-lg font-bold mb-3"
+                style="font-family: &quot;Outfit&quot;, sans-serif"
+              >
+                Neural Downregulation
+              </h3>
+              <p class="text-gray-500 leading-relaxed">
+                Binaural audio protocols and vagal nerve stimulation sequences
+                that drop your nervous system from sympathetic to
+                parasympathetic in under 12 minutes.
+              </p>
+            </div>
+            <div
+              class="neu-card hover:-translate-y-2 transition-all duration-300"
+            >
+              <div
+                class="w-12 h-12 rounded-xl flex items-center justify-center mb-6"
+                style="background: rgba(var(--accent-rgb), 0.15)"
+              >
+                <svg
+                  class="w-6 h-6"
+                  style="color: var(--accent)"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"
+                  />
+                </svg>
+              </div>
+              <h3
+                class="text-lg font-bold mb-3"
+                style="font-family: &quot;Outfit&quot;, sans-serif"
+              >
+                Supplement Architecture
+              </h3>
+              <p class="text-gray-500 leading-relaxed">
+                Pharmacogenomically-informed supplement stacks. Magnesium
+                glycinate, L-theanine, apigenin — dosed to your body weight and
+                metabolism.
+              </p>
+            </div>
+            <div
+              class="neu-card hover:-translate-y-2 transition-all duration-300"
+            >
+              <div
+                class="w-12 h-12 rounded-xl flex items-center justify-center mb-6"
+                style="background: rgba(var(--accent-rgb), 0.15)"
+              >
+                <svg
+                  class="w-6 h-6"
+                  style="color: var(--accent)"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                  />
+                </svg>
+              </div>
+              <h3
+                class="text-lg font-bold mb-3"
+                style="font-family: &quot;Outfit&quot;, sans-serif"
+              >
+                HRV Optimization
+              </h3>
+              <p class="text-gray-500 leading-relaxed">
+                Continuous heart rate variability tracking identifies your
+                recovery windows. We adjust your protocol weekly based on
+                autonomic readiness.
+              </p>
+            </div>
+            <div
+              class="neu-card hover:-translate-y-2 transition-all duration-300"
+            >
+              <div
+                class="w-12 h-12 rounded-xl flex items-center justify-center mb-6"
+                style="background: rgba(var(--accent-rgb), 0.15)"
+              >
+                <svg
+                  class="w-6 h-6"
+                  style="color: var(--accent)"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1"
+                  />
+                </svg>
+              </div>
+              <h3
+                class="text-lg font-bold mb-3"
+                style="font-family: &quot;Outfit&quot;, sans-serif"
+              >
+                Environment Engineering
+              </h3>
+              <p class="text-gray-500 leading-relaxed">
+                Temperature cascading, acoustic masking, and light elimination.
+                We audit your bedroom and ship the hardware you need.
+              </p>
+            </div>
+            <div
+              class="neu-card hover:-translate-y-2 transition-all duration-300"
+            >
+              <div
+                class="w-12 h-12 rounded-xl flex items-center justify-center mb-6"
+                style="background: rgba(var(--accent-rgb), 0.15)"
+              >
+                <svg
+                  class="w-6 h-6"
+                  style="color: var(--accent)"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
+                  />
+                </svg>
+              </div>
+              <h3
+                class="text-lg font-bold mb-3"
+                style="font-family: &quot;Outfit&quot;, sans-serif"
+              >
+                Behavioral Scripting
+              </h3>
+              <p class="text-gray-500 leading-relaxed">
+                Evening wind-down protocols, screen hygiene rules, and meal
+                timing windows. Personalized scripts replace your chaotic
+                pre-sleep routine.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- S5: How It Works -->
+      <section id="how" class="border-t border-gray-200 pt-20">
+        <div class="max-w-7xl mx-auto px-4 md:px-6">
+          <div class="text-center mb-16">
+            <p
+              class="text-xs font-black tracking-[0.2em] uppercase mb-4"
+              style="color: var(--accent)"
+            >
+              THE PROCESS
+            </p>
+            <h2
+              class="text-4xl md:text-5xl font-black tracking-tight mb-6"
+              style="
+                font-family: &quot;Outfit&quot;, sans-serif;
+                line-height: 1.1;
+              "
+            >
+              Four Phases to<br />Restorative Sleep
+            </h2>
+            <p class="text-xl text-gray-500 max-w-2xl mx-auto leading-relaxed">
+              From initial assessment to autonomous maintenance. Most clients
+              reach Phase 3 by week six.
+            </p>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div class="text-center">
+              <div
+                class="w-14 h-14 rounded-full neu-raised flex items-center justify-center mx-auto mb-6"
+              >
+                <span
+                  class="text-lg font-black"
+                  style="
+                    font-family: &quot;Outfit&quot;, sans-serif;
+                    background: linear-gradient(
+                      135deg,
+                      var(--accent),
+                      var(--accent-dark)
+                    );
+                    -webkit-background-clip: text;
+                    -webkit-text-fill-color: transparent;
+                  "
+                  >01</span
+                >
+              </div>
+              <div
+                class="hidden md:block w-full h-px border-b-2 border-dashed border-gray-300 mb-6"
+              ></div>
+              <div class="neu-card">
+                <h3
+                  class="text-lg font-bold mb-3"
+                  style="font-family: &quot;Outfit&quot;, sans-serif"
+                >
+                  Deep Assessment
+                </h3>
+                <p class="text-gray-500 text-sm leading-relaxed">
+                  7-night wearable data collection, comprehensive sleep
+                  questionnaire, circadian phenotyping, and a 60-minute
+                  clinician review.
+                </p>
+              </div>
+            </div>
+            <div class="text-center">
+              <div
+                class="w-14 h-14 rounded-full neu-raised flex items-center justify-center mx-auto mb-6"
+              >
+                <span
+                  class="text-lg font-black"
+                  style="
+                    font-family: &quot;Outfit&quot;, sans-serif;
+                    background: linear-gradient(
+                      135deg,
+                      var(--accent),
+                      var(--accent-dark)
+                    );
+                    -webkit-background-clip: text;
+                    -webkit-text-fill-color: transparent;
+                  "
+                  >02</span
+                >
+              </div>
+              <div
+                class="hidden md:block w-full h-px border-b-2 border-dashed border-gray-300 mb-6"
+              ></div>
+              <div class="neu-card">
+                <h3
+                  class="text-lg font-bold mb-3"
+                  style="font-family: &quot;Outfit&quot;, sans-serif"
+                >
+                  Protocol Design
+                </h3>
+                <p class="text-gray-500 text-sm leading-relaxed">
+                  Your clinician assembles a personalized protocol from the six
+                  pillars. Supplement stack, light schedule, and environment
+                  audit ship within 72 hours.
+                </p>
+              </div>
+            </div>
+            <div class="text-center">
+              <div
+                class="w-14 h-14 rounded-full neu-raised flex items-center justify-center mx-auto mb-6"
+              >
+                <span
+                  class="text-lg font-black"
+                  style="
+                    font-family: &quot;Outfit&quot;, sans-serif;
+                    background: linear-gradient(
+                      135deg,
+                      var(--accent),
+                      var(--accent-dark)
+                    );
+                    -webkit-background-clip: text;
+                    -webkit-text-fill-color: transparent;
+                  "
+                  >03</span
+                >
+              </div>
+              <div
+                class="hidden md:block w-full h-px border-b-2 border-dashed border-gray-300 mb-6"
+              ></div>
+              <div class="neu-card">
+                <h3
+                  class="text-lg font-bold mb-3"
+                  style="font-family: &quot;Outfit&quot;, sans-serif"
+                >
+                  Active Tuning
+                </h3>
+                <p class="text-gray-500 text-sm leading-relaxed">
+                  Weekly data reviews with your clinician. Dosing adjustments,
+                  timing shifts, and behavioral refinements based on real sleep
+                  stage data.
+                </p>
+              </div>
+            </div>
+            <div class="text-center">
+              <div
+                class="w-14 h-14 rounded-full neu-raised flex items-center justify-center mx-auto mb-6"
+              >
+                <span
+                  class="text-lg font-black"
+                  style="
+                    font-family: &quot;Outfit&quot;, sans-serif;
+                    background: linear-gradient(
+                      135deg,
+                      var(--accent),
+                      var(--accent-dark)
+                    );
+                    -webkit-background-clip: text;
+                    -webkit-text-fill-color: transparent;
+                  "
+                  >04</span
+                >
+              </div>
+              <div
+                class="hidden md:block w-full h-px border-b-2 border-dashed border-gray-300 mb-6"
+              ></div>
+              <div class="neu-card">
+                <h3
+                  class="text-lg font-bold mb-3"
+                  style="font-family: &quot;Outfit&quot;, sans-serif"
+                >
+                  Autonomous Phase
+                </h3>
+                <p class="text-gray-500 text-sm leading-relaxed">
+                  Your sleep architecture is rebuilt. We hand you the
+                  maintenance playbook — quarterly check-ins keep your gains
+                  locked in.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- S6: Interactive Demo -->
+      <section class="border-t border-gray-200 pt-20">
+        <div class="max-w-7xl mx-auto px-4 md:px-6">
+          <div class="text-center mb-16">
+            <p
+              class="text-xs font-black tracking-[0.2em] uppercase mb-4"
+              style="color: var(--accent)"
+            >
+              INSIDE THE PROTOCOL
+            </p>
+            <h2
+              class="text-4xl md:text-5xl font-black tracking-tight mb-6"
+              style="
+                font-family: &quot;Outfit&quot;, sans-serif;
+                line-height: 1.1;
+              "
+            >
+              See What Changes
+            </h2>
+            <p class="text-xl text-gray-500 max-w-2xl mx-auto leading-relaxed">
+              Real transformations from real data. Select a pillar to explore.
+            </p>
+          </div>
+          <div class="neu-card p-0 overflow-hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-2">
+              <div class="p-8 flex flex-col gap-4">
+                <div
+                  class="demo-pill active neu-inset rounded-xl p-5 cursor-pointer transition-all duration-300"
+                  style="border: 2px solid var(--accent)"
+                  data-tab="0"
+                >
+                  <h4
+                    class="font-bold mb-1"
+                    style="font-family: &quot;Outfit&quot;, sans-serif"
+                  >
+                    Circadian Realignment
+                  </h4>
+                  <p class="text-sm text-gray-500">
+                    Light exposure timing rebuilt from scratch
+                  </p>
+                </div>
+                <div
+                  class="demo-pill neu-raised-sm rounded-xl p-5 cursor-pointer transition-all duration-300"
+                  style="border: 2px solid transparent"
+                  data-tab="1"
+                >
+                  <h4
+                    class="font-bold mb-1"
+                    style="font-family: &quot;Outfit&quot;, sans-serif"
+                  >
+                    Deep Sleep Recovery
+                  </h4>
+                  <p class="text-sm text-gray-500">
+                    Stage 3 & 4 duration gains over 90 days
+                  </p>
+                </div>
+                <div
+                  class="demo-pill neu-raised-sm rounded-xl p-5 cursor-pointer transition-all duration-300"
+                  style="border: 2px solid transparent"
+                  data-tab="2"
+                >
+                  <h4
+                    class="font-bold mb-1"
+                    style="font-family: &quot;Outfit&quot;, sans-serif"
+                  >
+                    HRV Trajectory
+                  </h4>
+                  <p class="text-sm text-gray-500">
+                    Autonomic nervous system recovery curve
+                  </p>
+                </div>
+              </div>
+              <div
+                class="neu-inset rounded-[30px] min-h-[400px] p-8 m-4 lg:m-0 lg:rounded-none lg:rounded-r-[30px]"
+              >
+                <div class="demo-content" data-content="0">
+                  <img
+                    src="https://assets.cdn.filesafe.space/3Mh94ewIWZaOQuAxTDt4/media/69b439be070c58e28e626115.png"
+                    alt="Circadian data"
+                    class="w-full h-48 object-cover rounded-2xl mb-4"
+                  />
+                  <h3
+                    class="text-xl font-bold mb-2"
+                    style="font-family: &quot;Outfit&quot;, sans-serif"
+                  >
+                    Morning Light Protocol
+                  </h3>
+                  <p class="text-gray-500 leading-relaxed mb-4">
+                    Clients receive a 10,000 lux panel and a time-locked
+                    schedule calibrated to their melatonin onset. Average
+                    circadian shift: 47 minutes within 14 days.
+                  </p>
+                  <div class="flex items-center gap-3">
+                    <div
+                      class="neu-raised-sm px-4 py-2 rounded-full text-sm font-bold"
+                      style="color: var(--accent)"
+                    >
+                      +47 min shift
+                    </div>
+                    <div
+                      class="neu-raised-sm px-4 py-2 rounded-full text-sm font-bold text-gray-500"
+                    >
+                      14 day avg
+                    </div>
+                  </div>
+                </div>
+                <div class="demo-content hidden" data-content="1">
+                  <img
+                    src="https://assets.cdn.filesafe.space/3Mh94ewIWZaOQuAxTDt4/media/69b439beeba48751402641db.png"
+                    alt="Deep sleep data"
+                    class="w-full h-48 object-cover rounded-2xl mb-4"
+                  />
+                  <h3
+                    class="text-xl font-bold mb-2"
+                    style="font-family: &quot;Outfit&quot;, sans-serif"
+                  >
+                    Stage 3+4 Rebuilding
+                  </h3>
+                  <p class="text-gray-500 leading-relaxed mb-4">
+                    Most clients arrive with under 40 minutes of deep sleep. By
+                    day 42, the median client hits 87 minutes — a 117% increase
+                    in restorative sleep stages.
+                  </p>
+                  <div class="flex items-center gap-3">
+                    <div
+                      class="neu-raised-sm px-4 py-2 rounded-full text-sm font-bold"
+                      style="color: var(--accent)"
+                    >
+                      +117% deep sleep
+                    </div>
+                    <div
+                      class="neu-raised-sm px-4 py-2 rounded-full text-sm font-bold text-gray-500"
+                    >
+                      42 day median
+                    </div>
+                  </div>
+                </div>
+                <div class="demo-content hidden" data-content="2">
+                  <img
+                    src="https://assets.cdn.filesafe.space/3Mh94ewIWZaOQuAxTDt4/media/69b43b27eba4875b6d267ef7.png"
+                    alt="HRV data"
+                    class="w-full h-48 object-cover rounded-2xl mb-4"
+                  />
+                  <h3
+                    class="text-xl font-bold mb-2"
+                    style="font-family: &quot;Outfit&quot;, sans-serif"
+                  >
+                    Autonomic Resilience
+                  </h3>
+                  <p class="text-gray-500 leading-relaxed mb-4">
+                    HRV is the gold standard for recovery. Our clients see an
+                    average 23ms RMSSD increase — correlated with lower resting
+                    heart rate and faster cognitive recovery.
+                  </p>
+                  <div class="flex items-center gap-3">
+                    <div
+                      class="neu-raised-sm px-4 py-2 rounded-full text-sm font-bold"
+                      style="color: var(--accent)"
+                    >
+                      +23ms RMSSD
+                    </div>
+                    <div
+                      class="neu-raised-sm px-4 py-2 rounded-full text-sm font-bold text-gray-500"
+                    >
+                      90 day avg
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- S7: Pricing -->
+      <section id="pricing" class="border-t border-gray-200 pt-20">
+        <div class="max-w-7xl mx-auto px-4 md:px-6">
+          <div class="text-center mb-16">
+            <p
+              class="text-xs font-black tracking-[0.2em] uppercase mb-4"
+              style="color: var(--accent)"
+            >
+              PROGRAMS
+            </p>
+            <h2
+              class="text-4xl md:text-5xl font-black tracking-tight mb-6"
+              style="
+                font-family: &quot;Outfit&quot;, sans-serif;
+                line-height: 1.1;
+              "
+            >
+              Invest in Recovery
+            </h2>
+            <p class="text-xl text-gray-500 max-w-2xl mx-auto leading-relaxed">
+              Three tiers. One goal: restorative sleep every single night.
+            </p>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+            <div
+              class="neu-card rounded-3xl p-8 hover:-translate-y-2 transition-all duration-300 flex flex-col"
+            >
+              <h3
+                class="text-lg font-bold mb-2"
+                style="font-family: &quot;Outfit&quot;, sans-serif"
+              >
+                Foundation
+              </h3>
+              <p class="text-gray-500 text-sm mb-6">
+                Self-guided protocol with clinician oversight
+              </p>
+              <div class="mb-8">
+                <span
+                  class="text-5xl font-black"
+                  style="font-family: &quot;Outfit&quot;, sans-serif"
+                  >$1,200</span
+                ><span class="text-gray-400 ml-2">/90 days</span>
+              </div>
+              <div class="space-y-4 mb-10 text-left flex-1">
+                <div class="flex items-center gap-3">
+                  <div
+                    class="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0"
+                    style="background: rgba(var(--accent-rgb), 0.15)"
+                  >
+                    <svg
+                      class="w-3 h-3"
+                      style="color: var(--accent)"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="3"
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <span class="text-sm text-gray-600"
+                    >7-night baseline assessment</span
+                  >
+                </div>
+                <div class="flex items-center gap-3">
+                  <div
+                    class="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0"
+                    style="background: rgba(var(--accent-rgb), 0.15)"
+                  >
+                    <svg
+                      class="w-3 h-3"
+                      style="color: var(--accent)"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="3"
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <span class="text-sm text-gray-600"
+                    >Personalized supplement stack</span
+                  >
+                </div>
+                <div class="flex items-center gap-3">
+                  <div
+                    class="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0"
+                    style="background: rgba(var(--accent-rgb), 0.15)"
+                  >
+                    <svg
+                      class="w-3 h-3"
+                      style="color: var(--accent)"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="3"
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <span class="text-sm text-gray-600"
+                    >Light schedule blueprint</span
+                  >
+                </div>
+                <div class="flex items-center gap-3">
+                  <div
+                    class="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0"
+                    style="background: rgba(var(--accent-rgb), 0.15)"
+                  >
+                    <svg
+                      class="w-3 h-3"
+                      style="color: var(--accent)"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="3"
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <span class="text-sm text-gray-600"
+                    >Bi-weekly clinician check-in</span
+                  >
+                </div>
+              </div>
+              <button
+                class="btn-secondary w-full py-5 rounded-2xl text-lg font-bold justify-center"
+              >
+                Get Started
+              </button>
+            </div>
+            <div
+              class="neu-card rounded-3xl p-8 hover:-translate-y-2 transition-all duration-300 relative flex flex-col"
+              style="
+                transform: scale(1.05);
+                z-index: 10;
+                border: 2px solid rgba(var(--accent-rgb), 0.2);
+              "
+            >
+              <div
+                class="absolute -top-4 left-1/2 -translate-x-1/2 px-6 py-2 rounded-full text-xs font-black uppercase tracking-widest text-white"
+                style="
+                  background: linear-gradient(
+                    135deg,
+                    var(--accent),
+                    var(--accent-dark)
+                  );
+                "
+              >
+                MOST POPULAR
+              </div>
+              <h3
+                class="text-lg font-bold mb-2 mt-2"
+                style="font-family: &quot;Outfit&quot;, sans-serif"
+              >
+                Clinical
+              </h3>
+              <p class="text-gray-500 text-sm mb-6">
+                Full clinician-guided protocol with hardware
+              </p>
+              <div class="mb-8">
+                <span
+                  class="text-5xl font-black"
+                  style="font-family: &quot;Outfit&quot;, sans-serif"
+                  >$3,400</span
+                ><span class="text-gray-400 ml-2">/90 days</span>
+              </div>
+              <div class="space-y-4 mb-10 text-left flex-1">
+                <div class="flex items-center gap-3">
+                  <div
+                    class="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0"
+                    style="background: rgba(var(--accent-rgb), 0.15)"
+                  >
+                    <svg
+                      class="w-3 h-3"
+                      style="color: var(--accent)"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="3"
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <span class="text-sm text-gray-600"
+                    >Everything in Foundation</span
+                  >
+                </div>
+                <div class="flex items-center gap-3">
+                  <div
+                    class="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0"
+                    style="background: rgba(var(--accent-rgb), 0.15)"
+                  >
+                    <svg
+                      class="w-3 h-3"
+                      style="color: var(--accent)"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="3"
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <span class="text-sm text-gray-600"
+                    >10,000 lux light panel included</span
+                  >
+                </div>
+                <div class="flex items-center gap-3">
+                  <div
+                    class="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0"
+                    style="background: rgba(var(--accent-rgb), 0.15)"
+                  >
+                    <svg
+                      class="w-3 h-3"
+                      style="color: var(--accent)"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="3"
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <span class="text-sm text-gray-600"
+                    >Weekly 1:1 clinician sessions</span
+                  >
+                </div>
+                <div class="flex items-center gap-3">
+                  <div
+                    class="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0"
+                    style="background: rgba(var(--accent-rgb), 0.15)"
+                  >
+                    <svg
+                      class="w-3 h-3"
+                      style="color: var(--accent)"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="3"
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <span class="text-sm text-gray-600"
+                    >Full environment audit + hardware</span
+                  >
+                </div>
+                <div class="flex items-center gap-3">
+                  <div
+                    class="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0"
+                    style="background: rgba(var(--accent-rgb), 0.15)"
+                  >
+                    <svg
+                      class="w-3 h-3"
+                      style="color: var(--accent)"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="3"
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <span class="text-sm text-gray-600"
+                    >Real-time wearable data dashboard</span
+                  >
+                </div>
+              </div>
+              <button
+                class="btn-primary w-full py-5 rounded-2xl text-lg font-bold justify-center"
+              >
+                Start Clinical Program →
+              </button>
+            </div>
+            <div
+              class="neu-card rounded-3xl p-8 hover:-translate-y-2 transition-all duration-300 flex flex-col"
+            >
+              <h3
+                class="text-lg font-bold mb-2"
+                style="font-family: &quot;Outfit&quot;, sans-serif"
+              >
+                Executive
+              </h3>
+              <p class="text-gray-500 text-sm mb-6">
+                Concierge-level with in-home setup
+              </p>
+              <div class="mb-8">
+                <span
+                  class="text-5xl font-black"
+                  style="font-family: &quot;Outfit&quot;, sans-serif"
+                  >$8,500</span
+                ><span class="text-gray-400 ml-2">/90 days</span>
+              </div>
+              <div class="space-y-4 mb-10 text-left flex-1">
+                <div class="flex items-center gap-3">
+                  <div
+                    class="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0"
+                    style="background: rgba(var(--accent-rgb), 0.15)"
+                  >
+                    <svg
+                      class="w-3 h-3"
+                      style="color: var(--accent)"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="3"
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <span class="text-sm text-gray-600"
+                    >Everything in Clinical</span
+                  >
+                </div>
+                <div class="flex items-center gap-3">
+                  <div
+                    class="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0"
+                    style="background: rgba(var(--accent-rgb), 0.15)"
+                  >
+                    <svg
+                      class="w-3 h-3"
+                      style="color: var(--accent)"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="3"
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <span class="text-sm text-gray-600"
+                    >In-home environment installation</span
+                  >
+                </div>
+                <div class="flex items-center gap-3">
+                  <div
+                    class="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0"
+                    style="background: rgba(var(--accent-rgb), 0.15)"
+                  >
+                    <svg
+                      class="w-3 h-3"
+                      style="color: var(--accent)"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="3"
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <span class="text-sm text-gray-600"
+                    >Eight Sleep Pod Pro included</span
+                  >
+                </div>
+                <div class="flex items-center gap-3">
+                  <div
+                    class="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0"
+                    style="background: rgba(var(--accent-rgb), 0.15)"
+                  >
+                    <svg
+                      class="w-3 h-3"
+                      style="color: var(--accent)"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="3"
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <span class="text-sm text-gray-600"
+                    >On-call clinician access (24/7)</span
+                  >
+                </div>
+                <div class="flex items-center gap-3">
+                  <div
+                    class="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0"
+                    style="background: rgba(var(--accent-rgb), 0.15)"
+                  >
+                    <svg
+                      class="w-3 h-3"
+                      style="color: var(--accent)"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="3"
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <span class="text-sm text-gray-600"
+                    >Quarterly maintenance for life</span
+                  >
+                </div>
+              </div>
+              <button
+                class="btn-secondary w-full py-5 rounded-2xl text-lg font-bold justify-center"
+              >
+                Contact Us
+              </button>
+            </div>
+          </div>
+          <div class="mt-24">
+            <div class="neu-inset p-8 md:p-12 rounded-[40px] text-center">
+              <svg
+                class="w-10 h-10 mx-auto mb-6 text-gray-400"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"
+                />
+              </svg>
+              <p
+                class="text-2xl md:text-3xl font-bold italic text-gray-700 max-w-3xl mx-auto leading-relaxed mb-8"
+                style="font-family: &quot;Outfit&quot;, sans-serif"
+              >
+                "I hadn't slept more than 5 hours straight in three years. By
+                week five of the Clinical program, I was consistently hitting
+                7.5 hours with 90+ minutes of deep sleep. My Oura scores went
+                from the 20s to the 80s."
+              </p>
+              <div class="flex items-center justify-center gap-4">
+                <div
+                  class="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold"
+                  style="
+                    background: linear-gradient(
+                      135deg,
+                      var(--accent),
+                      var(--accent-dark)
+                    );
+                  "
+                >
+                  MK
+                </div>
+                <div class="text-left">
+                  <div class="font-bold text-gray-800">Dr. Marcus Kim</div>
+                  <div class="text-sm text-gray-500">
+                    Neurosurgeon, Stanford Health
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- S8: FAQ -->
+      <section id="faq" class="border-t border-gray-200 pt-20 pb-20">
+        <div class="max-w-7xl mx-auto px-4 md:px-6">
+          <div class="text-center mb-16">
+            <p
+              class="text-xs font-black tracking-[0.2em] uppercase mb-4"
+              style="color: var(--accent)"
+            >
+              QUESTIONS
+            </p>
+            <h2
+              class="text-4xl md:text-5xl font-black tracking-tight mb-6"
+              style="
+                font-family: &quot;Outfit&quot;, sans-serif;
+                line-height: 1.1;
+              "
+            >
+              Common Questions
+            </h2>
+          </div>
+          <div class="max-w-3xl mx-auto">
+            <div
+              class="faq-item neu-raised rounded-3xl p-6 mb-4 cursor-pointer transition-all duration-300"
+            >
+              <div class="flex items-center justify-between">
+                <h4
+                  class="font-bold text-gray-800 pr-4"
+                  style="font-family: &quot;Outfit&quot;, sans-serif"
+                >
+                  How is this different from a sleep coach or meditation app?
+                </h4>
+                <span
+                  class="faq-icon text-2xl text-gray-400 flex-shrink-0 font-light"
+                  >+</span
+                >
+              </div>
+              <div class="faq-answer overflow-hidden" style="max-height: 0">
+                <p class="text-gray-500 leading-relaxed pt-4">
+                  We're a clinical practice, not a content platform. Your
+                  protocol is built from wearable biometric data — real sleep
+                  stages, HRV, skin temperature — and adjusted weekly by a
+                  licensed clinician. Apps guess. We measure.
+                </p>
+              </div>
+            </div>
+            <div
+              class="faq-item neu-raised rounded-3xl p-6 mb-4 cursor-pointer transition-all duration-300"
+            >
+              <div class="flex items-center justify-between">
+                <h4
+                  class="font-bold text-gray-800 pr-4"
+                  style="font-family: &quot;Outfit&quot;, sans-serif"
+                >
+                  What wearable do I need?
+                </h4>
+                <span
+                  class="faq-icon text-2xl text-gray-400 flex-shrink-0 font-light"
+                  >+</span
+                >
+              </div>
+              <div class="faq-answer overflow-hidden" style="max-height: 0">
+                <p class="text-gray-500 leading-relaxed pt-4">
+                  We support WHOOP, Oura Ring, Apple Watch (Series 7+), and
+                  Eight Sleep. If you don't own one, we'll recommend the best
+                  fit for your protocol and budget during your assessment.
+                </p>
+              </div>
+            </div>
+            <div
+              class="faq-item neu-raised rounded-3xl p-6 mb-4 cursor-pointer transition-all duration-300"
+            >
+              <div class="flex items-center justify-between">
+                <h4
+                  class="font-bold text-gray-800 pr-4"
+                  style="font-family: &quot;Outfit&quot;, sans-serif"
+                >
+                  I travel frequently. Can the protocol adapt?
+                </h4>
+                <span
+                  class="faq-icon text-2xl text-gray-400 flex-shrink-0 font-light"
+                  >+</span
+                >
+              </div>
+              <div class="faq-answer overflow-hidden" style="max-height: 0">
+                <p class="text-gray-500 leading-relaxed pt-4">
+                  Yes — travel protocols are built into every program. We
+                  pre-shift your circadian rhythm before timezone changes and
+                  provide a portable light/supplement kit. Most executives on
+                  the Clinical plan travel 2-3 weeks per month.
+                </p>
+              </div>
+            </div>
+            <div
+              class="faq-item neu-raised rounded-3xl p-6 mb-4 cursor-pointer transition-all duration-300"
+            >
+              <div class="flex items-center justify-between">
+                <h4
+                  class="font-bold text-gray-800 pr-4"
+                  style="font-family: &quot;Outfit&quot;, sans-serif"
+                >
+                  When will I see results?
+                </h4>
+                <span
+                  class="faq-icon text-2xl text-gray-400 flex-shrink-0 font-light"
+                  >+</span
+                >
+              </div>
+              <div class="faq-answer overflow-hidden" style="max-height: 0">
+                <p class="text-gray-500 leading-relaxed pt-4">
+                  Most clients report subjective improvement within 10 days.
+                  Measurable deep sleep gains typically appear by day 21. By day
+                  42, 94% of clients show significant improvement in sleep
+                  efficiency, deep sleep duration, and morning HRV.
+                </p>
+              </div>
+            </div>
+            <div
+              class="faq-item neu-raised rounded-3xl p-6 mb-4 cursor-pointer transition-all duration-300"
+            >
+              <div class="flex items-center justify-between">
+                <h4
+                  class="font-bold text-gray-800 pr-4"
+                  style="font-family: &quot;Outfit&quot;, sans-serif"
+                >
+                  Are supplements safe with my current medications?
+                </h4>
+                <span
+                  class="faq-icon text-2xl text-gray-400 flex-shrink-0 font-light"
+                  >+</span
+                >
+              </div>
+              <div class="faq-answer overflow-hidden" style="max-height: 0">
+                <p class="text-gray-500 leading-relaxed pt-4">
+                  Every supplement stack is reviewed against your medication
+                  list by a licensed clinician before dispensing. We use
+                  pharmacogenomic data when available. If there's a
+                  contraindication, we substitute or remove — never guess.
+                </p>
+              </div>
+            </div>
+            <div
+              class="faq-item neu-raised rounded-3xl p-6 mb-4 cursor-pointer transition-all duration-300"
+            >
+              <div class="flex items-center justify-between">
+                <h4
+                  class="font-bold text-gray-800 pr-4"
+                  style="font-family: &quot;Outfit&quot;, sans-serif"
+                >
+                  What happens after the 90 days?
+                </h4>
+                <span
+                  class="faq-icon text-2xl text-gray-400 flex-shrink-0 font-light"
+                  >+</span
+                >
+              </div>
+              <div class="faq-answer overflow-hidden" style="max-height: 0">
+                <p class="text-gray-500 leading-relaxed pt-4">
+                  You keep everything — the hardware, the supplement formulas,
+                  and your maintenance playbook. Foundation and Clinical clients
+                  can add quarterly check-ins for $200/session. Executive
+                  clients receive lifetime quarterly reviews included.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- S9: CTA Banner -->
+      <section class="pb-20">
+        <div class="max-w-7xl mx-auto px-4 md:px-6">
+          <div
+            class="neu-card rounded-[40px] p-12 md:p-20 text-center relative overflow-hidden"
+          >
+            <div
+              class="absolute inset-0 opacity-[0.06] rounded-[40px]"
+              style="
+                background: linear-gradient(
+                  135deg,
+                  var(--accent),
+                  var(--accent-dark)
+                );
+              "
+            ></div>
+            <div class="relative z-10">
+              <h2
+                class="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight mb-6"
+                style="
+                  font-family: &quot;Outfit&quot;, sans-serif;
+                  line-height: 1.1;
+                "
+              >
+                Ready to Sleep<br /><span style="color: var(--accent)"
+                  >Deeply Again?</span
+                >
+              </h2>
+              <p
+                class="text-xl text-gray-500 max-w-2xl mx-auto leading-relaxed mb-10"
+              >
+                Your assessment takes 15 minutes. Your protocol ships in 72
+                hours. Your sleep changes in weeks.
+              </p>
+              <button
+                class="btn-primary px-12 py-5 rounded-2xl text-lg shadow-2xl group"
+              >
+                Book Your Free Assessment
+                <span
+                  class="inline-block transition-transform group-hover:translate-x-1"
+                  >→</span
+                >
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- S10: Marquee -->
+      <section class="border-t border-gray-200 py-16">
+        <div class="max-w-7xl mx-auto px-4 md:px-6">
+          <p
+            class="text-xs font-black tracking-[0.2em] uppercase text-gray-400 mb-10 text-center"
+          >
+            Integrations & Protocols
+          </p>
+        </div>
+        <div class="marquee-wrap">
+          <div class="marquee-track">
+            <div class="marquee-half">
+              <span
+                class="neu-raised-sm rounded-full px-6 py-3 text-sm font-bold text-gray-500 whitespace-nowrap"
+                >WHOOP 4.0</span
+              >
+              <span
+                class="neu-raised-sm rounded-full px-6 py-3 text-sm font-bold text-gray-500 whitespace-nowrap"
+                >Oura Ring Gen 3</span
+              >
+              <span
+                class="neu-raised-sm rounded-full px-6 py-3 text-sm font-bold text-gray-500 whitespace-nowrap"
+                >Eight Sleep Pod</span
+              >
+              <span
+                class="neu-raised-sm rounded-full px-6 py-3 text-sm font-bold text-gray-500 whitespace-nowrap"
+                >Apple Health</span
+              >
+              <span
+                class="neu-raised-sm rounded-full px-6 py-3 text-sm font-bold text-gray-500 whitespace-nowrap"
+                >CBT-I Protocol</span
+              >
+              <span
+                class="neu-raised-sm rounded-full px-6 py-3 text-sm font-bold text-gray-500 whitespace-nowrap"
+                >Circadian.io</span
+              >
+              <span
+                class="neu-raised-sm rounded-full px-6 py-3 text-sm font-bold text-gray-500 whitespace-nowrap"
+                >Apollo Neuro</span
+              >
+              <span
+                class="neu-raised-sm rounded-full px-6 py-3 text-sm font-bold text-gray-500 whitespace-nowrap"
+                >Levels CGM</span
+              >
+              <span
+                class="neu-raised-sm rounded-full px-6 py-3 text-sm font-bold text-gray-500 whitespace-nowrap"
+                >Dreem EEG</span
+              >
+              <span
+                class="neu-raised-sm rounded-full px-6 py-3 text-sm font-bold text-gray-500 whitespace-nowrap"
+                >Pharmacogenomics</span
+              >
+            </div>
+            <div class="marquee-half">
+              <span
+                class="neu-raised-sm rounded-full px-6 py-3 text-sm font-bold text-gray-500 whitespace-nowrap"
+                >WHOOP 4.0</span
+              >
+              <span
+                class="neu-raised-sm rounded-full px-6 py-3 text-sm font-bold text-gray-500 whitespace-nowrap"
+                >Oura Ring Gen 3</span
+              >
+              <span
+                class="neu-raised-sm rounded-full px-6 py-3 text-sm font-bold text-gray-500 whitespace-nowrap"
+                >Eight Sleep Pod</span
+              >
+              <span
+                class="neu-raised-sm rounded-full px-6 py-3 text-sm font-bold text-gray-500 whitespace-nowrap"
+                >Apple Health</span
+              >
+              <span
+                class="neu-raised-sm rounded-full px-6 py-3 text-sm font-bold text-gray-500 whitespace-nowrap"
+                >CBT-I Protocol</span
+              >
+              <span
+                class="neu-raised-sm rounded-full px-6 py-3 text-sm font-bold text-gray-500 whitespace-nowrap"
+                >Circadian.io</span
+              >
+              <span
+                class="neu-raised-sm rounded-full px-6 py-3 text-sm font-bold text-gray-500 whitespace-nowrap"
+                >Apollo Neuro</span
+              >
+              <span
+                class="neu-raised-sm rounded-full px-6 py-3 text-sm font-bold text-gray-500 whitespace-nowrap"
+                >Levels CGM</span
+              >
+              <span
+                class="neu-raised-sm rounded-full px-6 py-3 text-sm font-bold text-gray-500 whitespace-nowrap"
+                >Dreem EEG</span
+              >
+              <span
+                class="neu-raised-sm rounded-full px-6 py-3 text-sm font-bold text-gray-500 whitespace-nowrap"
+                >Pharmacogenomics</span
+              >
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- S11: About / Team -->
+      <section class="border-t border-gray-200 pt-20">
+        <div class="max-w-7xl mx-auto px-4 md:px-6">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div>
+              <p
+                class="text-xs font-black tracking-[0.2em] uppercase mb-4"
+                style="color: var(--accent)"
+              >
+                ABOUT
+              </p>
+              <h2
+                class="text-4xl md:text-5xl font-black tracking-tight mb-6"
+                style="
+                  font-family: &quot;Outfit&quot;, sans-serif;
+                  line-height: 1.1;
+                "
+              >
+                Built by Clinicians<br />Who Couldn't Sleep
+              </h2>
+              <p class="text-lg text-gray-500 leading-relaxed mb-6">
+                Somnus Protocol was founded by a sleep neurologist, a
+                chronobiologist, and a performance coach who were frustrated by
+                the gap between sleep science and consumer products. We don't
+                sell mattresses or white noise machines. We build clinical
+                protocols backed by polysomnography-grade data.
+              </p>
+              <p class="text-lg text-gray-500 leading-relaxed mb-10">
+                Based in San Francisco. Serving clients in 14 countries. Over
+                2,400 protocols delivered since 2023.
+              </p>
+              <button class="btn-secondary">Read Our Research →</button>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+              <div class="neu-card text-center">
+                <div
+                  class="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center text-white text-xl font-bold"
+                  style="
+                    background: linear-gradient(
+                      135deg,
+                      var(--accent),
+                      var(--accent-dark)
+                    );
+                  "
+                >
+                  DR
+                </div>
+                <h4
+                  class="font-bold text-sm mb-1"
+                  style="font-family: &quot;Outfit&quot;, sans-serif"
+                >
+                  Dr. Diana Russo
+                </h4>
+                <p class="text-xs text-gray-500">Sleep Neurologist</p>
+              </div>
+              <div class="neu-card text-center">
+                <div
+                  class="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center text-white text-xl font-bold"
+                  style="background: linear-gradient(135deg, #3b82f6, #2563eb)"
+                >
+                  JH
+                </div>
+                <h4
+                  class="font-bold text-sm mb-1"
+                  style="font-family: &quot;Outfit&quot;, sans-serif"
+                >
+                  James Hayashi
+                </h4>
+                <p class="text-xs text-gray-500">Chronobiologist</p>
+              </div>
+              <div class="neu-card text-center">
+                <div
+                  class="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center text-white text-xl font-bold"
+                  style="background: linear-gradient(135deg, #f59e0b, #d97706)"
+                >
+                  AT
+                </div>
+                <h4
+                  class="font-bold text-sm mb-1"
+                  style="font-family: &quot;Outfit&quot;, sans-serif"
+                >
+                  Ava Torres
+                </h4>
+                <p class="text-xs text-gray-500">Performance Coach</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- S12: Footer -->
+      <footer class="border-t border-gray-200 pt-20 pb-10 mt-32">
+        <div class="max-w-7xl mx-auto px-4 md:px-6">
+          <div
+            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16"
+          >
+            <div>
+              <div class="flex items-center gap-3 mb-4">
+                <div class="neu-raised p-2 rounded-xl">
+                  <svg
+                    class="w-6 h-6"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="var(--accent)"
+                    stroke-width="2"
+                  >
+                    <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
+                  </svg>
+                </div>
+                <span
+                  class="text-xl font-bold tracking-tight"
+                  style="font-family: &quot;Outfit&quot;, sans-serif"
+                  >Somnus</span
+                >
+              </div>
+              <p class="text-gray-500 leading-relaxed max-w-sm mb-6">
+                Clinical sleep architecture for high performers. Rebuild your
+                deepest sleep in 90 days.
+              </p>
+              <div class="flex gap-3">
+                <a
+                  href="#"
+                  class="neu-raised-sm p-2 rounded-lg text-gray-500 hover:text-emerald-600 transition-colors"
+                  ><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                    <path
+                      d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"
+                    /></svg
+                ></a>
+                <a
+                  href="#"
+                  class="neu-raised-sm p-2 rounded-lg text-gray-500 hover:text-emerald-600 transition-colors"
+                  ><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                    <path
+                      d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"
+                    /></svg
+                ></a>
+                <a
+                  href="#"
+                  class="neu-raised-sm p-2 rounded-lg text-gray-500 hover:text-emerald-600 transition-colors"
+                  ><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                    <path
+                      d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"
+                    /></svg
+                ></a>
+              </div>
+            </div>
+            <div>
+              <h4
+                class="font-bold text-gray-800 mb-6"
+                style="font-family: &quot;Outfit&quot;, sans-serif"
+              >
+                Programs
+              </h4>
+              <div class="space-y-3">
+                <a
+                  href="#"
+                  class="block text-gray-500 hover:text-emerald-600 transition-colors"
+                  >Foundation</a
+                >
+                <a
+                  href="#"
+                  class="block text-gray-500 hover:text-emerald-600 transition-colors"
+                  >Clinical</a
+                >
+                <a
+                  href="#"
+                  class="block text-gray-500 hover:text-emerald-600 transition-colors"
+                  >Executive</a
+                >
+                <a
+                  href="#"
+                  class="block text-gray-500 hover:text-emerald-600 transition-colors"
+                  >Corporate Wellness</a
+                >
+              </div>
+            </div>
+            <div>
+              <h4
+                class="font-bold text-gray-800 mb-6"
+                style="font-family: &quot;Outfit&quot;, sans-serif"
+              >
+                Resources
+              </h4>
+              <div class="space-y-3">
+                <a
+                  href="#"
+                  class="block text-gray-500 hover:text-emerald-600 transition-colors"
+                  >Sleep Science Blog</a
+                >
+                <a
+                  href="#"
+                  class="block text-gray-500 hover:text-emerald-600 transition-colors"
+                  >Published Research</a
+                >
+                <a
+                  href="#"
+                  class="block text-gray-500 hover:text-emerald-600 transition-colors"
+                  >Client Outcomes</a
+                >
+                <a
+                  href="#"
+                  class="block text-gray-500 hover:text-emerald-600 transition-colors"
+                  >Wearable Guides</a
+                >
+              </div>
+            </div>
+            <div>
+              <h4
+                class="font-bold text-gray-800 mb-6"
+                style="font-family: &quot;Outfit&quot;, sans-serif"
+              >
+                Stay Updated
+              </h4>
+              <p class="text-gray-500 text-sm mb-4">
+                Weekly sleep science insights. No spam.
+              </p>
+              <div class="flex gap-2">
+                <input
+                  type="email"
+                  placeholder="your@email.com"
+                  class="neu-inset rounded-xl px-4 py-3 text-sm flex-1 border-none outline-none"
+                  style="
+                    background: linear-gradient(
+                      145deg,
+                      var(--bg-mid),
+                      var(--bg)
+                    );
+                  "
+                />
+                <button class="btn-primary py-3 px-5 rounded-xl text-sm">
+                  →
+                </button>
+              </div>
+            </div>
+          </div>
+          <div
+            class="pt-8 border-t border-gray-200 flex flex-col md:flex-row items-center justify-between gap-4"
+          >
+            <p class="text-sm text-gray-400">
+              &copy; 2026 Somnus Protocol Inc. All rights reserved.
+            </p>
+            <div class="flex items-center gap-6">
+              <a
+                href="#"
+                class="text-sm text-gray-400 hover:text-emerald-600 transition-colors"
+                >Privacy</a
+              >
+              <a
+                href="#"
+                class="text-sm text-gray-400 hover:text-emerald-600 transition-colors"
+                >Terms</a
+              >
+              <a
+                href="#"
+                class="text-sm text-gray-400 hover:text-emerald-600 transition-colors"
+                >HIPAA Compliance</a
+              >
+              <div class="flex items-center gap-2">
+                <div class="w-2 h-2 rounded-full bg-green-500"></div>
+                <span class="text-xs text-gray-400"
+                  >All systems operational</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <script>
+      window.addEventListener("DOMContentLoaded", function () {
+        (function () {
+          var nav = document.getElementById("navbar");
+          window.addEventListener("scroll", function () {
+            nav.classList.toggle("scrolled", window.scrollY > 20);
+          });
+        })();
+        (function () {
+          var btn = document.getElementById("hamburger");
+          var menu = document.getElementById("mobileMenu");
+          btn.addEventListener("click", function () {
+            menu.classList.toggle("active");
+          });
+          menu.querySelectorAll("a").forEach(function (a) {
+            a.addEventListener("click", function () {
+              menu.classList.remove("active");
+            });
+          });
+        })();
+        (function () {
+          gsap.registerPlugin(ScrollTrigger);
+          gsap.fromTo(
+            ".hero-badge",
+            { opacity: 0, y: 20 },
+            { opacity: 1, y: 0, duration: 0.5, delay: 0.3, ease: "power3.out" },
+          );
+          gsap.fromTo(
+            ".hero-headline",
+            { opacity: 0, y: 30 },
+            { opacity: 1, y: 0, duration: 0.7, delay: 0.4, ease: "power3.out" },
+          );
+          gsap.fromTo(
+            ".hero-sub",
+            { opacity: 0, y: 20 },
+            { opacity: 1, y: 0, duration: 0.7, delay: 0.5, ease: "power3.out" },
+          );
+          gsap.fromTo(
+            ".hero-ctas",
+            { opacity: 0, y: 20 },
+            { opacity: 1, y: 0, duration: 0.7, delay: 0.6, ease: "power3.out" },
+          );
+          gsap.fromTo(
+            ".hero-preview",
+            { opacity: 0, scale: 0.95 },
+            {
+              opacity: 1,
+              scale: 1,
+              duration: 1,
+              delay: 0.8,
+              ease: "power3.out",
+            },
+          );
+          document.querySelectorAll("section").forEach(function (sec) {
+            gsap.fromTo(
+              sec,
+              { opacity: 0, y: 40 },
+              {
+                opacity: 1,
+                y: 0,
+                duration: 0.8,
+                ease: "power3.out",
+                scrollTrigger: {
+                  trigger: sec,
+                  start: "top 85%",
+                  toggleActions: "play none none reverse",
+                },
+              },
+            );
+          });
+          document.querySelectorAll(".neu-card").forEach(function (card, i) {
+            gsap.fromTo(
+              card,
+              { opacity: 0, y: 30 },
+              {
+                opacity: 1,
+                y: 0,
+                duration: 0.6,
+                delay: (i % 3) * 0.1,
+                ease: "power3.out",
+                scrollTrigger: {
+                  trigger: card,
+                  start: "top 90%",
+                  toggleActions: "play none none reverse",
+                },
+              },
+            );
+          });
+        })();
+        (function () {
+          var pills = document.querySelectorAll(".demo-pill");
+          var contents = document.querySelectorAll(".demo-content");
+          pills.forEach(function (pill) {
+            pill.addEventListener("click", function () {
+              var tab = pill.getAttribute("data-tab");
+              pills.forEach(function (p) {
+                p.classList.remove("neu-inset");
+                p.classList.add("neu-raised-sm");
+                p.style.borderColor = "transparent";
+              });
+              pill.classList.remove("neu-raised-sm");
+              pill.classList.add("neu-inset");
+              pill.style.borderColor = "var(--accent)";
+              contents.forEach(function (c) {
+                if (c.getAttribute("data-content") === tab) {
+                  gsap.fromTo(
+                    c,
+                    { opacity: 0, y: 10 },
+                    { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" },
+                  );
+                  c.classList.remove("hidden");
+                } else {
+                  c.classList.add("hidden");
+                }
+              });
+            });
+          });
+        })();
+        (function () {
+          document.querySelectorAll(".faq-item").forEach(function (item) {
+            item.addEventListener("click", function () {
+              var answer = item.querySelector(".faq-answer");
+              var icon = item.querySelector(".faq-icon");
+              var isOpen = item.classList.contains("active");
+              document.querySelectorAll(".faq-item").forEach(function (i) {
+                i.classList.remove("active");
+                gsap.to(i.querySelector(".faq-answer"), {
+                  maxHeight: 0,
+                  duration: 0.3,
+                  ease: "power2.inOut",
+                });
+                gsap.to(i.querySelector(".faq-icon"), {
+                  rotation: 0,
+                  duration: 0.3,
+                });
+              });
+              if (!isOpen) {
+                item.classList.add("active");
+                gsap.to(answer, {
+                  maxHeight: answer.scrollHeight,
+                  duration: 0.35,
+                  ease: "power2.out",
+                });
+                gsap.to(icon, { rotation: 45, duration: 0.3 });
+              }
+            });
+          });
+        })();
+      });
+    </script>
+  </body>
+</html>
